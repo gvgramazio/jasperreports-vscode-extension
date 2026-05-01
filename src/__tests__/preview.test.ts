@@ -1,9 +1,13 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import * as vscode from "vscode";
+import { createMockContext } from "../__mocks__/vscode";
+
+let mockContext: ReturnType<typeof createMockContext>;
 
 beforeEach(() => {
   vi.clearAllMocks();
   vscode.window.activeTextEditor = undefined;
+  mockContext = createMockContext();
 });
 
 describe("previewReport", () => {
@@ -11,7 +15,7 @@ describe("previewReport", () => {
     vscode.window.activeTextEditor = undefined;
 
     const { previewReport } = await import("../preview");
-    await previewReport("/ext");
+    await previewReport(mockContext as unknown as vscode.ExtensionContext);
 
     expect(vscode.window.showErrorMessage).toHaveBeenCalledWith(
       expect.stringContaining(".jrxml"),
@@ -24,7 +28,7 @@ describe("previewReport", () => {
     };
 
     const { previewReport } = await import("../preview");
-    await previewReport("/ext");
+    await previewReport(mockContext as unknown as vscode.ExtensionContext);
 
     expect(vscode.window.showErrorMessage).toHaveBeenCalledWith(
       expect.stringContaining(".jrxml"),

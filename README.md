@@ -56,13 +56,23 @@ Compile `.jrxml` files to `.jasper` directly from VS Code.
 
 ### Preview Report
 
-Preview filled reports as HTML directly inside VS Code.
+Preview filled reports as HTML or PDF directly inside VS Code.
 
 - **Command Palette** → `JasperReports: Preview Report` (active editor column)
 - **Command Palette** → `JasperReports: Preview Report to the Side` (side panel)
-- Compiles, fills with an empty data source, and renders HTML in a webview panel
-- Reuses the same preview panel across invocations
+- **Command Palette** → `JasperReports: Configure Preview` (change data source and format for the current file)
+- First invocation prompts for a data source (empty, or a JSON/CSV/XML file); subsequent runs reuse the saved choice with no prompts
+- Supports HTML (webview) and PDF (embedded in webview) output formats
+- Per-file configuration stored automatically — each JRXML remembers its data source and format
+- Optional live reload: auto-refreshes the preview when the JRXML file is saved
 - Requires the same Java and classpath configuration as the compile command
+
+#### Preview Settings
+
+| Setting                            | Description                                              |
+| ---------------------------------- | -------------------------------------------------------- |
+| `jasperreports.preview.format`     | Default export format: `html` or `pdf` (default: `html`) |
+| `jasperreports.preview.liveReload` | Auto re-run preview on save (default: `false`)           |
 
 ### Download Dependencies
 

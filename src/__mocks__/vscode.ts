@@ -33,6 +33,8 @@ export const window = {
     dispose: vi.fn(),
     title: "",
   }),
+  showQuickPick: vi.fn().mockResolvedValue(undefined),
+  showOpenDialog: vi.fn().mockResolvedValue(undefined),
 };
 
 export const extensions = {
@@ -67,4 +69,26 @@ export enum ViewColumn {
   One = 1,
   Two = 2,
   Three = 3,
+}
+
+export function createMockContext(
+  extensionPath = "/ext",
+): Record<string, unknown> {
+  const store = new Map<string, unknown>();
+  return {
+    extensionPath,
+    subscriptions: [],
+    workspaceState: {
+      get: vi.fn((key: string) => store.get(key)),
+      update: vi.fn((key: string, value: unknown) => {
+        if (value === undefined) {
+          store.delete(key);
+        } else {
+          store.set(key, value);
+        }
+        return Promise.resolve();
+      }),
+      keys: vi.fn(() => [...store.keys()]),
+    },
+  };
 }
