@@ -1,0 +1,5 @@
+{
+  "scopeName": "text.xml.jrxml",
+  "name": "JRXML",
+  "patterns": [{ "include": "text.xml" }]
+}

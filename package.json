@@ -13,11 +13,74 @@
     "Programming Languages"
   ],
   "activationEvents": [
-    "*"
+    "onLanguage:jrxml",
+    "onLanguage:jrtx"
   ],
   "main": "./dist/extension.js",
   "icon": "images/icon.png",
-  "contributes": {},
+  "extensionDependencies": [],
+  "extensionPack": [],
+  "contributes": {
+    "languages": [
+      {
+        "id": "jrxml",
+        "aliases": [
+          "JasperReports JRXML",
+          "JRXML"
+        ],
+        "extensions": [
+          ".jrxml"
+        ],
+        "configuration": "./language-configuration.json"
+      },
+      {
+        "id": "jrtx",
+        "aliases": [
+          "JasperReports Template",
+          "JRTX"
+        ],
+        "extensions": [
+          ".jrtx"
+        ],
+        "configuration": "./language-configuration.json"
+      }
+    ],
+    "grammars": [
+      {
+        "language": "jrxml",
+        "scopeName": "text.xml.jrxml",
+        "path": "./syntaxes/jrxml.tmLanguage.json"
+      },
+      {
+        "language": "jrtx",
+        "scopeName": "text.xml.jrtx",
+        "path": "./syntaxes/jrtx.tmLanguage.json"
+      }
+    ],
+    "configuration": {
+      "title": "JasperReports",
+      "properties": {
+        "jasperreports.schema.version": {
+          "type": "string",
+          "default": "7.0.6",
+          "enum": [
+            "7.0.6"
+          ],
+          "description": "JasperReports schema version to use for validation."
+        },
+        "jasperreports.schema.jrxmlPath": {
+          "type": "string",
+          "default": "",
+          "description": "Path to a custom JRXML XSD schema file. Overrides the bundled schema when set."
+        },
+        "jasperreports.schema.jrtxPath": {
+          "type": "string",
+          "default": "",
+          "description": "Path to a custom JRTX XSD schema file. Overrides the bundled schema when set."
+        }
+      }
+    }
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/gvgramazio/jasperreports-vscode-extension"

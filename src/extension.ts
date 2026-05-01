@@ -1,9 +1,80 @@
 import * as vscode from "vscode";
+import * as path from "path";
 
-export function activate(_context: vscode.ExtensionContext): void {
+const XML_EXTENSION_ID = "redhat.vscode-xml";
+
+export function activate(context: vscode.ExtensionContext): void {
   console.log("JasperReports extension is now active.");
+
+  registerXmlFileAssociations(context);
+  recommendXmlExtension();
 }
 
 export function deactivate(): void {
   // cleanup
+}
+
+/**
+ * Registers XML file associations so the Red Hat XML extension applies
+ * the bundled (or user-overridden) XSD schemas to .jrxml and .jrtx files.
+ */
+function registerXmlFileAssociations(context: vscode.ExtensionContext): void {
+  const config = vscode.workspace.getConfiguration("jasperreports");
+  const version = config.get<string>("schema.version", "7.0.6");
+  const customJrxmlPath = config.get<string>("schema.jrxmlPath", "");
+  const customJrtxPath = config.get<string>("schema.jrtxPath", "");
+
+  const jrxmlXsd =
+    customJrxmlPath ||
+    vscode.Uri.file(
+      path.join(context.extensionPath, "schemas", version, "jrxml.xsd"),
+    ).toString();
+  const jrtxXsd =
+    customJrtxPath ||
+    vscode.Uri.file(
+      path.join(context.extensionPath, "schemas", version, "jrtx.xsd"),
+    ).toString();
+
+  const xmlConfig = vscode.workspace.getConfiguration("xml");
+  const associations = xmlConfig.get<
+    Array<{ pattern: string; systemId: string }>
+  >("fileAssociations", []);
+
+  const jrxmlAssoc = { pattern: "**/*.jrxml", systemId: jrxmlXsd };
+  const jrtxAssoc = { pattern: "**/*.jrtx", systemId: jrtxXsd };
+
+  // Remove any existing JasperReports associations to avoid duplicates
+  const filtered = associations.filter(
+    (a) => a.pattern !== "**/*.jrxml" && a.pattern !== "**/*.jrtx",
+  );
+  filtered.push(jrxmlAssoc, jrtxAssoc);
+
+  xmlConfig.update(
+    "fileAssociations",
+    filtered,
+    vscode.ConfigurationTarget.Global,
+  );
+}
+
+/**
+ * Recommends the Red Hat XML extension for XSD-based validation, completion
+ * and hover support.
+ */
+function recommendXmlExtension(): void {
+  const xmlExt = vscode.extensions.getExtension(XML_EXTENSION_ID);
+  if (!xmlExt) {
+    vscode.window
+      .showInformationMessage(
+        "Install the 'XML' extension (Red Hat) for JRXML/JRTX validation and auto-completion.",
+        "Install",
+      )
+      .then((choice) => {
+        if (choice === "Install") {
+          vscode.commands.executeCommand(
+            "workbench.extensions.installExtension",
+            XML_EXTENSION_ID,
+          );
+        }
+      });
+  }
 }

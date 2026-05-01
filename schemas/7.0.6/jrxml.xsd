@@ -1,0 +1,1181 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  JasperReports JRXML Schema — version 7.0.6 (new format)
+  Generated for the JasperReports VS Code extension.
+  Based on the Jackson-serialized XML format introduced in JasperReports 7.0.1+.
+-->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           elementFormDefault="unqualified"
+           attributeFormDefault="unqualified">
+
+  <!-- ================================================================== -->
+  <!--  Simple types / enumerations                                       -->
+  <!-- ================================================================== -->
+
+  <xs:simpleType name="orientationType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="Portrait"/>
+      <xs:enumeration value="Landscape"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="printOrderType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="Vertical"/>
+      <xs:enumeration value="Horizontal"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="whenNoDataType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="NoPages"/>
+      <xs:enumeration value="BlankPage"/>
+      <xs:enumeration value="AllSectionsNoDetail"/>
+      <xs:enumeration value="NoDataSection"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="whenResourceMissingType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="Null"/>
+      <xs:enumeration value="Empty"/>
+      <xs:enumeration value="Key"/>
+      <xs:enumeration value="Error"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="calculationType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="Nothing"/>
+      <xs:enumeration value="Count"/>
+      <xs:enumeration value="Sum"/>
+      <xs:enumeration value="Average"/>
+      <xs:enumeration value="Lowest"/>
+      <xs:enumeration value="Highest"/>
+      <xs:enumeration value="StandardDeviation"/>
+      <xs:enumeration value="Variance"/>
+      <xs:enumeration value="System"/>
+      <xs:enumeration value="First"/>
+      <xs:enumeration value="DistinctCount"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="resetType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="Report"/>
+      <xs:enumeration value="Page"/>
+      <xs:enumeration value="Column"/>
+      <xs:enumeration value="Group"/>
+      <xs:enumeration value="None"/>
+      <xs:enumeration value="Master"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="evaluationTimeType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="Now"/>
+      <xs:enumeration value="Report"/>
+      <xs:enumeration value="Page"/>
+      <xs:enumeration value="Column"/>
+      <xs:enumeration value="Group"/>
+      <xs:enumeration value="Band"/>
+      <xs:enumeration value="Auto"/>
+      <xs:enumeration value="Master"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="horizontalTextAlignType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="Left"/>
+      <xs:enumeration value="Center"/>
+      <xs:enumeration value="Right"/>
+      <xs:enumeration value="Justified"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="horizontalImageAlignType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="Left"/>
+      <xs:enumeration value="Center"/>
+      <xs:enumeration value="Right"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="verticalTextAlignType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="Top"/>
+      <xs:enumeration value="Middle"/>
+      <xs:enumeration value="Bottom"/>
+      <xs:enumeration value="Justified"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="verticalImageAlignType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="Top"/>
+      <xs:enumeration value="Middle"/>
+      <xs:enumeration value="Bottom"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="positionType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="Float"/>
+      <xs:enumeration value="FixRelativeToTop"/>
+      <xs:enumeration value="FixRelativeToBottom"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="stretchType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="NoStretch"/>
+      <xs:enumeration value="ElementGroupHeight"/>
+      <xs:enumeration value="ElementGroupBottom"/>
+      <xs:enumeration value="ContainerHeight"/>
+      <xs:enumeration value="ContainerBottom"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="modeType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="Opaque"/>
+      <xs:enumeration value="Transparent"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="lineStyleType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="Solid"/>
+      <xs:enumeration value="Dashed"/>
+      <xs:enumeration value="Dotted"/>
+      <xs:enumeration value="Double"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="scaleImageType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="Clip"/>
+      <xs:enumeration value="FillFrame"/>
+      <xs:enumeration value="RetainShape"/>
+      <xs:enumeration value="RealHeight"/>
+      <xs:enumeration value="RealSize"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="splitType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="Stretch"/>
+      <xs:enumeration value="Prevent"/>
+      <xs:enumeration value="Immediate"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="rotationType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="None"/>
+      <xs:enumeration value="Left"/>
+      <xs:enumeration value="Right"/>
+      <xs:enumeration value="UpsideDown"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="lineDirectionType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="TopDown"/>
+      <xs:enumeration value="BottomUp"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="breakType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="Page"/>
+      <xs:enumeration value="Column"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="runDirectionType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="LTR"/>
+      <xs:enumeration value="RTL"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="onErrorType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="Error"/>
+      <xs:enumeration value="Blank"/>
+      <xs:enumeration value="Icon"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="textAdjustType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="CutText"/>
+      <xs:enumeration value="StretchHeight"/>
+      <xs:enumeration value="ScaleFont"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="hyperlinkTypeType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="None"/>
+      <xs:enumeration value="Reference"/>
+      <xs:enumeration value="LocalAnchor"/>
+      <xs:enumeration value="LocalPage"/>
+      <xs:enumeration value="RemoteAnchor"/>
+      <xs:enumeration value="RemotePage"/>
+      <xs:enumeration value="Custom"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="hyperlinkTargetType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="None"/>
+      <xs:enumeration value="Self"/>
+      <xs:enumeration value="Blank"/>
+      <xs:enumeration value="Parent"/>
+      <xs:enumeration value="Top"/>
+      <xs:enumeration value="Custom"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="sortOrderType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="Ascending"/>
+      <xs:enumeration value="Descending"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="sortFieldKindType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="Field"/>
+      <xs:enumeration value="Variable"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="footerPositionType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="Normal"/>
+      <xs:enumeration value="StackAtBottom"/>
+      <xs:enumeration value="ForceAtBottom"/>
+      <xs:enumeration value="CollateAtBottom"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="overflowType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="Stretch"/>
+      <xs:enumeration value="NoStretch"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="lineSpacingType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="Single"/>
+      <xs:enumeration value="1_1_2"/>
+      <xs:enumeration value="Double"/>
+      <xs:enumeration value="AtLeast"/>
+      <xs:enumeration value="Fixed"/>
+      <xs:enumeration value="Proportional"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="tabStopAlignType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="Left"/>
+      <xs:enumeration value="Center"/>
+      <xs:enumeration value="Right"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="incrementType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="None"/>
+      <xs:enumeration value="Report"/>
+      <xs:enumeration value="Page"/>
+      <xs:enumeration value="Column"/>
+      <xs:enumeration value="Group"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="datasetResetType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="None"/>
+      <xs:enumeration value="Report"/>
+      <xs:enumeration value="Page"/>
+      <xs:enumeration value="Column"/>
+      <xs:enumeration value="Group"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="colorType">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="#[0-9a-fA-F]{6}"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <!-- ================================================================== -->
+  <!--  Reusable complex types                                            -->
+  <!-- ================================================================== -->
+
+  <xs:complexType name="expressionType" mixed="true">
+    <xs:sequence>
+      <xs:any minOccurs="0" maxOccurs="unbounded" processContents="skip"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="propertyType">
+    <xs:attribute name="name" type="xs:string" use="required"/>
+    <xs:attribute name="value" type="xs:string"/>
+  </xs:complexType>
+
+  <xs:complexType name="propertyExpressionType" mixed="true">
+    <xs:sequence>
+      <xs:any minOccurs="0" maxOccurs="unbounded" processContents="skip"/>
+    </xs:sequence>
+    <xs:attribute name="name" type="xs:string" use="required"/>
+    <xs:attribute name="type" type="xs:string"/>
+  </xs:complexType>
+
+  <!-- pen -->
+  <xs:complexType name="penType">
+    <xs:attribute name="lineWidth" type="xs:decimal"/>
+    <xs:attribute name="lineStyle" type="lineStyleType"/>
+    <xs:attribute name="lineColor" type="xs:string"/>
+  </xs:complexType>
+
+  <!-- box -->
+  <xs:complexType name="boxType">
+    <xs:all>
+      <xs:element name="pen" type="penType" minOccurs="0"/>
+      <xs:element name="topPen" type="penType" minOccurs="0"/>
+      <xs:element name="leftPen" type="penType" minOccurs="0"/>
+      <xs:element name="bottomPen" type="penType" minOccurs="0"/>
+      <xs:element name="rightPen" type="penType" minOccurs="0"/>
+    </xs:all>
+    <xs:attribute name="padding" type="xs:int"/>
+    <xs:attribute name="topPadding" type="xs:int"/>
+    <xs:attribute name="leftPadding" type="xs:int"/>
+    <xs:attribute name="bottomPadding" type="xs:int"/>
+    <xs:attribute name="rightPadding" type="xs:int"/>
+    <xs:attribute name="style" type="xs:string"/>
+  </xs:complexType>
+
+  <!-- tabStop -->
+  <xs:complexType name="tabStopType">
+    <xs:attribute name="position" type="xs:int" use="required"/>
+    <xs:attribute name="alignment" type="tabStopAlignType"/>
+  </xs:complexType>
+
+  <!-- paragraph -->
+  <xs:complexType name="paragraphType">
+    <xs:sequence>
+      <xs:element name="tabStop" type="tabStopType" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+    <xs:attribute name="lineSpacing" type="lineSpacingType"/>
+    <xs:attribute name="lineSpacingSize" type="xs:decimal"/>
+    <xs:attribute name="firstLineIndent" type="xs:int"/>
+    <xs:attribute name="leftIndent" type="xs:int"/>
+    <xs:attribute name="rightIndent" type="xs:int"/>
+    <xs:attribute name="spacingBefore" type="xs:int"/>
+    <xs:attribute name="spacingAfter" type="xs:int"/>
+    <xs:attribute name="tabStopWidth" type="xs:int"/>
+  </xs:complexType>
+
+  <!-- hyperlinkParameter -->
+  <xs:complexType name="hyperlinkParameterType">
+    <xs:sequence>
+      <xs:element name="expression" type="expressionType" minOccurs="0"/>
+    </xs:sequence>
+    <xs:attribute name="name" type="xs:string" use="required"/>
+  </xs:complexType>
+
+  <!-- parameter (for subreport/datasetRun) -->
+  <xs:complexType name="subreportParameterType">
+    <xs:sequence>
+      <xs:element name="expression" type="expressionType" minOccurs="0"/>
+    </xs:sequence>
+    <xs:attribute name="name" type="xs:string" use="required"/>
+    <xs:attribute name="class" type="xs:string"/>
+  </xs:complexType>
+
+  <!-- returnValue -->
+  <xs:complexType name="returnValueType">
+    <xs:attribute name="toVariable" type="xs:string" use="required"/>
+    <xs:attribute name="subreportVariable" type="xs:string"/>
+    <xs:attribute name="calculation" type="calculationType"/>
+    <xs:attribute name="incrementerFactoryClass" type="xs:string"/>
+  </xs:complexType>
+
+  <!-- genericType -->
+  <xs:complexType name="genericTypeType">
+    <xs:attribute name="namespace" type="xs:string" use="required"/>
+    <xs:attribute name="name" type="xs:string" use="required"/>
+  </xs:complexType>
+
+  <!-- itemLabel (for chart plots) -->
+  <xs:complexType name="itemLabelType" mixed="true">
+    <xs:sequence>
+      <xs:element name="font" type="fontType" minOccurs="0"/>
+    </xs:sequence>
+    <xs:attribute name="color" type="xs:string"/>
+    <xs:attribute name="backgroundColor" type="xs:string"/>
+  </xs:complexType>
+
+  <!-- datasetRun -->
+  <xs:complexType name="datasetRunType">
+    <xs:sequence>
+      <xs:element name="parameter" type="subreportParameterType" minOccurs="0" maxOccurs="unbounded"/>
+      <xs:element name="connectionExpression" type="expressionType" minOccurs="0"/>
+      <xs:element name="dataSourceExpression" type="expressionType" minOccurs="0"/>
+    </xs:sequence>
+    <xs:attribute name="uuid" type="xs:string"/>
+    <xs:attribute name="subDataset" type="xs:string"/>
+  </xs:complexType>
+
+  <!-- series (for chart datasets) -->
+  <xs:complexType name="seriesType">
+    <xs:all>
+      <xs:element name="seriesExpression" type="expressionType" minOccurs="0"/>
+      <xs:element name="categoryExpression" type="expressionType" minOccurs="0"/>
+      <xs:element name="valueExpression" type="expressionType" minOccurs="0"/>
+      <xs:element name="labelExpression" type="expressionType" minOccurs="0"/>
+      <xs:element name="keyExpression" type="expressionType" minOccurs="0"/>
+      <xs:element name="xValueExpression" type="expressionType" minOccurs="0"/>
+      <xs:element name="yValueExpression" type="expressionType" minOccurs="0"/>
+      <xs:element name="zValueExpression" type="expressionType" minOccurs="0"/>
+      <xs:element name="xvalueExpression" type="expressionType" minOccurs="0"/>
+      <xs:element name="yvalueExpression" type="expressionType" minOccurs="0"/>
+      <xs:element name="zvalueExpression" type="expressionType" minOccurs="0"/>
+      <xs:element name="timeExpression" type="expressionType" minOccurs="0"/>
+      <xs:element name="dateExpression" type="expressionType" minOccurs="0"/>
+      <xs:element name="timePeriodExpression" type="expressionType" minOccurs="0"/>
+      <xs:element name="startDateExpression" type="expressionType" minOccurs="0"/>
+      <xs:element name="endDateExpression" type="expressionType" minOccurs="0"/>
+      <xs:element name="highExpression" type="expressionType" minOccurs="0"/>
+      <xs:element name="lowExpression" type="expressionType" minOccurs="0"/>
+      <xs:element name="openExpression" type="expressionType" minOccurs="0"/>
+      <xs:element name="closeExpression" type="expressionType" minOccurs="0"/>
+      <xs:element name="volumeExpression" type="expressionType" minOccurs="0"/>
+      <xs:element name="taskExpression" type="expressionType" minOccurs="0"/>
+      <xs:element name="subtaskExpression" type="expressionType" minOccurs="0"/>
+      <xs:element name="percentExpression" type="expressionType" minOccurs="0"/>
+      <xs:element name="itemHyperlink" type="itemHyperlinkType" minOccurs="0"/>
+      <xs:element name="sectionHyperlink" type="itemHyperlinkType" minOccurs="0"/>
+    </xs:all>
+  </xs:complexType>
+
+  <!-- itemHyperlink -->
+  <xs:complexType name="itemHyperlinkType">
+    <xs:sequence>
+      <xs:element name="hyperlinkReferenceExpression" type="expressionType" minOccurs="0"/>
+      <xs:element name="hyperlinkAnchorExpression" type="expressionType" minOccurs="0"/>
+      <xs:element name="hyperlinkPageExpression" type="expressionType" minOccurs="0"/>
+      <xs:element name="hyperlinkTooltipExpression" type="expressionType" minOccurs="0"/>
+      <xs:element name="hyperlinkParameter" type="hyperlinkParameterType" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+    <xs:attribute name="linkType" type="xs:string"/>
+    <xs:attribute name="linkTarget" type="xs:string"/>
+  </xs:complexType>
+
+  <!-- chart dataset -->
+  <xs:complexType name="chartDatasetType">
+    <xs:choice minOccurs="0" maxOccurs="unbounded">
+      <xs:element name="datasetRun" type="datasetRunType"/>
+      <xs:element name="series" type="seriesType"/>
+      <xs:element name="valueExpression" type="expressionType"/>
+      <xs:element name="incrementWhenExpression" type="expressionType"/>
+      <xs:element name="seriesExpression" type="expressionType"/>
+      <xs:element name="categoryExpression" type="expressionType"/>
+      <xs:element name="labelExpression" type="expressionType"/>
+      <xs:element name="keyExpression" type="expressionType"/>
+      <xs:element name="dateExpression" type="expressionType"/>
+      <xs:element name="highExpression" type="expressionType"/>
+      <xs:element name="lowExpression" type="expressionType"/>
+      <xs:element name="openExpression" type="expressionType"/>
+      <xs:element name="closeExpression" type="expressionType"/>
+      <xs:element name="volumeExpression" type="expressionType"/>
+      <xs:element name="timePeriodExpression" type="expressionType"/>
+      <xs:element name="startDateExpression" type="expressionType"/>
+      <xs:element name="endDateExpression" type="expressionType"/>
+      <xs:element name="xvalueExpression" type="expressionType"/>
+      <xs:element name="yvalueExpression" type="expressionType"/>
+      <xs:element name="zvalueExpression" type="expressionType"/>
+      <xs:element name="taskExpression" type="expressionType"/>
+      <xs:element name="subtaskExpression" type="expressionType"/>
+      <xs:element name="percentExpression" type="expressionType"/>
+      <xs:element name="itemHyperlink" type="itemHyperlinkType"/>
+    </xs:choice>
+    <xs:attribute name="kind" type="xs:string"/>
+    <xs:attribute name="resetType" type="datasetResetType"/>
+    <xs:attribute name="resetGroup" type="xs:string"/>
+    <xs:attribute name="incrementType" type="incrementType"/>
+    <xs:attribute name="incrementGroup" type="xs:string"/>
+    <xs:anyAttribute processContents="skip"/>
+  </xs:complexType>
+
+  <!-- chart plot -->
+  <xs:complexType name="chartPlotType">
+    <xs:choice minOccurs="0" maxOccurs="unbounded">
+      <xs:element name="itemLabel" type="itemLabelType"/>
+      <xs:element name="meterInterval" type="meterIntervalType"/>
+      <xs:element name="axis" type="axisType"/>
+      <xs:element name="dataRange" type="dataRangeType"/>
+      <xs:element name="seriesColor">
+        <xs:complexType>
+          <xs:attribute name="order" type="xs:int"/>
+          <xs:attribute name="color" type="xs:string"/>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="valueDisplay">
+        <xs:complexType mixed="true">
+          <xs:choice minOccurs="0" maxOccurs="unbounded">
+            <xs:element name="font" type="fontType"/>
+          </xs:choice>
+          <xs:attribute name="color" type="xs:string"/>
+          <xs:attribute name="mask" type="xs:string"/>
+          <xs:attribute name="fontName" type="xs:string"/>
+          <xs:attribute name="fontSize" type="xs:decimal"/>
+          <xs:attribute name="bold" type="xs:boolean"/>
+          <xs:attribute name="italic" type="xs:boolean"/>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="categoryAxisLabelExpression" type="expressionType"/>
+      <xs:element name="valueAxisLabelExpression" type="expressionType"/>
+      <xs:element name="domainAxisMinValueExpression" type="expressionType"/>
+      <xs:element name="domainAxisMaxValueExpression" type="expressionType"/>
+      <xs:element name="rangeAxisMinValueExpression" type="expressionType"/>
+      <xs:element name="rangeAxisMaxValueExpression" type="expressionType"/>
+      <xs:element name="timeAxisLabelExpression" type="expressionType"/>
+      <xs:element name="xaxisLabelExpression" type="expressionType"/>
+      <xs:element name="yaxisLabelExpression" type="expressionType"/>
+      <xs:element name="interval" type="meterIntervalType"/>
+      <xs:element name="lowRange" type="dataRangeType"/>
+      <xs:element name="mediumRange" type="dataRangeType"/>
+      <xs:element name="highRange" type="dataRangeType"/>
+    </xs:choice>
+    <xs:attribute name="orientation" type="orientationType"/>
+    <xs:attribute name="backgroundAlpha" type="xs:decimal"/>
+    <xs:attribute name="foregroundAlpha" type="xs:decimal"/>
+    <xs:attribute name="labelRotation" type="xs:decimal"/>
+    <xs:attribute name="showLabels" type="xs:boolean"/>
+    <xs:attribute name="showTickLabels" type="xs:boolean"/>
+    <xs:attribute name="showTickMarks" type="xs:boolean"/>
+    <xs:attribute name="isShowLabels" type="xs:boolean"/>
+    <xs:attribute name="isShowTickLabels" type="xs:boolean"/>
+    <xs:attribute name="isShowTickMarks" type="xs:boolean"/>
+    <xs:attribute name="isShowLines" type="xs:boolean"/>
+    <xs:attribute name="isShowShapes" type="xs:boolean"/>
+    <xs:attribute name="depthFactor" type="xs:decimal"/>
+    <xs:attribute name="isCircular" type="xs:boolean"/>
+    <xs:anyAttribute processContents="skip"/>
+  </xs:complexType>
+
+  <!-- meterInterval -->
+  <xs:complexType name="meterIntervalType">
+    <xs:sequence>
+      <xs:element name="dataRange" type="dataRangeType" minOccurs="0"/>
+    </xs:sequence>
+    <xs:attribute name="label" type="xs:string"/>
+    <xs:attribute name="color" type="xs:string"/>
+    <xs:attribute name="alpha" type="xs:decimal"/>
+    <xs:attribute name="backgroundColor" type="xs:string"/>
+  </xs:complexType>
+  <xs:complexType name="dataRangeType">
+    <xs:all>
+      <xs:element name="lowExpression" type="expressionType" minOccurs="0"/>
+      <xs:element name="highExpression" type="expressionType" minOccurs="0"/>
+    </xs:all>
+  </xs:complexType>
+
+  <!-- axis (for multipleAxisChart) -->
+  <xs:complexType name="axisType">
+    <xs:choice minOccurs="0" maxOccurs="unbounded">
+      <xs:element name="element" type="elementType"/>
+      <xs:element name="chart" type="elementType"/>
+      <xs:element name="position" type="xs:string"/>
+    </xs:choice>
+  </xs:complexType>
+
+  <!-- chartTitle / chartSubtitle / chartLegend -->
+  <xs:complexType name="chartTitleType">
+    <xs:sequence>
+      <xs:element name="expression" type="expressionType" minOccurs="0"/>
+      <xs:element name="font" type="fontType" minOccurs="0"/>
+    </xs:sequence>
+    <xs:attribute name="position" type="xs:string"/>
+    <xs:attribute name="color" type="xs:string"/>
+  </xs:complexType>
+
+  <!-- font -->
+  <xs:complexType name="fontType">
+    <xs:attribute name="fontName" type="xs:string"/>
+    <xs:attribute name="fontSize" type="xs:decimal"/>
+    <xs:attribute name="bold" type="xs:boolean"/>
+    <xs:attribute name="italic" type="xs:boolean"/>
+    <xs:attribute name="underline" type="xs:boolean"/>
+    <xs:attribute name="strikeThrough" type="xs:boolean"/>
+    <xs:attribute name="pdfFontName" type="xs:string"/>
+    <xs:attribute name="pdfEncoding" type="xs:string"/>
+    <xs:attribute name="pdfEmbedded" type="xs:boolean"/>
+  </xs:complexType>
+
+  <!-- conditionalStyle -->
+  <xs:complexType name="conditionalStyleType">
+    <xs:choice minOccurs="0" maxOccurs="unbounded">
+      <xs:element name="conditionExpression" type="expressionType"/>
+      <xs:element name="box" type="boxType"/>
+      <xs:element name="pen" type="penType"/>
+      <xs:element name="paragraph" type="paragraphType"/>
+    </xs:choice>
+    <xs:attributeGroup ref="styleAttributes"/>
+  </xs:complexType>
+
+  <!-- shared style attributes -->
+  <xs:attributeGroup name="styleAttributes">
+    <xs:attribute name="mode" type="modeType"/>
+    <xs:attribute name="forecolor" type="xs:string"/>
+    <xs:attribute name="backcolor" type="xs:string"/>
+    <xs:attribute name="fontName" type="xs:string"/>
+    <xs:attribute name="fontSize" type="xs:decimal"/>
+    <xs:attribute name="bold" type="xs:boolean"/>
+    <xs:attribute name="italic" type="xs:boolean"/>
+    <xs:attribute name="underline" type="xs:boolean"/>
+    <xs:attribute name="strikeThrough" type="xs:boolean"/>
+    <xs:attribute name="pdfFontName" type="xs:string"/>
+    <xs:attribute name="pdfEncoding" type="xs:string"/>
+    <xs:attribute name="pdfEmbedded" type="xs:boolean"/>
+    <xs:attribute name="hTextAlign" type="horizontalTextAlignType"/>
+    <xs:attribute name="vTextAlign" type="verticalTextAlignType"/>
+    <xs:attribute name="hImageAlign" type="horizontalImageAlignType"/>
+    <xs:attribute name="vImageAlign" type="verticalImageAlignType"/>
+    <xs:attribute name="rotation" type="rotationType"/>
+    <xs:attribute name="markup" type="xs:string"/>
+    <xs:attribute name="pattern" type="xs:string"/>
+    <xs:attribute name="blankWhenNull" type="xs:boolean"/>
+    <xs:attribute name="radius" type="xs:int"/>
+    <xs:attribute name="scaleImage" type="scaleImageType"/>
+    <xs:attribute name="fill" type="xs:string"/>
+  </xs:attributeGroup>
+
+  <!-- ================================================================== -->
+  <!--  The <element> type — polymorphic via the "kind" attribute         -->
+  <!-- ================================================================== -->
+
+  <xs:complexType name="elementType">
+    <xs:choice minOccurs="0" maxOccurs="unbounded">
+      <xs:element name="property" type="propertyType"/>
+      <xs:element name="propertyExpression" type="propertyExpressionType"/>
+      <xs:element name="printWhenExpression" type="expressionType"/>
+
+      <!-- text content (staticText) -->
+      <xs:element name="text" type="expressionType"/>
+
+      <!-- expression (textField, image, subreport, etc.) -->
+      <xs:element name="expression" type="expressionType"/>
+      <xs:element name="patternExpression" type="expressionType"/>
+      <xs:element name="anchorNameExpression" type="expressionType"/>
+      <xs:element name="bookmarkLevelExpression" type="expressionType"/>
+
+      <!-- hyperlink expressions -->
+      <xs:element name="hyperlinkReferenceExpression" type="expressionType"/>
+      <xs:element name="hyperlinkAnchorExpression" type="expressionType"/>
+      <xs:element name="hyperlinkPageExpression" type="expressionType"/>
+      <xs:element name="hyperlinkTooltipExpression" type="expressionType"/>
+      <xs:element name="hyperlinkParameter" type="hyperlinkParameterType"/>
+
+      <!-- box, pen, paragraph -->
+      <xs:element name="box" type="boxType"/>
+      <xs:element name="pen" type="penType"/>
+      <xs:element name="paragraph" type="paragraphType"/>
+
+      <!-- subreport children -->
+      <xs:element name="connectionExpression" type="expressionType"/>
+      <xs:element name="dataSourceExpression" type="expressionType"/>
+      <xs:element name="returnValue" type="returnValueType"/>
+      <xs:element name="parameter" type="subreportParameterType"/>
+
+      <!-- generic element children -->
+      <xs:element name="genericType" type="genericTypeType"/>
+
+      <!-- additional element children -->
+      <xs:element name="borderSplitType" type="expressionType"/>
+      <xs:element name="titleExpression" type="expressionType"/>
+      <xs:element name="subtitleExpression" type="expressionType"/>
+
+      <!-- chart children -->
+      <xs:element name="chartTitle" type="chartTitleType"/>
+      <xs:element name="chartSubtitle" type="chartTitleType"/>
+      <xs:element name="chartLegend" type="chartTitleType"/>
+      <xs:element name="dataset" type="chartDatasetType"/>
+      <xs:element name="plot" type="chartPlotType"/>
+
+      <!-- component children -->
+      <xs:element name="component">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="datasetRun" type="datasetRunType" minOccurs="0"/>
+            <xs:element name="contents" minOccurs="0">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element name="element" type="elementType" minOccurs="0" maxOccurs="unbounded"/>
+                </xs:sequence>
+                <xs:attribute name="height" type="xs:int"/>
+                <xs:attribute name="width" type="xs:int"/>
+              </xs:complexType>
+            </xs:element>
+            <xs:any minOccurs="0" maxOccurs="unbounded" processContents="skip"/>
+          </xs:sequence>
+          <xs:attribute name="kind" type="xs:string"/>
+          <xs:attribute name="printOrder" type="printOrderType"/>
+          <xs:anyAttribute processContents="skip"/>
+        </xs:complexType>
+      </xs:element>
+
+      <!-- crosstab children -->
+      <xs:element name="rowGroup">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="bucket" type="bucketType" minOccurs="0"/>
+            <xs:element name="header" type="crosstabCellType" minOccurs="0"/>
+            <xs:element name="totalHeader" type="crosstabCellType" minOccurs="0"/>
+          </xs:sequence>
+          <xs:attribute name="name" type="xs:string" use="required"/>
+          <xs:attribute name="width" type="xs:int"/>
+          <xs:attribute name="totalPosition" type="xs:string"/>
+          <xs:attribute name="headerPosition" type="xs:string"/>
+          <xs:attribute name="position" type="xs:string"/>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="columnGroup">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="bucket" type="bucketType" minOccurs="0"/>
+            <xs:element name="header" type="crosstabCellType" minOccurs="0"/>
+            <xs:element name="totalHeader" type="crosstabCellType" minOccurs="0"/>
+          </xs:sequence>
+          <xs:attribute name="name" type="xs:string" use="required"/>
+          <xs:attribute name="height" type="xs:int"/>
+          <xs:attribute name="totalPosition" type="xs:string"/>
+          <xs:attribute name="headerPosition" type="xs:string"/>
+          <xs:attribute name="position" type="xs:string"/>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="measure">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="expression" type="expressionType" minOccurs="0"/>
+          </xs:sequence>
+          <xs:attribute name="name" type="xs:string" use="required"/>
+          <xs:attribute name="class" type="xs:string"/>
+          <xs:attribute name="calculation" type="calculationType"/>
+          <xs:attribute name="percentageOf" type="xs:string"/>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="cell">
+        <xs:complexType>
+          <xs:choice minOccurs="0" maxOccurs="unbounded">
+            <xs:element name="contents" type="contentsType"/>
+            <xs:element name="element" type="elementType"/>
+            <xs:element name="box" type="boxType"/>
+          </xs:choice>
+          <xs:attribute name="width" type="xs:int"/>
+          <xs:attribute name="height" type="xs:int"/>
+          <xs:attribute name="rowTotalGroup" type="xs:string"/>
+          <xs:attribute name="columnTotalGroup" type="xs:string"/>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="whenNoDataCell">
+        <xs:complexType>
+          <xs:choice minOccurs="0" maxOccurs="unbounded">
+            <xs:element name="contents" type="contentsType"/>
+            <xs:element name="element" type="elementType"/>
+          </xs:choice>
+          <xs:attribute name="width" type="xs:int"/>
+          <xs:attribute name="height" type="xs:int"/>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="headerCell">
+        <xs:complexType>
+          <xs:choice minOccurs="0" maxOccurs="unbounded">
+            <xs:element name="contents" type="contentsType"/>
+            <xs:element name="element" type="elementType"/>
+            <xs:element name="box" type="boxType"/>
+          </xs:choice>
+          <xs:attribute name="width" type="xs:int"/>
+          <xs:attribute name="height" type="xs:int"/>
+        </xs:complexType>
+      </xs:element>
+
+      <!-- nested elements (frame, elementGroup) -->
+      <xs:element name="element" type="elementType"/>
+    </xs:choice>
+
+    <!-- Common element attributes -->
+    <xs:attribute name="kind" type="xs:string"/>
+    <xs:attribute name="uuid" type="xs:string"/>
+    <xs:attribute name="key" type="xs:string"/>
+    <xs:attribute name="style" type="xs:string"/>
+    <xs:attribute name="x" type="xs:int"/>
+    <xs:attribute name="y" type="xs:int"/>
+    <xs:attribute name="width" type="xs:int"/>
+    <xs:attribute name="height" type="xs:int"/>
+
+    <xs:attributeGroup ref="styleAttributes"/>
+
+    <xs:attribute name="positionType" type="positionType"/>
+    <xs:attribute name="stretchType" type="stretchType"/>
+    <xs:attribute name="printRepeatedValues" type="xs:boolean"/>
+    <xs:attribute name="removeLineWhenBlank" type="xs:boolean"/>
+    <xs:attribute name="printInFirstWholeBand" type="xs:boolean"/>
+    <xs:attribute name="printWhenDetailOverflows" type="xs:boolean"/>
+    <xs:attribute name="printWhenGroupChanges" type="xs:string"/>
+
+    <!-- text/textField attributes -->
+    <xs:attribute name="textAdjust" type="textAdjustType"/>
+    <xs:attribute name="evaluationTime" type="evaluationTimeType"/>
+    <xs:attribute name="evaluationGroup" type="xs:string"/>
+    <xs:attribute name="bookmarkLevel" type="xs:int"/>
+
+    <!-- hyperlink attributes -->
+    <xs:attribute name="linkType" type="xs:string"/>
+    <xs:attribute name="linkTarget" type="xs:string"/>
+
+    <!-- image attributes -->
+    <xs:attribute name="onErrorType" type="onErrorType"/>
+    <xs:attribute name="usingCache" type="xs:boolean"/>
+    <xs:attribute name="lazy" type="xs:boolean"/>
+
+    <!-- line attributes -->
+    <xs:attribute name="direction" type="lineDirectionType"/>
+
+    <!-- break attributes -->
+    <xs:attribute name="type" type="breakType"/>
+
+    <!-- chart attributes -->
+    <xs:attribute name="chartType" type="xs:string"/>
+    <xs:attribute name="customizerClass" type="xs:string"/>
+    <xs:attribute name="renderType" type="xs:string"/>
+    <xs:attribute name="theme" type="xs:string"/>
+
+    <!-- crosstab attributes -->
+    <xs:attribute name="columnBreakOffset" type="xs:int"/>
+    <xs:attribute name="repeatColumnHeaders" type="xs:boolean"/>
+    <xs:attribute name="repeatRowHeaders" type="xs:boolean"/>
+    <xs:attribute name="runDirection" type="runDirectionType"/>
+    <xs:attribute name="ignoreWidth" type="xs:boolean"/>
+
+    <!-- subreport attributes -->
+    <xs:attribute name="overflowType" type="overflowType"/>
+
+    <!-- allow any extra attributes for extensibility -->
+    <xs:anyAttribute processContents="skip"/>
+  </xs:complexType>
+
+  <!-- bucket (crosstab) -->
+  <xs:complexType name="bucketType">
+    <xs:sequence>
+      <xs:element name="expression" type="expressionType" minOccurs="0"/>
+      <xs:element name="orderByExpression" type="expressionType" minOccurs="0"/>
+      <xs:element name="comparatorExpression" type="expressionType" minOccurs="0"/>
+    </xs:sequence>
+    <xs:attribute name="class" type="xs:string"/>
+    <xs:attribute name="order" type="sortOrderType"/>
+  </xs:complexType>
+
+  <!-- crosstab cell content type -->
+  <xs:complexType name="crosstabCellType">
+    <xs:choice minOccurs="0" maxOccurs="unbounded">
+      <xs:element name="contents" type="contentsType"/>
+      <xs:element name="element" type="elementType"/>
+      <xs:element name="box" type="boxType"/>
+    </xs:choice>
+    <xs:attribute name="style" type="xs:string"/>
+    <xs:attribute name="width" type="xs:int"/>
+    <xs:attribute name="height" type="xs:int"/>
+    <xs:attributeGroup ref="styleAttributes"/>
+  </xs:complexType>
+
+  <!-- contents type (used in crosstab cells and components) -->
+  <xs:complexType name="contentsType">
+    <xs:choice minOccurs="0" maxOccurs="unbounded">
+      <xs:element name="element" type="elementType"/>
+      <xs:element name="box" type="boxType"/>
+      <xs:element name="property" type="propertyType"/>
+    </xs:choice>
+    <xs:attributeGroup ref="styleAttributes"/>
+    <xs:attribute name="style" type="xs:string"/>
+    <xs:attribute name="height" type="xs:int"/>
+    <xs:attribute name="width" type="xs:int"/>
+  </xs:complexType>
+
+  <!-- part type (used in book-style reports with sectionType="Part") -->
+  <xs:complexType name="partType">
+    <xs:choice minOccurs="0" maxOccurs="unbounded">
+      <xs:element name="property" type="propertyType"/>
+      <xs:element name="propertyExpression" type="propertyExpressionType"/>
+      <xs:element name="partNameExpression" type="expressionType"/>
+      <xs:element name="component">
+        <xs:complexType>
+          <xs:choice minOccurs="0" maxOccurs="unbounded">
+            <xs:element name="expression" type="expressionType"/>
+            <xs:element name="parameter" type="subreportParameterType"/>
+            <xs:element name="returnValue" type="returnValueType"/>
+            <xs:element name="connectionExpression" type="expressionType"/>
+            <xs:element name="dataSourceExpression" type="expressionType"/>
+          </xs:choice>
+          <xs:attribute name="kind" type="xs:string"/>
+          <xs:attribute name="usingCache" type="xs:boolean"/>
+          <xs:anyAttribute processContents="skip"/>
+        </xs:complexType>
+      </xs:element>
+    </xs:choice>
+    <xs:attribute name="uuid" type="xs:string"/>
+    <xs:attribute name="evaluationTime" type="xs:string"/>
+    <xs:anyAttribute processContents="skip"/>
+  </xs:complexType>
+
+  <!-- ================================================================== -->
+  <!--  Band type                                                         -->
+  <!-- ================================================================== -->
+
+  <xs:complexType name="bandType">
+    <xs:choice minOccurs="0" maxOccurs="unbounded">
+      <xs:element name="printWhenExpression" type="expressionType"/>
+      <xs:element name="property" type="propertyType"/>
+      <xs:element name="element" type="elementType"/>
+      <xs:element name="part" type="partType"/>
+    </xs:choice>
+    <xs:attribute name="height" type="xs:int"/>
+    <xs:attribute name="splitType" type="splitType"/>
+  </xs:complexType>
+
+  <!-- Band sections that contain a single band (title, pageHeader, etc.) -->
+  <xs:complexType name="singleBandSectionType">
+    <xs:choice minOccurs="0" maxOccurs="unbounded">
+      <xs:element name="printWhenExpression" type="expressionType"/>
+      <xs:element name="property" type="propertyType"/>
+      <xs:element name="element" type="elementType"/>
+      <xs:element name="part" type="partType"/>
+    </xs:choice>
+    <xs:attribute name="height" type="xs:int"/>
+    <xs:attribute name="splitType" type="splitType"/>
+  </xs:complexType>
+
+  <!-- Detail section contains multiple bands or parts -->
+  <xs:complexType name="detailSectionType">
+    <xs:choice minOccurs="0" maxOccurs="unbounded">
+      <xs:element name="band" type="bandType"/>
+      <xs:element name="part" type="partType"/>
+    </xs:choice>
+  </xs:complexType>
+
+  <!-- ================================================================== -->
+  <!--  Top-level child types                                             -->
+  <!-- ================================================================== -->
+
+  <!-- style -->
+  <xs:complexType name="styleType">
+    <xs:sequence>
+      <xs:element name="conditionalStyle" type="conditionalStyleType" minOccurs="0" maxOccurs="unbounded"/>
+      <xs:element name="box" type="boxType" minOccurs="0"/>
+      <xs:element name="pen" type="penType" minOccurs="0"/>
+      <xs:element name="paragraph" type="paragraphType" minOccurs="0"/>
+    </xs:sequence>
+    <xs:attribute name="name" type="xs:string" use="required"/>
+    <xs:attribute name="default" type="xs:boolean"/>
+    <xs:attribute name="style" type="xs:string"/>
+    <xs:attributeGroup ref="styleAttributes"/>
+  </xs:complexType>
+
+  <!-- parameter -->
+  <xs:complexType name="parameterType">
+    <xs:sequence>
+      <xs:element name="property" type="propertyType" minOccurs="0" maxOccurs="unbounded"/>
+      <xs:element name="defaultValueExpression" type="expressionType" minOccurs="0"/>
+      <xs:element name="description" type="xs:string" minOccurs="0"/>
+    </xs:sequence>
+    <xs:attribute name="name" type="xs:string" use="required"/>
+    <xs:attribute name="class" type="xs:string"/>
+    <xs:attribute name="isForPrompting" type="xs:boolean"/>
+    <xs:attribute name="forPrompting" type="xs:boolean"/>
+    <xs:attribute name="evaluationTime" type="xs:string"/>
+    <xs:attribute name="nestedType" type="xs:string"/>
+  </xs:complexType>
+
+  <!-- field -->
+  <xs:complexType name="fieldType">
+    <xs:choice minOccurs="0" maxOccurs="unbounded">
+      <xs:element name="property" type="propertyType"/>
+      <xs:element name="propertyExpression" type="propertyExpressionType"/>
+      <xs:element name="description" type="xs:string"/>
+    </xs:choice>
+    <xs:attribute name="name" type="xs:string" use="required"/>
+    <xs:attribute name="class" type="xs:string"/>
+  </xs:complexType>
+
+  <!-- variable -->
+  <xs:complexType name="variableType">
+    <xs:sequence>
+      <xs:element name="expression" type="expressionType" minOccurs="0"/>
+      <xs:element name="initialValueExpression" type="expressionType" minOccurs="0"/>
+    </xs:sequence>
+    <xs:attribute name="name" type="xs:string" use="required"/>
+    <xs:attribute name="class" type="xs:string"/>
+    <xs:attribute name="calculation" type="calculationType"/>
+    <xs:attribute name="resetType" type="resetType"/>
+    <xs:attribute name="resetGroup" type="xs:string"/>
+    <xs:attribute name="incrementType" type="incrementType"/>
+    <xs:attribute name="incrementGroup" type="xs:string"/>
+    <xs:attribute name="incrementerFactoryClass" type="xs:string"/>
+  </xs:complexType>
+
+  <!-- sortField -->
+  <xs:complexType name="sortFieldType">
+    <xs:attribute name="name" type="xs:string" use="required"/>
+    <xs:attribute name="order" type="sortOrderType"/>
+    <xs:attribute name="type" type="sortFieldKindType"/>
+  </xs:complexType>
+
+  <!-- query -->
+  <xs:complexType name="queryType" mixed="true">
+    <xs:sequence>
+      <xs:any minOccurs="0" maxOccurs="unbounded" processContents="skip"/>
+    </xs:sequence>
+    <xs:attribute name="language" type="xs:string"/>
+  </xs:complexType>
+
+  <!-- group -->
+  <xs:complexType name="groupType">
+    <xs:sequence>
+      <xs:element name="expression" type="expressionType" minOccurs="0"/>
+      <xs:element name="groupHeader" minOccurs="0">
+        <xs:complexType>
+          <xs:choice minOccurs="0" maxOccurs="unbounded">
+            <xs:element name="band" type="bandType"/>
+            <xs:element name="part" type="partType"/>
+          </xs:choice>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="groupFooter" minOccurs="0">
+        <xs:complexType>
+          <xs:choice minOccurs="0" maxOccurs="unbounded">
+            <xs:element name="band" type="bandType"/>
+            <xs:element name="part" type="partType"/>
+          </xs:choice>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+    <xs:attribute name="name" type="xs:string" use="required"/>
+    <xs:attribute name="startNewColumn" type="xs:boolean"/>
+    <xs:attribute name="startNewPage" type="xs:boolean"/>
+    <xs:attribute name="resetPageNumber" type="xs:boolean"/>
+    <xs:attribute name="reprintHeaderOnEachPage" type="xs:boolean"/>
+    <xs:attribute name="reprintHeaderOnEachColumn" type="xs:boolean"/>
+    <xs:attribute name="minHeightToStartNewPage" type="xs:int"/>
+    <xs:attribute name="minDetailsToStartFromTop" type="xs:int"/>
+    <xs:attribute name="footerPosition" type="footerPositionType"/>
+    <xs:attribute name="keepTogether" type="xs:boolean"/>
+    <xs:attribute name="preventOrphanFooter" type="xs:boolean"/>
+  </xs:complexType>
+
+  <!-- dataset (subDataset) -->
+  <xs:complexType name="datasetType">
+    <xs:sequence>
+      <xs:element name="property" type="propertyType" minOccurs="0" maxOccurs="unbounded"/>
+      <xs:element name="propertyExpression" type="propertyExpressionType" minOccurs="0" maxOccurs="unbounded"/>
+      <xs:element name="scriptlet" minOccurs="0" maxOccurs="unbounded">
+        <xs:complexType>
+          <xs:attribute name="name" type="xs:string" use="required"/>
+          <xs:attribute name="class" type="xs:string"/>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="parameter" type="parameterType" minOccurs="0" maxOccurs="unbounded"/>
+      <xs:element name="query" type="queryType" minOccurs="0"/>
+      <xs:element name="field" type="fieldType" minOccurs="0" maxOccurs="unbounded"/>
+      <xs:element name="sortField" type="sortFieldType" minOccurs="0" maxOccurs="unbounded"/>
+      <xs:element name="variable" type="variableType" minOccurs="0" maxOccurs="unbounded"/>
+      <xs:element name="filterExpression" type="expressionType" minOccurs="0"/>
+      <xs:element name="group" type="groupType" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+    <xs:attribute name="name" type="xs:string" use="required"/>
+    <xs:attribute name="uuid" type="xs:string"/>
+    <xs:attribute name="scriptletClass" type="xs:string"/>
+    <xs:attribute name="resourceBundle" type="xs:string"/>
+    <xs:attribute name="whenResourceMissingType" type="whenResourceMissingType"/>
+  </xs:complexType>
+
+  <!-- template -->
+  <xs:simpleType name="templateType">
+    <xs:restriction base="xs:string"/>
+  </xs:simpleType>
+
+  <!-- ================================================================== -->
+  <!--  Root element: jasperReport                                        -->
+  <!-- ================================================================== -->
+
+  <xs:element name="jasperReport">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="property" type="propertyType" minOccurs="0" maxOccurs="unbounded"/>
+        <xs:element name="propertyExpression" type="propertyExpressionType" minOccurs="0" maxOccurs="unbounded"/>
+        <xs:element name="import" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+        <xs:element name="template" type="templateType" minOccurs="0" maxOccurs="unbounded"/>
+        <xs:element name="style" type="styleType" minOccurs="0" maxOccurs="unbounded"/>
+        <xs:element name="dataset" type="datasetType" minOccurs="0" maxOccurs="unbounded"/>
+        <xs:element name="scriptlet" minOccurs="0" maxOccurs="unbounded">
+          <xs:complexType>
+            <xs:attribute name="name" type="xs:string" use="required"/>
+            <xs:attribute name="class" type="xs:string"/>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="parameter" type="parameterType" minOccurs="0" maxOccurs="unbounded"/>
+        <xs:element name="query" type="queryType" minOccurs="0"/>
+        <xs:element name="field" type="fieldType" minOccurs="0" maxOccurs="unbounded"/>
+        <xs:element name="sortField" type="sortFieldType" minOccurs="0" maxOccurs="unbounded"/>
+        <xs:element name="variable" type="variableType" minOccurs="0" maxOccurs="unbounded"/>
+        <xs:element name="filterExpression" type="expressionType" minOccurs="0"/>
+        <xs:element name="group" type="groupType" minOccurs="0" maxOccurs="unbounded"/>
+        <xs:element name="background" type="singleBandSectionType" minOccurs="0"/>
+        <xs:element name="title" type="singleBandSectionType" minOccurs="0"/>
+        <xs:element name="pageHeader" type="singleBandSectionType" minOccurs="0"/>
+        <xs:element name="columnHeader" type="singleBandSectionType" minOccurs="0"/>
+        <xs:element name="detail" type="detailSectionType" minOccurs="0"/>
+        <xs:element name="columnFooter" type="singleBandSectionType" minOccurs="0"/>
+        <xs:element name="pageFooter" type="singleBandSectionType" minOccurs="0"/>
+        <xs:element name="lastPageFooter" type="singleBandSectionType" minOccurs="0"/>
+        <xs:element name="summary" type="singleBandSectionType" minOccurs="0"/>
+        <xs:element name="noData" type="singleBandSectionType" minOccurs="0"/>
+      </xs:sequence>
+
+      <!-- jasperReport attributes -->
+      <xs:attribute name="name" type="xs:string" use="required"/>
+      <xs:attribute name="language" type="xs:string"/>
+      <xs:attribute name="uuid" type="xs:string"/>
+      <xs:attribute name="columnCount" type="xs:int"/>
+      <xs:attribute name="printOrder" type="printOrderType"/>
+      <xs:attribute name="columnDirection" type="runDirectionType"/>
+      <xs:attribute name="pageWidth" type="xs:int"/>
+      <xs:attribute name="pageHeight" type="xs:int"/>
+      <xs:attribute name="columnWidth" type="xs:int"/>
+      <xs:attribute name="columnSpacing" type="xs:int"/>
+      <xs:attribute name="leftMargin" type="xs:int"/>
+      <xs:attribute name="rightMargin" type="xs:int"/>
+      <xs:attribute name="topMargin" type="xs:int"/>
+      <xs:attribute name="bottomMargin" type="xs:int"/>
+      <xs:attribute name="orientation" type="orientationType"/>
+      <xs:attribute name="whenNoDataType" type="whenNoDataType"/>
+      <xs:attribute name="sectionType" type="xs:string"/>
+      <xs:attribute name="titleNewPage" type="xs:boolean"/>
+      <xs:attribute name="summaryNewPage" type="xs:boolean"/>
+      <xs:attribute name="summaryWithPageHeaderAndFooter" type="xs:boolean"/>
+      <xs:attribute name="floatColumnFooter" type="xs:boolean"/>
+      <xs:attribute name="scriptletClass" type="xs:string"/>
+      <xs:attribute name="formatFactoryClass" type="xs:string"/>
+      <xs:attribute name="resourceBundle" type="xs:string"/>
+      <xs:attribute name="whenResourceMissingType" type="whenResourceMissingType"/>
+      <xs:attribute name="ignorePagination" type="xs:boolean"/>
+    </xs:complexType>
+  </xs:element>
+
+</xs:schema>
