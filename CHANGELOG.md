@@ -1,3 +1,11 @@
+## [1.1.1](https://github.com/gvgramazio/jasperreports-vscode-extension/compare/v1.1.0...v1.1.1) (2026-05-01)
+
+
+### Bug Fixes
+
+* ignore format issues in CHANGELOG.md ([843dfc0](https://github.com/gvgramazio/jasperreports-vscode-extension/commit/843dfc0bc9a3dac7b3f42151d2b3b4f911d50dde))
+* separate publish command in semantic release configuration ([3183228](https://github.com/gvgramazio/jasperreports-vscode-extension/commit/318322843a1fc13b557285ec198bcfc355511b3b))
+
 # [1.1.0](https://github.com/gvgramazio/jasperreports-vscode-extension/compare/v1.0.0...v1.1.0) (2026-05-01)
 
 
