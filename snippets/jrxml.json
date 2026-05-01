@@ -1,0 +1,418 @@
+{
+  "JasperReport Root": {
+    "prefix": "jasperReport",
+    "description": "Root <jasperReport> element",
+    "body": [
+      "<jasperReport name=\"${1:ReportName}\" language=\"java\" pageWidth=\"${2:595}\" pageHeight=\"${3:842}\" columnWidth=\"${4:515}\" leftMargin=\"${5:40}\" rightMargin=\"${6:40}\" topMargin=\"${7:50}\" bottomMargin=\"${8:50}\">",
+      "\t$0",
+      "</jasperReport>"
+    ]
+  },
+
+  "Field": {
+    "prefix": "field",
+    "description": "<field> declaration",
+    "body": [
+      "<field name=\"${1:fieldName}\" class=\"${2:java.lang.String}\"/>"
+    ]
+  },
+  "Field with Description": {
+    "prefix": "fieldDesc",
+    "description": "<field> with <description>",
+    "body": [
+      "<field name=\"${1:fieldName}\" class=\"${2:java.lang.String}\">",
+      "\t<description><![CDATA[${3:description}]]></description>",
+      "</field>"
+    ]
+  },
+  "Parameter": {
+    "prefix": "parameter",
+    "description": "<parameter> declaration",
+    "body": [
+      "<parameter name=\"${1:paramName}\" class=\"${2:java.lang.String}\"/>"
+    ]
+  },
+  "Parameter with Default": {
+    "prefix": "parameterDefault",
+    "description": "<parameter> with default value expression",
+    "body": [
+      "<parameter name=\"${1:paramName}\" class=\"${2:java.lang.String}\">",
+      "\t<expression><![CDATA[${3:defaultValue}]]></expression>",
+      "</parameter>"
+    ]
+  },
+  "Variable": {
+    "prefix": "variable",
+    "description": "<variable> declaration",
+    "body": [
+      "<variable name=\"${1:varName}\" class=\"${2:java.lang.String}\" calculation=\"${3|Nothing,Sum,Count,Average,Lowest,Highest,StandardDeviation,Variance,System,First,DistinctCount|}\" resetType=\"${4|Report,Page,Column,Group,None|}\">",
+      "\t<expression><![CDATA[${5:expression}]]></expression>",
+      "</variable>"
+    ]
+  },
+  "Sort Field": {
+    "prefix": "sortField",
+    "description": "<sortField> declaration",
+    "body": [
+      "<sortField name=\"${1:fieldName}\" order=\"${2|Ascending,Descending|}\"/>"
+    ]
+  },
+  "Query": {
+    "prefix": "query",
+    "description": "<query> element",
+    "body": [
+      "<query language=\"${1|sql,hql,xPath,jsonql,json,ejbql|}\">\n\t<![CDATA[${2:SELECT * FROM table}]]>\n</query>"
+    ]
+  },
+  "Property": {
+    "prefix": "property",
+    "description": "<property> element",
+    "body": [
+      "<property name=\"${1:name}\" value=\"${2:value}\"/>"
+    ]
+  },
+
+  "Style": {
+    "prefix": "style",
+    "description": "<style> element",
+    "body": [
+      "<style name=\"${1:styleName}\" fontName=\"${2:DejaVu Sans}\" fontSize=\"${3:12.0}\" bold=\"${4|false,true|}\" italic=\"${5|false,true|}\"/>"
+    ]
+  },
+  "Style Default": {
+    "prefix": "styleDefault",
+    "description": "Default <style> element",
+    "body": [
+      "<style name=\"${1:styleName}\" default=\"true\" fontName=\"${2:DejaVu Sans}\" fontSize=\"${3:12.0}\" bold=\"${4|false,true|}\" italic=\"${5|false,true|}\"/>"
+    ]
+  },
+  "Conditional Style": {
+    "prefix": "conditionalStyle",
+    "description": "<conditionalStyle> element",
+    "body": [
+      "<conditionalStyle ${1:forecolor=\"#FF0000\"}>",
+      "\t<conditionExpression><![CDATA[${2:condition}]]></conditionExpression>",
+      "</conditionalStyle>"
+    ]
+  },
+
+  "Title": {
+    "prefix": "title",
+    "description": "<title> section",
+    "body": [
+      "<title height=\"${1:50}\">",
+      "\t$0",
+      "</title>"
+    ]
+  },
+  "Page Header": {
+    "prefix": "pageHeader",
+    "description": "<pageHeader> section",
+    "body": [
+      "<pageHeader height=\"${1:20}\">",
+      "\t$0",
+      "</pageHeader>"
+    ]
+  },
+  "Column Header": {
+    "prefix": "columnHeader",
+    "description": "<columnHeader> section",
+    "body": [
+      "<columnHeader height=\"${1:20}\">",
+      "\t$0",
+      "</columnHeader>"
+    ]
+  },
+  "Detail": {
+    "prefix": "detail",
+    "description": "<detail> section with band",
+    "body": [
+      "<detail>",
+      "\t<band height=\"${1:20}\">",
+      "\t\t$0",
+      "\t</band>",
+      "</detail>"
+    ]
+  },
+  "Column Footer": {
+    "prefix": "columnFooter",
+    "description": "<columnFooter> section",
+    "body": [
+      "<columnFooter height=\"${1:20}\">",
+      "\t$0",
+      "</columnFooter>"
+    ]
+  },
+  "Page Footer": {
+    "prefix": "pageFooter",
+    "description": "<pageFooter> section",
+    "body": [
+      "<pageFooter height=\"${1:20}\">",
+      "\t$0",
+      "</pageFooter>"
+    ]
+  },
+  "Last Page Footer": {
+    "prefix": "lastPageFooter",
+    "description": "<lastPageFooter> section",
+    "body": [
+      "<lastPageFooter height=\"${1:20}\">",
+      "\t$0",
+      "</lastPageFooter>"
+    ]
+  },
+  "Summary": {
+    "prefix": "summary",
+    "description": "<summary> section",
+    "body": [
+      "<summary height=\"${1:50}\">",
+      "\t$0",
+      "</summary>"
+    ]
+  },
+  "No Data": {
+    "prefix": "noData",
+    "description": "<noData> section",
+    "body": [
+      "<noData height=\"${1:50}\">",
+      "\t$0",
+      "</noData>"
+    ]
+  },
+  "Background": {
+    "prefix": "background",
+    "description": "<background> section",
+    "body": [
+      "<background height=\"${1:50}\">",
+      "\t$0",
+      "</background>"
+    ]
+  },
+  "Band": {
+    "prefix": "band",
+    "description": "<band> element",
+    "body": [
+      "<band height=\"${1:20}\">",
+      "\t$0",
+      "</band>"
+    ]
+  },
+  "Group": {
+    "prefix": "group",
+    "description": "<group> with header and footer",
+    "body": [
+      "<group name=\"${1:GroupName}\">",
+      "\t<expression><![CDATA[${2:\\$F\\{fieldName\\}}]]></expression>",
+      "\t<groupHeader>",
+      "\t\t<band height=\"${3:20}\">",
+      "\t\t\t$0",
+      "\t\t</band>",
+      "\t</groupHeader>",
+      "\t<groupFooter>",
+      "\t\t<band height=\"${4:20}\">",
+      "\t\t</band>",
+      "\t</groupFooter>",
+      "</group>"
+    ]
+  },
+
+  "Text Field": {
+    "prefix": "textField",
+    "description": "<element kind=\"textField\">",
+    "body": [
+      "<element kind=\"textField\" x=\"${1:0}\" y=\"${2:0}\" width=\"${3:100}\" height=\"${4:15}\">",
+      "\t<expression><![CDATA[${5:\\$F\\{fieldName\\}}]]></expression>",
+      "</element>"
+    ]
+  },
+  "Static Text": {
+    "prefix": "staticText",
+    "description": "<element kind=\"staticText\">",
+    "body": [
+      "<element kind=\"staticText\" x=\"${1:0}\" y=\"${2:0}\" width=\"${3:100}\" height=\"${4:15}\">",
+      "\t<text><![CDATA[${5:Label}]]></text>",
+      "</element>"
+    ]
+  },
+  "Image": {
+    "prefix": "image",
+    "description": "<element kind=\"image\">",
+    "body": [
+      "<element kind=\"image\" x=\"${1:0}\" y=\"${2:0}\" width=\"${3:100}\" height=\"${4:50}\">",
+      "\t<expression><![CDATA[${5:\"image.png\"}]]></expression>",
+      "</element>"
+    ]
+  },
+  "Line": {
+    "prefix": "line",
+    "description": "<element kind=\"line\">",
+    "body": [
+      "<element kind=\"line\" x=\"${1:0}\" y=\"${2:0}\" width=\"${3:515}\" height=\"${4:1}\"/>"
+    ]
+  },
+  "Rectangle": {
+    "prefix": "rectangle",
+    "description": "<element kind=\"rectangle\">",
+    "body": [
+      "<element kind=\"rectangle\" x=\"${1:0}\" y=\"${2:0}\" width=\"${3:100}\" height=\"${4:50}\" radius=\"${5:0}\"/>"
+    ]
+  },
+  "Ellipse": {
+    "prefix": "ellipse",
+    "description": "<element kind=\"ellipse\">",
+    "body": [
+      "<element kind=\"ellipse\" x=\"${1:0}\" y=\"${2:0}\" width=\"${3:50}\" height=\"${4:50}\"/>"
+    ]
+  },
+  "Frame": {
+    "prefix": "frame",
+    "description": "<element kind=\"frame\">",
+    "body": [
+      "<element kind=\"frame\" x=\"${1:0}\" y=\"${2:0}\" width=\"${3:515}\" height=\"${4:50}\">",
+      "\t$0",
+      "</element>"
+    ]
+  },
+  "Subreport": {
+    "prefix": "subreport",
+    "description": "<element kind=\"subreport\">",
+    "body": [
+      "<element kind=\"subreport\" x=\"${1:0}\" y=\"${2:0}\" width=\"${3:515}\" height=\"${4:50}\">",
+      "\t<connectionExpression><![CDATA[${5:\\$P\\{REPORT_CONNECTION\\}}]]></connectionExpression>",
+      "\t<expression><![CDATA[${6:\"SubReport.jasper\"}]]></expression>",
+      "</element>"
+    ]
+  },
+  "Chart": {
+    "prefix": "chart",
+    "description": "<element kind=\"chart\">",
+    "body": [
+      "<element kind=\"chart\" chartType=\"${1|bar,pie,line,area,stackedBar,stackedArea,xyLine,xyArea,xyBar,scatter,bubble,timeSeries,highLow,candlestick,gantt,meter,thermometer,multiAxis,pie3D|}\" x=\"${2:0}\" y=\"${3:0}\" width=\"${4:400}\" height=\"${5:300}\">",
+      "\t<dataset kind=\"${6|category,pie,xy,timeSeries,timeperiod,highLow,gantt,value|}\">",
+      "\t\t<series>",
+      "\t\t\t<seriesExpression><![CDATA[${7:\"Series\"}]]></seriesExpression>",
+      "\t\t\t<categoryExpression><![CDATA[${8:\\$F\\{category\\}}]]></categoryExpression>",
+      "\t\t\t<valueExpression><![CDATA[${9:\\$F\\{value\\}}]]></valueExpression>",
+      "\t\t</series>",
+      "\t</dataset>",
+      "\t<plot/>",
+      "</element>"
+    ]
+  },
+  "Crosstab": {
+    "prefix": "crosstab",
+    "description": "<element kind=\"crosstab\">",
+    "body": [
+      "<element kind=\"crosstab\" x=\"${1:0}\" y=\"${2:0}\" width=\"${3:515}\" height=\"${4:60}\">",
+      "\t<dataset/>",
+      "\t<rowGroup name=\"${5:RowGroup}\" totalPosition=\"End\" width=\"${6:80}\">",
+      "\t\t<bucket class=\"${7:java.lang.String}\">",
+      "\t\t\t<expression><![CDATA[${8:\\$F\\{rowField\\}}]]></expression>",
+      "\t\t</bucket>",
+      "\t\t<header>",
+      "\t\t\t<contents>",
+      "\t\t\t\t$0",
+      "\t\t\t</contents>",
+      "\t\t</header>",
+      "\t</rowGroup>",
+      "\t<columnGroup name=\"${9:ColumnGroup}\" totalPosition=\"End\" height=\"${10:20}\">",
+      "\t\t<bucket class=\"${11:java.lang.String}\">",
+      "\t\t\t<expression><![CDATA[${12:\\$F\\{colField\\}}]]></expression>",
+      "\t\t</bucket>",
+      "\t\t<header>",
+      "\t\t\t<contents>",
+      "\t\t\t</contents>",
+      "\t\t</header>",
+      "\t</columnGroup>",
+      "\t<measure name=\"${13:measureName}\" calculation=\"${14|Sum,Count,Average,Nothing|}\" class=\"${15:java.lang.Double}\">",
+      "\t\t<expression><![CDATA[${16:\\$F\\{valueField\\}}]]></expression>",
+      "\t</measure>",
+      "\t<cell>",
+      "\t\t<contents>",
+      "\t\t</contents>",
+      "\t</cell>",
+      "</element>"
+    ]
+  },
+  "Component": {
+    "prefix": "component",
+    "description": "<element kind=\"component\">",
+    "body": [
+      "<element kind=\"component\" x=\"${1:0}\" y=\"${2:0}\" width=\"${3:100}\" height=\"${4:50}\">",
+      "\t$0",
+      "</element>"
+    ]
+  },
+  "Element Group": {
+    "prefix": "elementGroup",
+    "description": "<element kind=\"elementGroup\">",
+    "body": [
+      "<element kind=\"elementGroup\">",
+      "\t$0",
+      "</element>"
+    ]
+  },
+  "Generic Element": {
+    "prefix": "generic",
+    "description": "<element kind=\"generic\">",
+    "body": [
+      "<element kind=\"generic\" x=\"${1:0}\" y=\"${2:0}\" width=\"${3:100}\" height=\"${4:50}\">",
+      "\t<genericType namespace=\"${5:namespace}\" name=\"${6:name}\"/>",
+      "\t$0",
+      "</element>"
+    ]
+  },
+
+  "Expression": {
+    "prefix": "expression",
+    "description": "<expression> with CDATA",
+    "body": [
+      "<expression><![CDATA[${1:expression}]]></expression>"
+    ]
+  },
+  "Text": {
+    "prefix": "text",
+    "description": "<text> with CDATA",
+    "body": [
+      "<text><![CDATA[${1:text}]]></text>"
+    ]
+  },
+  "Box": {
+    "prefix": "box",
+    "description": "<box> with pen",
+    "body": [
+      "<box>",
+      "\t<pen lineWidth=\"${1:0.5}\"/>",
+      "</box>"
+    ]
+  },
+
+  "Field Expression": {
+    "prefix": "$F",
+    "description": "$F{} field reference",
+    "body": [
+      "\\$F{${1:fieldName}}"
+    ]
+  },
+  "Parameter Expression": {
+    "prefix": "$P",
+    "description": "$P{} parameter reference",
+    "body": [
+      "\\$P{${1:paramName}}"
+    ]
+  },
+  "Variable Expression": {
+    "prefix": "$V",
+    "description": "$V{} variable reference",
+    "body": [
+      "\\$V{${1:varName}}"
+    ]
+  },
+  "Resource Expression": {
+    "prefix": "$R",
+    "description": "$R{} resource bundle reference",
+    "body": [
+      "\\$R{${1:resourceKey}}"
+    ]
+  }
+}
