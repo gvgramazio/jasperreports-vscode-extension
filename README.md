@@ -53,6 +53,15 @@ Compile `.jrxml` files to `.jasper` directly from VS Code.
 | `jasperreports.java.home` | Path to a JRE/JDK installation (auto-detects `JAVA_HOME` if empty)                            |
 | `jasperreports.classpath` | Array of paths to JasperReports JARs and dependencies (supports globs like `/path/to/libs/*`) |
 
+### Preview Report
+
+Preview filled reports as HTML directly inside VS Code.
+
+- **Command Palette** → `JasperReports: Preview Report`
+- Compiles, fills with an empty data source, and renders HTML in a side panel
+- Reuses the same preview panel across invocations
+- Requires the same Java and classpath configuration as the compile command
+
 ## Installation
 
 ### From Marketplace
