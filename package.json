@@ -81,6 +81,11 @@
         "command": "jasperreports.preview",
         "title": "Preview Report",
         "category": "JasperReports"
+      },
+      {
+        "command": "jasperreports.previewToSide",
+        "title": "Preview Report to the Side",
+        "category": "JasperReports"
       }
     ],
     "menus": {
@@ -91,6 +96,10 @@
         },
         {
           "command": "jasperreports.preview",
+          "when": "editorLangId == jrxml"
+        },
+        {
+          "command": "jasperreports.previewToSide",
           "when": "editorLangId == jrxml"
         }
       ]
