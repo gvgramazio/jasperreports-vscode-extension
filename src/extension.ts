@@ -3,11 +3,13 @@ import * as path from "path";
 
 const XML_EXTENSION_ID = "redhat.vscode-xml";
 
-export function activate(context: vscode.ExtensionContext): void {
+export async function activate(
+  context: vscode.ExtensionContext,
+): Promise<void> {
   console.log("JasperReports extension is now active.");
 
   registerXmlFileAssociations(context);
-  recommendXmlExtension();
+  await activateXmlExtension();
 }
 
 export function deactivate(): void {
@@ -57,12 +59,18 @@ function registerXmlFileAssociations(context: vscode.ExtensionContext): void {
 }
 
 /**
- * Recommends the Red Hat XML extension for XSD-based validation, completion
- * and hover support.
+ * Activates the Red Hat XML extension so it processes .jrxml/.jrtx files.
+ * vscode-xml only activates on `onLanguage:xml` by default; opening a .jrxml
+ * alone won't trigger it. We activate it programmatically and recommend
+ * installation if it's missing.
  */
-function recommendXmlExtension(): void {
+async function activateXmlExtension(): Promise<void> {
   const xmlExt = vscode.extensions.getExtension(XML_EXTENSION_ID);
-  if (!xmlExt) {
+  if (xmlExt) {
+    if (!xmlExt.isActive) {
+      await xmlExt.activate();
+    }
+  } else {
     vscode.window
       .showInformationMessage(
         "Install the 'XML' extension (Red Hat) for JRXML/JRTX validation and auto-completion.",

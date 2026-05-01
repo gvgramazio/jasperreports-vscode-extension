@@ -63,6 +63,14 @@
         "path": "./snippets/jrxml.json"
       }
     ],
+    "xmlLanguageParticipants": [
+      {
+        "languageId": "jrxml"
+      },
+      {
+        "languageId": "jrtx"
+      }
+    ],
     "configuration": {
       "title": "JasperReports",
       "properties": {

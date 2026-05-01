@@ -15,14 +15,14 @@ describe("extension", () => {
     expect(typeof extension.deactivate).toBe("function");
   });
 
-  it("activate registers xml file associations", () => {
+  it("activate registers xml file associations", async () => {
     const context = {
       extensionPath: "/mock/extension/path",
       subscriptions: [],
       globalStorageUri: { fsPath: "/mock/storage" },
     } as unknown as vscode.ExtensionContext;
 
-    extension.activate(context);
+    await extension.activate(context);
 
     const xmlConfig = vscode.workspace.getConfiguration("xml");
     expect(xmlConfig.update).toHaveBeenCalledWith(
@@ -35,7 +35,7 @@ describe("extension", () => {
     );
   });
 
-  it("activate recommends xml extension when not installed", () => {
+  it("activate recommends xml extension when not installed", async () => {
     const context = {
       extensionPath: "/mock/extension/path",
       subscriptions: [],
@@ -44,7 +44,7 @@ describe("extension", () => {
 
     vi.mocked(vscode.extensions.getExtension).mockReturnValue(undefined);
 
-    extension.activate(context);
+    await extension.activate(context);
 
     expect(vscode.window.showInformationMessage).toHaveBeenCalledWith(
       expect.stringContaining("XML"),
@@ -52,19 +52,41 @@ describe("extension", () => {
     );
   });
 
-  it("activate does not recommend xml extension when already installed", () => {
+  it("activate activates xml extension when installed but inactive", async () => {
     const context = {
       extensionPath: "/mock/extension/path",
       subscriptions: [],
       globalStorageUri: { fsPath: "/mock/storage" },
     } as unknown as vscode.ExtensionContext;
 
-    vi.mocked(vscode.extensions.getExtension).mockReturnValue(
-      {} as vscode.Extension<unknown>,
-    );
+    const mockActivate = vi.fn().mockResolvedValue(undefined);
+    vi.mocked(vscode.extensions.getExtension).mockReturnValue({
+      isActive: false,
+      activate: mockActivate,
+    } as unknown as vscode.Extension<unknown>);
 
-    extension.activate(context);
+    await extension.activate(context);
 
+    expect(mockActivate).toHaveBeenCalled();
+    expect(vscode.window.showInformationMessage).not.toHaveBeenCalled();
+  });
+
+  it("activate does not re-activate xml extension when already active", async () => {
+    const context = {
+      extensionPath: "/mock/extension/path",
+      subscriptions: [],
+      globalStorageUri: { fsPath: "/mock/storage" },
+    } as unknown as vscode.ExtensionContext;
+
+    const mockActivate = vi.fn().mockResolvedValue(undefined);
+    vi.mocked(vscode.extensions.getExtension).mockReturnValue({
+      isActive: true,
+      activate: mockActivate,
+    } as unknown as vscode.Extension<unknown>);
+
+    await extension.activate(context);
+
+    expect(mockActivate).not.toHaveBeenCalled();
     expect(vscode.window.showInformationMessage).not.toHaveBeenCalled();
   });
 });
