@@ -37,6 +37,22 @@ The extension automatically activates the XML extension when needed and prompts 
 - **Common children** — `expression`, `text`, `box`
 - **Expression references** — `$F{}`, `$P{}`, `$V{}`, `$R{}`
 
+### Compile JRXML
+
+Compile `.jrxml` files to `.jasper` directly from VS Code.
+
+- **Command Palette** → `JasperReports: Compile JRXML`
+- Progress notification during compilation
+- Errors shown in the output channel and as notifications
+- Requires Java (JRE 8+) and JasperReports JARs on the classpath
+
+#### Compile Settings
+
+| Setting | Description |
+| --- | --- |
+| `jasperreports.java.home` | Path to a JRE/JDK installation (auto-detects `JAVA_HOME` if empty) |
+| `jasperreports.classpath` | Array of paths to JasperReports JARs and dependencies (supports globs like `/path/to/libs/*`) |
+
 ## Installation
 
 ### From Marketplace
