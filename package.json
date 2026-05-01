@@ -1,0 +1,48 @@
+{
+  "name": "jasperreports",
+  "displayName": "JasperReports",
+  "description": "Viewer & editor for Jasper files and projects",
+  "version": "0.0.1",
+  "publisher": "gvgramazio",
+  "license": "MIT",
+  "engines": {
+    "vscode": "^1.99.0"
+  },
+  "categories": [
+    "Programming Languages"
+  ],
+  "activationEvents": [
+    "*"
+  ],
+  "main": "./dist/extension.js",
+  "icon": "images/icon.png",
+  "contributes": {},
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/gvgramazio/jasperreports-vscode-extension"
+  },
+  "scripts": {
+    "build": "node esbuild.mjs",
+    "watch": "node esbuild.mjs --watch",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "test": "vitest run",
+    "vsce:package": "vsce package --no-dependencies --allow-star-activation"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.39.4",
+    "@types/vscode": "~1.99.0",
+    "@typescript-eslint/eslint-plugin": "^8.0.0",
+    "@typescript-eslint/parser": "^8.0.0",
+    "@vscode/vsce": "^3.0.0",
+    "esbuild": "^0.25.0",
+    "eslint": "^9.0.0",
+    "eslint-config-prettier": "^10.0.0",
+    "prettier": "^3.0.0",
+    "typescript": "^5.7.0",
+    "typescript-eslint": "^8.59.1",
+    "vitest": "^3.0.0"
+  }
+}
