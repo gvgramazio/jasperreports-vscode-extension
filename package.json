@@ -86,6 +86,11 @@
         "command": "jasperreports.previewToSide",
         "title": "Preview Report to the Side",
         "category": "JasperReports"
+      },
+      {
+        "command": "jasperreports.downloadDependencies",
+        "title": "Download Dependencies",
+        "category": "JasperReports"
       }
     ],
     "menus": {

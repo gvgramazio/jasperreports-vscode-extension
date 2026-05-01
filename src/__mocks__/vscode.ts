@@ -1,6 +1,9 @@
 import { vi } from "vitest";
 
 export const workspace = {
+  workspaceFolders: undefined as
+    | Array<{ uri: { fsPath: string }; name: string; index: number }>
+    | undefined,
   getConfiguration: vi.fn().mockReturnValue({
     get: vi.fn((_key: string, defaultValue?: unknown) => defaultValue),
     update: vi.fn(),
