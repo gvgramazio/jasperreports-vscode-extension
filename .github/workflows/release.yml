@@ -2,20 +2,24 @@ name: Release
 
 on:
   push:
-    tags:
-      - "v*"
+    branches:
+      - master
 
 permissions:
   contents: write
+  issues: write
+  pull-requests: write
 
 jobs:
   release:
-    name: Build & Release
+    name: Semantic Release
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout
         uses: actions/checkout@v6
+        with:
+          persist-credentials: false
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v6
@@ -38,20 +42,8 @@ jobs:
       - name: Test
         run: pnpm run test
 
-      - name: Build
-        run: pnpm run build
-
-      - name: Package VSIX
-        run: pnpm run vsce:package
-
-      - name: Publish to Marketplace
-        if: env.VSCE_PAT != ''
-        run: pnpm dlx @vscode/vsce publish --no-dependencies --allow-star-activation --packagePath *.vsix
+      - name: Release
+        run: pnpm exec semantic-release
         env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           VSCE_PAT: ${{ secrets.VSCE_PAT }}
-
-      - name: Create GitHub Release
-        uses: softprops/action-gh-release@v3
-        with:
-          files: "*.vsix"
-          generate_release_notes: true
