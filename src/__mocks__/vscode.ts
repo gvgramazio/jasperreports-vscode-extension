@@ -22,9 +22,7 @@ export const window = {
       (_options: unknown, task: (progress: unknown) => Promise<unknown>) =>
         task({ report: vi.fn() }),
     ),
-  activeTextEditor: undefined as
-    | { document: { fileName: string } }
-    | undefined,
+  activeTextEditor: undefined as { document: { fileName: string } } | undefined,
 };
 
 export const extensions = {
