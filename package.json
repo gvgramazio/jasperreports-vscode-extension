@@ -57,6 +57,12 @@
         "path": "./syntaxes/jrtx.tmLanguage.json"
       }
     ],
+    "snippets": [
+      {
+        "language": "jrxml",
+        "path": "./snippets/jrxml.json"
+      }
+    ],
     "configuration": {
       "title": "JasperReports",
       "properties": {
