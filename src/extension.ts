@@ -31,6 +31,9 @@ function registerCommands(context: vscode.ExtensionContext): void {
     vscode.commands.registerCommand("jasperreports.preview", () =>
       previewReport(context.extensionPath),
     ),
+    vscode.commands.registerCommand("jasperreports.previewToSide", () =>
+      previewReport(context.extensionPath, vscode.ViewColumn.Beside),
+    ),
   );
 }
 
