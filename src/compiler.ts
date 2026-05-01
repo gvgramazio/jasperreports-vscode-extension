@@ -104,7 +104,7 @@ function runCompiler(
   channel: vscode.OutputChannel,
 ): Promise<void> {
   return new Promise((resolve) => {
-    const args = ["-cp", classpath, "JrCompiler", jrxmlPath];
+    const args = ["-cp", classpath, "JrCompiler", "compile", jrxmlPath];
     const cwd = path.dirname(jrxmlPath);
 
     execFile(javaPath, args, { cwd }, (err, stdout, stderr) => {

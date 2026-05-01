@@ -1,6 +1,7 @@
 import * as vscode from "vscode";
 import * as path from "path";
 import { compileReport, disposeOutputChannel } from "./compiler";
+import { previewReport, disposePreviewPanel } from "./preview";
 
 const XML_EXTENSION_ID = "redhat.vscode-xml";
 
@@ -16,6 +17,7 @@ export async function activate(
 
 export function deactivate(): void {
   disposeOutputChannel();
+  disposePreviewPanel();
 }
 
 /**
@@ -25,6 +27,9 @@ function registerCommands(context: vscode.ExtensionContext): void {
   context.subscriptions.push(
     vscode.commands.registerCommand("jasperreports.compile", () =>
       compileReport(context.extensionPath),
+    ),
+    vscode.commands.registerCommand("jasperreports.preview", () =>
+      previewReport(context.extensionPath),
     ),
   );
 }
