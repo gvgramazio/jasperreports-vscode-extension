@@ -3,6 +3,7 @@ node_modules/
 *.vsix
 .vscode-test/
 out/
+lib/build/
 
 # macOS
 .DS_Store
