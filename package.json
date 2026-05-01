@@ -76,12 +76,21 @@
         "command": "jasperreports.compile",
         "title": "Compile JRXML",
         "category": "JasperReports"
+      },
+      {
+        "command": "jasperreports.preview",
+        "title": "Preview Report",
+        "category": "JasperReports"
       }
     ],
     "menus": {
       "commandPalette": [
         {
           "command": "jasperreports.compile",
+          "when": "editorLangId == jrxml"
+        },
+        {
+          "command": "jasperreports.preview",
           "when": "editorLangId == jrxml"
         }
       ]

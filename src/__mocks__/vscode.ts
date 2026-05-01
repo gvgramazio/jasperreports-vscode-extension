@@ -23,6 +23,13 @@ export const window = {
         task({ report: vi.fn() }),
     ),
   activeTextEditor: undefined as { document: { fileName: string } } | undefined,
+  createWebviewPanel: vi.fn().mockReturnValue({
+    webview: { html: "" },
+    reveal: vi.fn(),
+    onDidDispose: vi.fn(),
+    dispose: vi.fn(),
+    title: "",
+  }),
 };
 
 export const extensions = {
@@ -49,4 +56,12 @@ export enum ProgressLocation {
   SourceControl = 1,
   Window = 10,
   Notification = 15,
+}
+
+export enum ViewColumn {
+  Active = -1,
+  Beside = -2,
+  One = 1,
+  Two = 2,
+  Three = 3,
 }
