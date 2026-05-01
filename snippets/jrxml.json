@@ -12,9 +12,7 @@
   "Field": {
     "prefix": "field",
     "description": "<field> declaration",
-    "body": [
-      "<field name=\"${1:fieldName}\" class=\"${2:java.lang.String}\"/>"
-    ]
+    "body": ["<field name=\"${1:fieldName}\" class=\"${2:java.lang.String}\"/>"]
   },
   "Field with Description": {
     "prefix": "fieldDesc",
@@ -67,9 +65,7 @@
   "Property": {
     "prefix": "property",
     "description": "<property> element",
-    "body": [
-      "<property name=\"${1:name}\" value=\"${2:value}\"/>"
-    ]
+    "body": ["<property name=\"${1:name}\" value=\"${2:value}\"/>"]
   },
 
   "Style": {
@@ -99,29 +95,17 @@
   "Title": {
     "prefix": "title",
     "description": "<title> section",
-    "body": [
-      "<title height=\"${1:50}\">",
-      "\t$0",
-      "</title>"
-    ]
+    "body": ["<title height=\"${1:50}\">", "\t$0", "</title>"]
   },
   "Page Header": {
     "prefix": "pageHeader",
     "description": "<pageHeader> section",
-    "body": [
-      "<pageHeader height=\"${1:20}\">",
-      "\t$0",
-      "</pageHeader>"
-    ]
+    "body": ["<pageHeader height=\"${1:20}\">", "\t$0", "</pageHeader>"]
   },
   "Column Header": {
     "prefix": "columnHeader",
     "description": "<columnHeader> section",
-    "body": [
-      "<columnHeader height=\"${1:20}\">",
-      "\t$0",
-      "</columnHeader>"
-    ]
+    "body": ["<columnHeader height=\"${1:20}\">", "\t$0", "</columnHeader>"]
   },
   "Detail": {
     "prefix": "detail",
@@ -137,65 +121,37 @@
   "Column Footer": {
     "prefix": "columnFooter",
     "description": "<columnFooter> section",
-    "body": [
-      "<columnFooter height=\"${1:20}\">",
-      "\t$0",
-      "</columnFooter>"
-    ]
+    "body": ["<columnFooter height=\"${1:20}\">", "\t$0", "</columnFooter>"]
   },
   "Page Footer": {
     "prefix": "pageFooter",
     "description": "<pageFooter> section",
-    "body": [
-      "<pageFooter height=\"${1:20}\">",
-      "\t$0",
-      "</pageFooter>"
-    ]
+    "body": ["<pageFooter height=\"${1:20}\">", "\t$0", "</pageFooter>"]
   },
   "Last Page Footer": {
     "prefix": "lastPageFooter",
     "description": "<lastPageFooter> section",
-    "body": [
-      "<lastPageFooter height=\"${1:20}\">",
-      "\t$0",
-      "</lastPageFooter>"
-    ]
+    "body": ["<lastPageFooter height=\"${1:20}\">", "\t$0", "</lastPageFooter>"]
   },
   "Summary": {
     "prefix": "summary",
     "description": "<summary> section",
-    "body": [
-      "<summary height=\"${1:50}\">",
-      "\t$0",
-      "</summary>"
-    ]
+    "body": ["<summary height=\"${1:50}\">", "\t$0", "</summary>"]
   },
   "No Data": {
     "prefix": "noData",
     "description": "<noData> section",
-    "body": [
-      "<noData height=\"${1:50}\">",
-      "\t$0",
-      "</noData>"
-    ]
+    "body": ["<noData height=\"${1:50}\">", "\t$0", "</noData>"]
   },
   "Background": {
     "prefix": "background",
     "description": "<background> section",
-    "body": [
-      "<background height=\"${1:50}\">",
-      "\t$0",
-      "</background>"
-    ]
+    "body": ["<background height=\"${1:50}\">", "\t$0", "</background>"]
   },
   "Band": {
     "prefix": "band",
     "description": "<band> element",
-    "body": [
-      "<band height=\"${1:20}\">",
-      "\t$0",
-      "</band>"
-    ]
+    "body": ["<band height=\"${1:20}\">", "\t$0", "</band>"]
   },
   "Group": {
     "prefix": "group",
@@ -346,11 +302,7 @@
   "Element Group": {
     "prefix": "elementGroup",
     "description": "<element kind=\"elementGroup\">",
-    "body": [
-      "<element kind=\"elementGroup\">",
-      "\t$0",
-      "</element>"
-    ]
+    "body": ["<element kind=\"elementGroup\">", "\t$0", "</element>"]
   },
   "Generic Element": {
     "prefix": "generic",
@@ -366,53 +318,37 @@
   "Expression": {
     "prefix": "expression",
     "description": "<expression> with CDATA",
-    "body": [
-      "<expression><![CDATA[${1:expression}]]></expression>"
-    ]
+    "body": ["<expression><![CDATA[${1:expression}]]></expression>"]
   },
   "Text": {
     "prefix": "text",
     "description": "<text> with CDATA",
-    "body": [
-      "<text><![CDATA[${1:text}]]></text>"
-    ]
+    "body": ["<text><![CDATA[${1:text}]]></text>"]
   },
   "Box": {
     "prefix": "box",
     "description": "<box> with pen",
-    "body": [
-      "<box>",
-      "\t<pen lineWidth=\"${1:0.5}\"/>",
-      "</box>"
-    ]
+    "body": ["<box>", "\t<pen lineWidth=\"${1:0.5}\"/>", "</box>"]
   },
 
   "Field Expression": {
     "prefix": "$F",
     "description": "$F{} field reference",
-    "body": [
-      "\\$F{${1:fieldName}}"
-    ]
+    "body": ["\\$F{${1:fieldName}}"]
   },
   "Parameter Expression": {
     "prefix": "$P",
     "description": "$P{} parameter reference",
-    "body": [
-      "\\$P{${1:paramName}}"
-    ]
+    "body": ["\\$P{${1:paramName}}"]
   },
   "Variable Expression": {
     "prefix": "$V",
     "description": "$V{} variable reference",
-    "body": [
-      "\\$V{${1:varName}}"
-    ]
+    "body": ["\\$V{${1:varName}}"]
   },
   "Resource Expression": {
     "prefix": "$R",
     "description": "$R{} resource bundle reference",
-    "body": [
-      "\\$R{${1:resourceKey}}"
-    ]
+    "body": ["\\$R{${1:resourceKey}}"]
   }
 }

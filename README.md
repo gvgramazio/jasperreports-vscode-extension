@@ -20,11 +20,11 @@ The extension automatically activates the XML extension when needed and prompts 
 
 ### Schema Configuration
 
-| Setting | Description |
-| --- | --- |
-| `jasperreports.schema.version` | Bundled schema version (default: `7.0.6`) |
+| Setting                          | Description                                    |
+| -------------------------------- | ---------------------------------------------- |
+| `jasperreports.schema.version`   | Bundled schema version (default: `7.0.6`)      |
 | `jasperreports.schema.jrxmlPath` | Path to a custom JRXML XSD (overrides bundled) |
-| `jasperreports.schema.jrtxPath` | Path to a custom JRTX XSD (overrides bundled) |
+| `jasperreports.schema.jrtxPath`  | Path to a custom JRTX XSD (overrides bundled)  |
 
 ### Snippets
 
@@ -48,9 +48,9 @@ Compile `.jrxml` files to `.jasper` directly from VS Code.
 
 #### Compile Settings
 
-| Setting | Description |
-| --- | --- |
-| `jasperreports.java.home` | Path to a JRE/JDK installation (auto-detects `JAVA_HOME` if empty) |
+| Setting                   | Description                                                                                   |
+| ------------------------- | --------------------------------------------------------------------------------------------- |
+| `jasperreports.java.home` | Path to a JRE/JDK installation (auto-detects `JAVA_HOME` if empty)                            |
 | `jasperreports.classpath` | Array of paths to JasperReports JARs and dependencies (supports globs like `/path/to/libs/*`) |
 
 ## Installation
