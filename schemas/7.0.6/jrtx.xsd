@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  JasperReports JRTX (Template) Schema — version 7.0.6
+  Generated for the JasperReports VS Code extension.
+-->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           elementFormDefault="unqualified"
+           attributeFormDefault="unqualified">
+
+  <xs:simpleType name="modeType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="Opaque"/>
+      <xs:enumeration value="Transparent"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="horizontalTextAlignType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="Left"/>
+      <xs:enumeration value="Center"/>
+      <xs:enumeration value="Right"/>
+      <xs:enumeration value="Justified"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="verticalTextAlignType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="Top"/>
+      <xs:enumeration value="Middle"/>
+      <xs:enumeration value="Bottom"/>
+      <xs:enumeration value="Justified"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="rotationType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="None"/>
+      <xs:enumeration value="Left"/>
+      <xs:enumeration value="Right"/>
+      <xs:enumeration value="UpsideDown"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="lineStyleType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="Solid"/>
+      <xs:enumeration value="Dashed"/>
+      <xs:enumeration value="Dotted"/>
+      <xs:enumeration value="Double"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:complexType name="penType">
+    <xs:attribute name="lineWidth" type="xs:decimal"/>
+    <xs:attribute name="lineStyle" type="lineStyleType"/>
+    <xs:attribute name="lineColor" type="xs:string"/>
+  </xs:complexType>
+
+  <xs:complexType name="boxType">
+    <xs:all>
+      <xs:element name="pen" type="penType" minOccurs="0"/>
+      <xs:element name="topPen" type="penType" minOccurs="0"/>
+      <xs:element name="leftPen" type="penType" minOccurs="0"/>
+      <xs:element name="bottomPen" type="penType" minOccurs="0"/>
+      <xs:element name="rightPen" type="penType" minOccurs="0"/>
+    </xs:all>
+    <xs:attribute name="padding" type="xs:int"/>
+    <xs:attribute name="topPadding" type="xs:int"/>
+    <xs:attribute name="leftPadding" type="xs:int"/>
+    <xs:attribute name="bottomPadding" type="xs:int"/>
+    <xs:attribute name="rightPadding" type="xs:int"/>
+  </xs:complexType>
+
+  <xs:complexType name="paragraphType">
+    <xs:attribute name="lineSpacing" type="xs:string"/>
+    <xs:attribute name="lineSpacingSize" type="xs:decimal"/>
+    <xs:attribute name="firstLineIndent" type="xs:int"/>
+    <xs:attribute name="leftIndent" type="xs:int"/>
+    <xs:attribute name="rightIndent" type="xs:int"/>
+    <xs:attribute name="spacingBefore" type="xs:int"/>
+    <xs:attribute name="spacingAfter" type="xs:int"/>
+    <xs:attribute name="tabStopWidth" type="xs:int"/>
+  </xs:complexType>
+
+  <xs:complexType name="conditionalStyleType">
+    <xs:sequence>
+      <xs:element name="conditionExpression" minOccurs="0">
+        <xs:complexType mixed="true">
+          <xs:sequence>
+            <xs:any minOccurs="0" maxOccurs="unbounded" processContents="skip"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+    <xs:attributeGroup ref="styleAttributes"/>
+  </xs:complexType>
+
+  <xs:attributeGroup name="styleAttributes">
+    <xs:attribute name="mode" type="modeType"/>
+    <xs:attribute name="forecolor" type="xs:string"/>
+    <xs:attribute name="backcolor" type="xs:string"/>
+    <xs:attribute name="fontName" type="xs:string"/>
+    <xs:attribute name="fontSize" type="xs:decimal"/>
+    <xs:attribute name="bold" type="xs:boolean"/>
+    <xs:attribute name="italic" type="xs:boolean"/>
+    <xs:attribute name="underline" type="xs:boolean"/>
+    <xs:attribute name="strikeThrough" type="xs:boolean"/>
+    <xs:attribute name="pdfFontName" type="xs:string"/>
+    <xs:attribute name="pdfEncoding" type="xs:string"/>
+    <xs:attribute name="pdfEmbedded" type="xs:boolean"/>
+    <xs:attribute name="hTextAlign" type="horizontalTextAlignType"/>
+    <xs:attribute name="vTextAlign" type="verticalTextAlignType"/>
+    <xs:attribute name="rotation" type="rotationType"/>
+    <xs:attribute name="markup" type="xs:string"/>
+    <xs:attribute name="pattern" type="xs:string"/>
+    <xs:attribute name="blankWhenNull" type="xs:boolean"/>
+    <xs:attribute name="radius" type="xs:int"/>
+    <xs:attribute name="fill" type="xs:string"/>
+    <xs:attribute name="hImageAlign" type="xs:string"/>
+    <xs:attribute name="vImageAlign" type="xs:string"/>
+  </xs:attributeGroup>
+
+  <xs:complexType name="styleType">
+    <xs:sequence>
+      <xs:element name="conditionalStyle" type="conditionalStyleType" minOccurs="0" maxOccurs="unbounded"/>
+      <xs:element name="box" type="boxType" minOccurs="0"/>
+      <xs:element name="pen" type="penType" minOccurs="0"/>
+      <xs:element name="paragraph" type="paragraphType" minOccurs="0"/>
+    </xs:sequence>
+    <xs:attribute name="name" type="xs:string" use="required"/>
+    <xs:attribute name="default" type="xs:boolean"/>
+    <xs:attribute name="style" type="xs:string"/>
+    <xs:attributeGroup ref="styleAttributes"/>
+  </xs:complexType>
+
+  <xs:element name="jasperTemplate">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="template" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+        <xs:element name="style" type="styleType" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+
+</xs:schema>

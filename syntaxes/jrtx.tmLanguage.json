@@ -1,0 +1,5 @@
+{
+  "scopeName": "text.xml.jrtx",
+  "name": "JRTX",
+  "patterns": [{ "include": "text.xml" }]
+}
