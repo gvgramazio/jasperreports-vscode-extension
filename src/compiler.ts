@@ -2,17 +2,7 @@ import * as vscode from "vscode";
 import * as path from "path";
 import { execFile } from "child_process";
 import { resolveJavaExecutable, validateJava } from "./java";
-
-const OUTPUT_CHANNEL_NAME = "JasperReports";
-
-let outputChannel: vscode.OutputChannel | undefined;
-
-function getOutputChannel(): vscode.OutputChannel {
-  if (!outputChannel) {
-    outputChannel = vscode.window.createOutputChannel(OUTPUT_CHANNEL_NAME);
-  }
-  return outputChannel;
-}
+import { getOutputChannel } from "./logger";
 
 /**
  * Builds the classpath string for running the JR compiler.
@@ -132,9 +122,4 @@ function runCompiler(
       resolve();
     });
   });
-}
-
-export function disposeOutputChannel(): void {
-  outputChannel?.dispose();
-  outputChannel = undefined;
 }
