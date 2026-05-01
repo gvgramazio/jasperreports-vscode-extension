@@ -28,9 +28,10 @@ The extension automatically activates the XML extension when needed and prompts 
 
 ### Snippets
 
-37 snippets for rapid JRXML authoring, covering:
+44 snippets for rapid JRXML authoring, covering:
 
-- **Data model** — `field`, `parameter`, `variable`, `sortField`, `query`, `property`
+- **Root** — `jasperReport`
+- **Data model** — `field`, `fieldDesc`, `parameter`, `parameterDefault`, `variable`, `sortField`, `query`, `property`
 - **Styles** — `style`, `styleDefault`, `conditionalStyle`
 - **Sections** — `title`, `pageHeader`, `columnHeader`, `detail`, `columnFooter`, `pageFooter`, `lastPageFooter`, `summary`, `noData`, `background`, `band`, `group`
 - **Report elements** (JR 7.0.6 `<element kind="...">` format) — `textField`, `staticText`, `image`, `line`, `rectangle`, `ellipse`, `frame`, `subreport`, `chart`, `crosstab`, `component`, `elementGroup`, `generic`
