@@ -5,6 +5,7 @@
   "version": "0.0.1",
   "publisher": "gvgramazio",
   "license": "MIT",
+  "packageManager": "pnpm@10.33.2",
   "engines": {
     "vscode": "^1.99.0"
   },
