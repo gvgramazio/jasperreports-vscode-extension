@@ -1,3 +1,17 @@
+# [1.1.0](https://github.com/gvgramazio/jasperreports-vscode-extension/compare/v1.0.0...v1.1.0) (2026-05-01)
+
+
+### Bug Fixes
+
+* format changelog entries for CI tests ([a9bbd8a](https://github.com/gvgramazio/jasperreports-vscode-extension/commit/a9bbd8ac0b1f696ea94a78cbebb2acf01bf7d12a))
+
+
+### Features
+
+* add report preview functionality and update commands in VS Code extension ([a8f88be](https://github.com/gvgramazio/jasperreports-vscode-extension/commit/a8f88be6c5bbb81fcb238d8e0ca54da4f5a2e0b4))
+* add side panel preview functionality for reports in VS Code extension ([b57d3d1](https://github.com/gvgramazio/jasperreports-vscode-extension/commit/b57d3d1d282289265ecd66bc8d58510e3c3d6397))
+* implement download dependencies functionality in VS Code extension ([f8d6a43](https://github.com/gvgramazio/jasperreports-vscode-extension/commit/f8d6a43f08b6c021368cbf702617a3cad4b0dee9))
+
 # 1.0.0 (2026-05-01)
 
 ### Bug Fixes
