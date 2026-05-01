@@ -5,6 +5,7 @@ import * as os from "os";
 import { execFile } from "child_process";
 import { resolveJavaExecutable, validateJava } from "./java";
 import { buildClasspath } from "./compiler";
+import { getOutputChannel } from "./logger";
 import {
   type PreviewFormat,
   getPreviewConfig,
@@ -78,6 +79,14 @@ export async function previewReport(
   const dataSourcePath = fileConfig.dataSourcePath;
   const fileName = path.basename(filePath);
 
+  const channel = getOutputChannel();
+  channel.appendLine(`Previewing ${fileName} (${format})...`);
+  channel.appendLine(`  Java: ${javaPath} (${javaResult.version})`);
+  channel.appendLine(`  File: ${filePath}`);
+  if (dataSourcePath) {
+    channel.appendLine(`  Data source: ${dataSourcePath}`);
+  }
+
   await vscode.window.withProgress(
     {
       location: vscode.ProgressLocation.Notification,
@@ -126,9 +135,19 @@ function runPreview(
 
     const cwd = path.dirname(jrxmlPath);
 
-    execFile(javaPath, args, { cwd }, (err, _stdout, stderr) => {
+    execFile(javaPath, args, { cwd }, (err, stdout, stderr) => {
+      const channel = getOutputChannel();
+      if (stdout) {
+        channel.appendLine(stdout);
+      }
+      if (stderr) {
+        channel.appendLine(stderr);
+      }
+
       if (err) {
         const errorMsg = stderr || err.message;
+        channel.appendLine(`FAILED: ${errorMsg}`);
+        channel.show(true);
         reject(new Error(errorMsg.split("\n")[0]));
         return;
       }
@@ -137,13 +156,17 @@ function runPreview(
         if (format === "pdf") {
           const pdfBytes = fs.readFileSync(outputFile);
           fs.unlinkSync(outputFile);
+          channel.appendLine(`OK → preview rendered (${format})`);
           resolve(pdfBytes.toString("base64"));
         } else {
           const html = fs.readFileSync(outputFile, "utf-8");
           fs.unlinkSync(outputFile);
+          channel.appendLine(`OK → preview rendered (${format})`);
           resolve(html);
         }
       } catch (readErr) {
+        channel.appendLine(`FAILED: Failed to read preview output: ${readErr}`);
+        channel.show(true);
         reject(new Error(`Failed to read preview output: ${readErr}`));
       }
     });

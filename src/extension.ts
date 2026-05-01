@@ -1,7 +1,8 @@
 import * as vscode from "vscode";
 import * as path from "path";
-import { compileReport, disposeOutputChannel } from "./compiler";
+import { compileReport } from "./compiler";
 import { downloadDependencies } from "./dependencies";
+import { disposeOutputChannel, getOutputChannel } from "./logger";
 import { previewReport, disposePreviewPanel } from "./preview";
 import { configurePreview } from "./previewConfig";
 
@@ -10,7 +11,8 @@ const XML_EXTENSION_ID = "redhat.vscode-xml";
 export async function activate(
   context: vscode.ExtensionContext,
 ): Promise<void> {
-  console.log("JasperReports extension is now active.");
+  const channel = getOutputChannel();
+  channel.appendLine("JasperReports extension is now active.");
 
   registerXmlFileAssociations(context);
   registerCommands(context);
