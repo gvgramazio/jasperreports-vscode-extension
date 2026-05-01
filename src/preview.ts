@@ -16,6 +16,7 @@ let currentPanel: vscode.WebviewPanel | undefined;
  */
 export async function previewReport(
   extensionPath: string,
+  viewColumn: vscode.ViewColumn = vscode.ViewColumn.Active,
   jrxmlPath?: string,
 ): Promise<void> {
   // Resolve the file to preview
@@ -69,7 +70,7 @@ export async function previewReport(
     },
     async () => {
       const htmlContent = await runPreview(javaPath, classpath, filePath);
-      showPreviewPanel(fileName, htmlContent);
+      showPreviewPanel(fileName, htmlContent, viewColumn);
     },
   );
 }
@@ -113,9 +114,11 @@ function runPreview(
   });
 }
 
-function showPreviewPanel(fileName: string, htmlContent: string): void {
-  const column = vscode.ViewColumn.Beside;
-
+function showPreviewPanel(
+  fileName: string,
+  htmlContent: string,
+  column: vscode.ViewColumn,
+): void {
   if (currentPanel) {
     currentPanel.title = `Preview: ${fileName}`;
     currentPanel.webview.html = wrapHtml(htmlContent);
