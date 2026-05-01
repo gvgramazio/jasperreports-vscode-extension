@@ -63,6 +63,16 @@ Preview filled reports as HTML directly inside VS Code.
 - Reuses the same preview panel across invocations
 - Requires the same Java and classpath configuration as the compile command
 
+### Download Dependencies
+
+Automatically download JasperReports JARs and all transitive dependencies into your workspace.
+
+- **Command Palette** → `JasperReports: Download Dependencies`
+- Downloads the version matching the `jasperreports.schema.version` setting
+- JARs are saved to `.jasperreports/` in the workspace root
+- Automatically updates `jasperreports.classpath` in workspace settings
+- Requires [Maven](https://maven.apache.org/) installed and available on PATH (or via `MAVEN_HOME`/`M2_HOME`)
+
 ## Installation
 
 ### From Marketplace
