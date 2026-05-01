@@ -19,3 +19,5 @@ esbuild.mjs
 pnpm-lock.yaml
 pnpm-workspace.yaml
 PLAN.md
+lib/src/
+lib/build/

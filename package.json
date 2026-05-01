@@ -71,6 +71,21 @@
         "languageId": "jrtx"
       }
     ],
+    "commands": [
+      {
+        "command": "jasperreports.compile",
+        "title": "Compile JRXML",
+        "category": "JasperReports"
+      }
+    ],
+    "menus": {
+      "commandPalette": [
+        {
+          "command": "jasperreports.compile",
+          "when": "editorLangId == jrxml"
+        }
+      ]
+    },
     "configuration": {
       "title": "JasperReports",
       "properties": {
@@ -91,6 +106,19 @@
           "type": "string",
           "default": "",
           "description": "Path to a custom JRTX XSD schema file. Overrides the bundled schema when set."
+        },
+        "jasperreports.java.home": {
+          "type": "string",
+          "default": "",
+          "description": "Path to a JRE or JDK installation. If empty, uses JAVA_HOME or java on PATH."
+        },
+        "jasperreports.classpath": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": [],
+          "markdownDescription": "Paths to JasperReports JARs and dependencies. Supports glob patterns (e.g. `/path/to/libs/*`). Required for the compile command."
         }
       }
     }
