@@ -3,6 +3,7 @@ import * as path from "path";
 import { compileReport, disposeOutputChannel } from "./compiler";
 import { downloadDependencies } from "./dependencies";
 import { previewReport, disposePreviewPanel } from "./preview";
+import { configurePreview } from "./previewConfig";
 
 const XML_EXTENSION_ID = "redhat.vscode-xml";
 
@@ -30,13 +31,16 @@ function registerCommands(context: vscode.ExtensionContext): void {
       compileReport(context.extensionPath),
     ),
     vscode.commands.registerCommand("jasperreports.preview", () =>
-      previewReport(context.extensionPath),
+      previewReport(context),
     ),
     vscode.commands.registerCommand("jasperreports.previewToSide", () =>
-      previewReport(context.extensionPath, vscode.ViewColumn.Beside),
+      previewReport(context, vscode.ViewColumn.Beside),
     ),
     vscode.commands.registerCommand("jasperreports.downloadDependencies", () =>
       downloadDependencies(),
+    ),
+    vscode.commands.registerCommand("jasperreports.configurePreview", () =>
+      configurePreview(context),
     ),
   );
 }

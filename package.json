@@ -91,6 +91,11 @@
         "command": "jasperreports.downloadDependencies",
         "title": "Download Dependencies",
         "category": "JasperReports"
+      },
+      {
+        "command": "jasperreports.configurePreview",
+        "title": "Configure Preview",
+        "category": "JasperReports"
       }
     ],
     "menus": {
@@ -105,6 +110,10 @@
         },
         {
           "command": "jasperreports.previewToSide",
+          "when": "editorLangId == jrxml"
+        },
+        {
+          "command": "jasperreports.configurePreview",
           "when": "editorLangId == jrxml"
         }
       ]
@@ -142,6 +151,20 @@
           },
           "default": [],
           "markdownDescription": "Paths to JasperReports JARs and dependencies. Supports glob patterns (e.g. `/path/to/libs/*`). Required for the compile command."
+        },
+        "jasperreports.preview.format": {
+          "type": "string",
+          "default": "html",
+          "enum": [
+            "html",
+            "pdf"
+          ],
+          "description": "Default export format for report preview."
+        },
+        "jasperreports.preview.liveReload": {
+          "type": "boolean",
+          "default": false,
+          "description": "Automatically re-run preview when the JRXML file is saved."
         }
       }
     }

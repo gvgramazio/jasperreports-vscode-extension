@@ -1,6 +1,7 @@
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Constructor;
+import java.io.File;
 import java.util.HashMap;
 
 /**
@@ -12,7 +13,7 @@ import java.util.HashMap;
  * Commands:
  * <ul>
  *   <li>{@code java -cp <cp> JrCompiler compile <file.jrxml>} — compile to .jasper</li>
- *   <li>{@code java -cp <cp> JrCompiler preview <file.jrxml> <output.html>} — compile, fill with empty data, export to HTML</li>
+ *   <li>{@code java -cp <cp> JrCompiler preview <file.jrxml> <output> <format> [dataSourcePath]} — compile, fill, export</li>
  * </ul>
  */
 public class JrCompiler {
@@ -32,11 +33,12 @@ public class JrCompiler {
                     compile(args[1]);
                     break;
                 case "preview":
-                    if (args.length != 3) {
-                        System.err.println("Usage: java JrCompiler preview <file.jrxml> <output.html>");
+                    if (args.length < 4 || args.length > 5) {
+                        System.err.println("Usage: java JrCompiler preview <file.jrxml> <output> <format> [dataSourcePath]");
                         System.exit(1);
                     }
-                    preview(args[1], args[2]);
+                    String dsPath = args.length == 5 ? args[4] : null;
+                    preview(args[1], args[2], args[3], dsPath);
                     break;
                 default:
                     printUsage();
@@ -60,7 +62,8 @@ public class JrCompiler {
         compileMethod.invoke(null, jrxmlPath);
     }
 
-    private static void preview(String jrxmlPath, String outputHtml) throws Exception {
+    private static void preview(String jrxmlPath, String outputFile,
+                                String format, String dataSourcePath) throws Exception {
         // 1. Compile
         Class<?> compileManager = Class.forName(
             "net.sf.jasperreports.engine.JasperCompileManager");
@@ -68,37 +71,76 @@ public class JrCompiler {
             "compileReport", String.class);
         Object jasperReport = compileMethod.invoke(null, jrxmlPath);
 
-        // 2. Fill with empty data source
+        // 2. Create data source
+        Object dataSource = createDataSource(dataSourcePath);
+
+        // 3. Fill
         Class<?> fillManager = Class.forName(
             "net.sf.jasperreports.engine.JasperFillManager");
-        Class<?> dataSourceClass = Class.forName(
+        Class<?> dataSourceInterface = Class.forName(
             "net.sf.jasperreports.engine.JRDataSource");
-        Class<?> emptyDsClass = Class.forName(
-            "net.sf.jasperreports.engine.JREmptyDataSource");
         Class<?> jasperReportClass = Class.forName(
             "net.sf.jasperreports.engine.JasperReport");
 
-        Constructor<?> emptyDsCtor = emptyDsClass.getConstructor();
-        Object emptyDs = emptyDsCtor.newInstance();
-
         Method fillMethod = fillManager.getMethod(
-            "fillReport", jasperReportClass, java.util.Map.class, dataSourceClass);
+            "fillReport", jasperReportClass, java.util.Map.class, dataSourceInterface);
         Object jasperPrint = fillMethod.invoke(null, jasperReport,
-            new HashMap<String, Object>(), emptyDs);
+            new HashMap<String, Object>(), dataSource);
 
-        // 3. Export to HTML
+        // 4. Export
         Class<?> exportManager = Class.forName(
             "net.sf.jasperreports.engine.JasperExportManager");
         Class<?> jasperPrintClass = Class.forName(
             "net.sf.jasperreports.engine.JasperPrint");
-        Method exportMethod = exportManager.getMethod(
-            "exportReportToHtmlFile", jasperPrintClass, String.class);
-        exportMethod.invoke(null, jasperPrint, outputHtml);
+
+        if ("pdf".equalsIgnoreCase(format)) {
+            Method exportMethod = exportManager.getMethod(
+                "exportReportToPdfFile", jasperPrintClass, String.class);
+            exportMethod.invoke(null, jasperPrint, outputFile);
+        } else {
+            Method exportMethod = exportManager.getMethod(
+                "exportReportToHtmlFile", jasperPrintClass, String.class);
+            exportMethod.invoke(null, jasperPrint, outputFile);
+        }
+    }
+
+    private static Object createDataSource(String dataSourcePath) throws Exception {
+        if (dataSourcePath == null || dataSourcePath.isEmpty()) {
+            Class<?> emptyDsClass = Class.forName(
+                "net.sf.jasperreports.engine.JREmptyDataSource");
+            Constructor<?> ctor = emptyDsClass.getConstructor();
+            return ctor.newInstance();
+        }
+
+        String lowerPath = dataSourcePath.toLowerCase();
+        if (lowerPath.endsWith(".json")) {
+            Class<?> jsonDsClass = Class.forName(
+                "net.sf.jasperreports.json.data.JsonDataSource");
+            Constructor<?> ctor = jsonDsClass.getConstructor(File.class);
+            return ctor.newInstance(new File(dataSourcePath));
+        } else if (lowerPath.endsWith(".csv")) {
+            Class<?> csvDsClass = Class.forName(
+                "net.sf.jasperreports.engine.data.JRCsvDataSource");
+            Constructor<?> ctor = csvDsClass.getConstructor(File.class);
+            return ctor.newInstance(new File(dataSourcePath));
+        } else if (lowerPath.endsWith(".xml")) {
+            Class<?> xmlDsClass = Class.forName(
+                "net.sf.jasperreports.engine.data.JRXmlDataSource");
+            Constructor<?> ctor = xmlDsClass.getConstructor(File.class);
+            return ctor.newInstance(new File(dataSourcePath));
+        } else {
+            throw new IllegalArgumentException(
+                "Unsupported data source file type: " + dataSourcePath +
+                ". Supported extensions: .json, .csv, .xml");
+        }
     }
 
     private static void printUsage() {
         System.err.println("Usage:");
         System.err.println("  java JrCompiler compile <file.jrxml>");
-        System.err.println("  java JrCompiler preview <file.jrxml> <output.html>");
+        System.err.println("  java JrCompiler preview <file.jrxml> <output> <format> [dataSourcePath]");
+        System.err.println();
+        System.err.println("  format: html | pdf");
+        System.err.println("  dataSourcePath: path to .json, .csv, or .xml file (optional, defaults to empty)");
     }
 }
