@@ -1,0 +1,28 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "esbuild-watch",
+      "type": "shell",
+      "command": "pnpm node esbuild.mjs --watch",
+      "isBackground": true,
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "problemMatcher": [
+        {
+          "pattern": {
+            "regexp": "✘ \\[ERROR\\] (.+)",
+            "message": 1
+          },
+          "background": {
+            "activeOnStart": true,
+            "beginsPattern": ".",
+            "endsPattern": "Watching for changes..."
+          }
+        }
+      ]
+    }
+  ]
+}
