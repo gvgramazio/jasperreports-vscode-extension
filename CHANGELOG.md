@@ -1,3 +1,16 @@
+# [1.2.0](https://github.com/gvgramazio/jasperreports-vscode-extension/compare/v1.1.1...v1.2.0) (2026-05-02)
+
+
+### Bug Fixes
+
+* update snippet count and add missing data model fields in README.md ([a5661e8](https://github.com/gvgramazio/jasperreports-vscode-extension/commit/a5661e8c7f3732bf1d191400141e61b4d706bb68))
+
+
+### Features
+
+* enhance preview functionality with configurable data source and format options ([b2a5386](https://github.com/gvgramazio/jasperreports-vscode-extension/commit/b2a5386788940f0870def7996fb2bea03a3c1b53))
+* refactor logging functionality to a dedicated logger module ([a8ff228](https://github.com/gvgramazio/jasperreports-vscode-extension/commit/a8ff2289968e725ef800da84a0cdf5ff131c2adf))
+
 ## [1.1.1](https://github.com/gvgramazio/jasperreports-vscode-extension/compare/v1.1.0...v1.1.1) (2026-05-01)
 
 
