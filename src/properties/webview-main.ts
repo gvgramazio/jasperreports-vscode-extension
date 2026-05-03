@@ -50,6 +50,24 @@ function setupEditListeners(): void {
         }
       });
     });
+
+  // Handle stale banner
+  const overlay = document.getElementById("stale-overlay");
+  if (overlay) {
+    overlay.addEventListener("click", () => {
+      vscode.postMessage({ type: "refresh" });
+    });
+  }
+
+  // Listen for markStale messages from extension
+  window.addEventListener("message", (event: MessageEvent) => {
+    if (event.data?.type === "markStale") {
+      const staleOverlay = document.getElementById("stale-overlay");
+      if (staleOverlay) {
+        staleOverlay.classList.add("visible");
+      }
+    }
+  });
 }
 
 // Run after DOM is ready

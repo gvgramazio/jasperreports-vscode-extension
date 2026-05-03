@@ -102,12 +102,14 @@ A dedicated activity bar panel showing the structure of the active `.jrxml` file
 
 A webview panel below the Report Outline showing detailed properties for the selected tree item.
 
-- **Attributes** — all element attributes in a tabular view, **editable inline** (blur or Enter commits, Escape reverts)
+- **Attributes** — all element attributes in a tabular view, **editable inline** (blur or Enter commits, Escape reverts); `uuid` is read-only
 - **Expressions** — expression content (e.g. `textFieldExpression`, `imageExpression`) displayed with CDATA text
 - **Style** — referenced style name
 - **Box & Pen** — border and line properties including per-side pen attributes
 - **Report Element** — common element properties (position, size, key, etc.)
 - Automatically updates when selecting a different node in the outline tree
+- After an inline edit, the panel re-parses the document and refreshes with fresh positions
+- When the document changes externally, a stale banner prompts you to refresh
 - Themed using VS Code CSS variables for seamless integration
 
 ### Outline Actions
@@ -116,7 +118,7 @@ Context menu actions available on tree items:
 
 - **Add** — right-click a group (Fields, Parameters, Variables, Sort Fields, Groups) to add a new element with a prompted name
 - **Add Band** — right-click a section (Title, Detail, etc.) to add a new band
-- **Delete** — right-click any field, parameter, variable, sortField, group, band, or style to delete it (with confirmation)
+- **Delete** — right-click any field, parameter, variable, sortField, group, groupHeader, groupFooter, section, band, element, or style to delete it (with confirmation)
 
 ## Installation
 

@@ -128,6 +128,11 @@ function registerOutlineView(context: vscode.ExtensionContext): void {
       debounceTimer = setTimeout(() => {
         outlineProvider?.refresh(e.document.getText());
       }, 300);
+
+      // Mark properties panel stale for external edits
+      if (!propertiesProvider.editInProgress) {
+        propertiesProvider.markStale();
+      }
     }),
   );
 

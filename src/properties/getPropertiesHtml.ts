@@ -63,9 +63,38 @@ export function getPropertiesHtml(
     .edit-input:focus {
       outline: 1px solid var(--vscode-focusBorder);
     }
+    .stale-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: var(--vscode-editor-background);
+      opacity: 0.85;
+      z-index: 1000;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+    }
+    .stale-overlay.visible {
+      display: flex;
+    }
+    .stale-message {
+      padding: 12px 20px;
+      border: 1px solid var(--vscode-editorWarning-foreground);
+      border-radius: 4px;
+      color: var(--vscode-editorWarning-foreground);
+      background: var(--vscode-editor-background);
+      text-align: center;
+      font-size: var(--vscode-font-size);
+    }
   </style>
 </head>
 <body>
+  <div id="stale-overlay" class="stale-overlay">
+    <div class="stale-message">Document changed externally.<br/>Click to refresh.</div>
+  </div>
   ${groups.length > 0 ? `<div class="node-label">${escapeHtml(nodeLabel)}</div>` : ""}
   ${content}
   <script type="module" nonce="${nonce}" src="${scriptUri}"></script>
