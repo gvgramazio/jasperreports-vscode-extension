@@ -71,6 +71,29 @@
         "languageId": "jrtx"
       }
     ],
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "jasperreports-panel",
+          "title": "JasperReports",
+          "icon": "images/jasperreports-panel.svg"
+        }
+      ]
+    },
+    "views": {
+      "jasperreports-panel": [
+        {
+          "id": "jasperreports-outline",
+          "name": "Report Outline"
+        }
+      ]
+    },
+    "viewsWelcome": [
+      {
+        "view": "jasperreports-outline",
+        "contents": "Open a .jrxml file to see the report outline."
+      }
+    ],
     "commands": [
       {
         "command": "jasperreports.compile",
@@ -96,6 +119,11 @@
         "command": "jasperreports.configurePreview",
         "title": "Configure Preview",
         "category": "JasperReports"
+      },
+      {
+        "command": "jasperreports.outline.reveal",
+        "title": "Go to Element",
+        "category": "JasperReports"
       }
     ],
     "menus": {
@@ -115,6 +143,10 @@
         {
           "command": "jasperreports.configurePreview",
           "when": "editorLangId == jrxml"
+        },
+        {
+          "command": "jasperreports.outline.reveal",
+          "when": "false"
         }
       ]
     },
@@ -205,5 +237,8 @@
     "typescript": "^6.0.3",
     "typescript-eslint": "^8.59.1",
     "vitest": "^4.1.5"
+  },
+  "dependencies": {
+    "saxes": "^6.0.0"
   }
 }
