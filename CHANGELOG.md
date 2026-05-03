@@ -1,3 +1,10 @@
+# [1.7.0](https://github.com/gvgramazio/jasperreports-vscode-extension/compare/v1.6.0...v1.7.0) (2026-05-03)
+
+
+### Features
+
+* add CodeQL workflow for security analysis ([31d93e1](https://github.com/gvgramazio/jasperreports-vscode-extension/commit/31d93e109cf3815bed6e15329dd0923f983d2f88))
+
 # [1.6.0](https://github.com/gvgramazio/jasperreports-vscode-extension/compare/v1.5.0...v1.6.0) (2026-05-03)
 
 
