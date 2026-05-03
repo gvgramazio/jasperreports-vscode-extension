@@ -22,7 +22,7 @@ export async function activate(
   const channel = getOutputChannel();
   channel.appendLine("JasperReports extension is now active.");
 
-  registerXmlFileAssociations(context);
+  await registerXmlFileAssociations(context);
   registerCommands(context);
   registerOutlineView(context);
   await activateXmlExtension();
@@ -154,7 +154,9 @@ function isJrxmlDocument(document: vscode.TextDocument): boolean {
  * Registers XML file associations so the Red Hat XML extension applies
  * the bundled (or user-overridden) XSD schemas to .jrxml and .jrtx files.
  */
-function registerXmlFileAssociations(context: vscode.ExtensionContext): void {
+async function registerXmlFileAssociations(
+  context: vscode.ExtensionContext,
+): Promise<void> {
   const config = vscode.workspace.getConfiguration("jasperreports");
   const version = config.get<string>("schema.version", "7.0.6");
   const customJrxmlPath = config.get<string>("schema.jrxmlPath", "");
@@ -185,10 +187,10 @@ function registerXmlFileAssociations(context: vscode.ExtensionContext): void {
   );
   filtered.push(jrxmlAssoc, jrtxAssoc);
 
-  xmlConfig.update(
+  await xmlConfig.update(
     "fileAssociations",
     filtered,
-    vscode.ConfigurationTarget.Global,
+    vscode.ConfigurationTarget.Workspace,
   );
 }
 
@@ -205,18 +207,15 @@ async function activateXmlExtension(): Promise<void> {
       await xmlExt.activate();
     }
   } else {
-    vscode.window
-      .showInformationMessage(
-        "Install the 'XML' extension (Red Hat) for JRXML/JRTX validation and auto-completion.",
-        "Install",
-      )
-      .then((choice) => {
-        if (choice === "Install") {
-          vscode.commands.executeCommand(
-            "workbench.extensions.installExtension",
-            XML_EXTENSION_ID,
-          );
-        }
-      });
+    const choice = await vscode.window.showInformationMessage(
+      "Install the 'XML' extension (Red Hat) for JRXML/JRTX validation and auto-completion.",
+      "Install",
+    );
+    if (choice === "Install") {
+      vscode.commands.executeCommand(
+        "workbench.extensions.installExtension",
+        XML_EXTENSION_ID,
+      );
+    }
   }
 }

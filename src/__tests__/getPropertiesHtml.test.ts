@@ -56,7 +56,7 @@ describe("getPropertiesHtml", () => {
       },
     ];
     const html = getPropertiesHtml(makeWebview(), extensionUri, groups, "Node");
-    // escapeAttr should have escaped the value in the input's value attribute
+    // escapeHtml should have escaped the value in the input's value attribute
     expect(html).toContain("edit-input");
     expect(html).toContain("&lt;test&gt;&amp;&quot;val&quot;");
   });

@@ -31,7 +31,7 @@ describe("extension", () => {
         expect.objectContaining({ pattern: "**/*.jrxml" }),
         expect.objectContaining({ pattern: "**/*.jrtx" }),
       ]),
-      vscode.ConfigurationTarget.Global,
+      vscode.ConfigurationTarget.Workspace,
     );
   });
 
@@ -104,13 +104,10 @@ describe("extension", () => {
 
     await extension.activate(context);
 
-    // Allow the `.then()` microtask to resolve
-    await vi.waitFor(() => {
-      expect(vscode.commands.executeCommand).toHaveBeenCalledWith(
-        "workbench.extensions.installExtension",
-        "redhat.vscode-xml",
-      );
-    });
+    expect(vscode.commands.executeCommand).toHaveBeenCalledWith(
+      "workbench.extensions.installExtension",
+      "redhat.vscode-xml",
+    );
   });
 
   it("deactivate does not throw", () => {
