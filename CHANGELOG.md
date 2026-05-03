@@ -1,3 +1,15 @@
+# [1.3.0](https://github.com/gvgramazio/jasperreports-vscode-extension/compare/v1.2.0...v1.3.0) (2026-05-03)
+
+
+### Features
+
+* add JRXML report outline feature with interactive tree view ([ff3dd86](https://github.com/gvgramazio/jasperreports-vscode-extension/commit/ff3dd8688004e4f2142473e40f5360280e9ccad7))
+* add outline actions and enhance properties view with inline editing ([bd9c4bc](https://github.com/gvgramazio/jasperreports-vscode-extension/commit/bd9c4bcd6484e42445357359e28917492013a9e6))
+* critical UX fixes ([1d93b71](https://github.com/gvgramazio/jasperreports-vscode-extension/commit/1d93b71182d7c9ffc94aa2cf6042d9b085d570fd))
+* enhance properties view with input validation and UX improvements ([2848edb](https://github.com/gvgramazio/jasperreports-vscode-extension/commit/2848edbc10df79d576daa838e767cf29c41e6a53))
+* implement drag-and-drop functionality for outline items ([b6dc24a](https://github.com/gvgramazio/jasperreports-vscode-extension/commit/b6dc24a96f2880b390cad795342406be78f51e1e))
+* implement properties view with webview integration and update JRXML parsing for text content ([c7c4f28](https://github.com/gvgramazio/jasperreports-vscode-extension/commit/c7c4f28a8d14d4682cd8982af02bc54a1e45facb))
+
 # [1.2.0](https://github.com/gvgramazio/jasperreports-vscode-extension/compare/v1.1.1...v1.2.0) (2026-05-02)
 
 
