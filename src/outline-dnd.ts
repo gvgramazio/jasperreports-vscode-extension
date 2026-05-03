@@ -1,6 +1,5 @@
 import * as vscode from "vscode";
-import { OutlineItem } from "./outline";
-import { NodePosition } from "./jrxml-parser";
+import { OutlineItem, nodeToFullLineRange } from "./outline";
 
 const MIME_TYPE = "application/vnd.code.tree.jasperreports-outline";
 
@@ -97,23 +96,4 @@ export class OutlineDragAndDropController implements vscode.TreeDragAndDropContr
     edit.insert(document.uri, insertPos, sourceText);
     await vscode.workspace.applyEdit(edit);
   }
-}
-
-function nodeToFullLineRange(
-  document: vscode.TextDocument,
-  position: NodePosition,
-): vscode.Range {
-  const startLine = position.startLine - 1; // 0-based
-  const endLine = position.endLine; // line after
-
-  const start = new vscode.Position(startLine, 0);
-  const end =
-    endLine < document.lineCount
-      ? new vscode.Position(endLine, 0)
-      : new vscode.Position(
-          document.lineCount - 1,
-          document.lineAt(document.lineCount - 1).text.length,
-        );
-
-  return new vscode.Range(start, end);
 }

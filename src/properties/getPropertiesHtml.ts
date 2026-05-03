@@ -118,9 +118,9 @@ function renderGroup(group: PropertyGroup): string {
         e.editable && e.attributePosition
           ? `<vscode-table-cell class="value-cell">
               <input class="edit-input" type="text"
-                value="${escapeAttr(e.value)}"
-                data-attr="${escapeAttr(e.name)}"
-                data-pos="${escapeAttr(JSON.stringify(e.attributePosition))}"${e.typeInfo ? ` data-type="${escapeAttr(e.typeInfo.type)}"` : ""}${e.typeInfo?.enumValues ? ` data-enum="${escapeAttr(JSON.stringify(e.typeInfo.enumValues))}"` : ""} />
+                value="${escapeHtml(e.value)}"
+                data-attr="${escapeHtml(e.name)}"
+                data-pos="${escapeHtml(JSON.stringify(e.attributePosition))}"${e.typeInfo ? ` data-type="${escapeHtml(e.typeInfo.type)}"` : ""}${e.typeInfo?.enumValues ? ` data-enum="${escapeHtml(JSON.stringify(e.typeInfo.enumValues))}"` : ""} />
             </vscode-table-cell>`
           : `<vscode-table-cell class="value-cell">${escapeHtml(e.value)}</vscode-table-cell>`;
 
@@ -150,14 +150,6 @@ function escapeHtml(text: string): string {
     .replace(/</g, "&lt;")
     .replace(/>/g, "&gt;")
     .replace(/"/g, "&quot;");
-}
-
-function escapeAttr(text: string): string {
-  return text
-    .replace(/&/g, "&amp;")
-    .replace(/"/g, "&quot;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;");
 }
 
 function getNonce(): string {

@@ -1,5 +1,5 @@
 import * as vscode from "vscode";
-import { OutlineItem } from "./outline";
+import { OutlineItem, nodeToFullLineRange } from "./outline";
 import { NodePosition } from "./jrxml-parser";
 
 const ELEMENT_TEMPLATES: Record<string, (name: string) => string> = {
@@ -142,7 +142,7 @@ export async function deleteElement(item: OutlineItem): Promise<void> {
   );
   if (confirm !== "Delete") return;
 
-  const range = nodeToRange(editor.document, item.node.position);
+  const range = nodeToFullLineRange(editor.document, item.node.position);
   const edit = new vscode.WorkspaceEdit();
   edit.delete(editor.document.uri, range);
   await vscode.workspace.applyEdit(edit);
@@ -219,27 +219,4 @@ function getInsertPosition(
   }
 
   return undefined;
-}
-
-function nodeToRange(
-  document: vscode.TextDocument,
-  position: NodePosition,
-): vscode.Range {
-  // Include the entire line(s) containing the element
-  const startLine = position.startLine - 1; // 0-based
-  const endLine = position.endLine; // Already the line after (we want to delete the full line)
-
-  // Delete from start of line (include leading whitespace for clean deletion)
-  const start = new vscode.Position(startLine, 0);
-
-  // If endLine is within document, delete up to start of next line
-  const end =
-    endLine < document.lineCount
-      ? new vscode.Position(endLine, 0)
-      : new vscode.Position(
-          document.lineCount - 1,
-          document.lineAt(document.lineCount - 1).text.length,
-        );
-
-  return new vscode.Range(start, end);
 }

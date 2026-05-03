@@ -15,19 +15,14 @@ vi.mock("fs", async (importOriginal) => {
   };
 });
 
-vi.mock("../java", () => ({
-  resolveJavaExecutable: vi.fn(),
-  validateJava: vi.fn(),
-}));
-
 vi.mock("../compiler", () => ({
-  buildClasspath: vi.fn(),
+  resolveActiveJrxmlPath: vi.fn(),
+  resolveJavaEnv: vi.fn(),
 }));
 
 import { execFile } from "child_process";
 import * as fs from "fs";
-import { resolveJavaExecutable, validateJava } from "../java";
-import { buildClasspath } from "../compiler";
+import { resolveActiveJrxmlPath, resolveJavaEnv } from "../compiler";
 
 let mockContext: ReturnType<typeof createMockContext>;
 
@@ -38,115 +33,33 @@ beforeEach(() => {
 });
 
 describe("previewReport", () => {
-  it("shows error when no jrxml file is open", async () => {
-    vscode.window.activeTextEditor = undefined;
+  it("returns early when no jrxml file is resolved", async () => {
+    vi.mocked(resolveActiveJrxmlPath).mockReturnValue(undefined);
 
     const { previewReport } = await import("../preview");
     await previewReport(mockContext as unknown as vscode.ExtensionContext);
 
-    expect(vscode.window.showErrorMessage).toHaveBeenCalledWith(
-      expect.stringContaining(".jrxml"),
-    );
+    expect(resolveJavaEnv).not.toHaveBeenCalled();
+    expect(execFile).not.toHaveBeenCalled();
   });
 
-  it("shows error when active file is not jrxml", async () => {
-    vscode.window.activeTextEditor = {
-      document: { fileName: "/test/file.xml" },
-    };
+  it("returns early when Java environment is not resolved", async () => {
+    vi.mocked(resolveActiveJrxmlPath).mockReturnValue("/test/report.jrxml");
+    vi.mocked(resolveJavaEnv).mockResolvedValue(undefined);
 
     const { previewReport } = await import("../preview");
     await previewReport(mockContext as unknown as vscode.ExtensionContext);
 
-    expect(vscode.window.showErrorMessage).toHaveBeenCalledWith(
-      expect.stringContaining(".jrxml"),
-    );
-  });
-
-  it("shows error when Java is not found", async () => {
-    vscode.window.activeTextEditor = {
-      document: { fileName: "/test/report.jrxml" },
-    };
-    vi.mocked(resolveJavaExecutable).mockReturnValue(undefined);
-
-    const { previewReport } = await import("../preview");
-    await previewReport(mockContext as unknown as vscode.ExtensionContext);
-
-    expect(vscode.window.showErrorMessage).toHaveBeenCalledWith(
-      expect.stringContaining("Java not found"),
-    );
-  });
-
-  it("shows error when Java validation fails", async () => {
-    vscode.window.activeTextEditor = {
-      document: { fileName: "/test/report.jrxml" },
-    };
-    vi.mocked(resolveJavaExecutable).mockReturnValue("/usr/bin/java");
-    vi.mocked(validateJava).mockResolvedValue({
-      ok: false,
-      error: "Cannot run java",
-    });
-
-    const { previewReport } = await import("../preview");
-    await previewReport(mockContext as unknown as vscode.ExtensionContext);
-
-    expect(vscode.window.showErrorMessage).toHaveBeenCalledWith(
-      "Cannot run java",
-    );
-  });
-
-  it("shows error when classpath is not configured", async () => {
-    vscode.window.activeTextEditor = {
-      document: { fileName: "/test/report.jrxml" },
-    };
-    vi.mocked(resolveJavaExecutable).mockReturnValue("/usr/bin/java");
-    vi.mocked(validateJava).mockResolvedValue({
-      ok: true,
-      version: "17.0.2",
-    });
-    vi.mocked(buildClasspath).mockReturnValue(undefined);
-
-    const { previewReport } = await import("../preview");
-    await previewReport(mockContext as unknown as vscode.ExtensionContext);
-
-    expect(vscode.window.showErrorMessage).toHaveBeenCalledWith(
-      expect.stringContaining("classpath is not configured"),
-      "Open Settings",
-    );
-  });
-
-  it("opens settings when user clicks 'Open Settings' on classpath error", async () => {
-    vscode.window.activeTextEditor = {
-      document: { fileName: "/test/report.jrxml" },
-    };
-    vi.mocked(resolveJavaExecutable).mockReturnValue("/usr/bin/java");
-    vi.mocked(validateJava).mockResolvedValue({
-      ok: true,
-      version: "17.0.2",
-    });
-    vi.mocked(buildClasspath).mockReturnValue(undefined);
-    vi.mocked(vscode.window.showErrorMessage).mockResolvedValue(
-      "Open Settings" as never,
-    );
-
-    const { previewReport } = await import("../preview");
-    await previewReport(mockContext as unknown as vscode.ExtensionContext);
-
-    expect(vscode.commands.executeCommand).toHaveBeenCalledWith(
-      "workbench.action.openSettings",
-      "jasperreports.classpath",
-    );
+    expect(execFile).not.toHaveBeenCalled();
   });
 
   it("returns when user cancels data source prompt", async () => {
-    vscode.window.activeTextEditor = {
-      document: { fileName: "/test/report.jrxml" },
-    };
-    vi.mocked(resolveJavaExecutable).mockReturnValue("/usr/bin/java");
-    vi.mocked(validateJava).mockResolvedValue({
-      ok: true,
-      version: "17.0.2",
+    vi.mocked(resolveActiveJrxmlPath).mockReturnValue("/test/report.jrxml");
+    vi.mocked(resolveJavaEnv).mockResolvedValue({
+      javaPath: "/usr/bin/java",
+      javaVersion: "17.0.2",
+      classpath: "/cp/jr.jar",
     });
-    vi.mocked(buildClasspath).mockReturnValue("/cp/jr.jar");
     // promptDataSource returns 'cancelled' when quick pick is dismissed
     vi.mocked(vscode.window.showQuickPick).mockResolvedValue(undefined);
 
@@ -158,15 +71,12 @@ describe("previewReport", () => {
   });
 
   it("previews HTML successfully", async () => {
-    vscode.window.activeTextEditor = {
-      document: { fileName: "/test/report.jrxml" },
-    };
-    vi.mocked(resolveJavaExecutable).mockReturnValue("/usr/bin/java");
-    vi.mocked(validateJava).mockResolvedValue({
-      ok: true,
-      version: "17.0.2",
+    vi.mocked(resolveActiveJrxmlPath).mockReturnValue("/test/report.jrxml");
+    vi.mocked(resolveJavaEnv).mockResolvedValue({
+      javaPath: "/usr/bin/java",
+      javaVersion: "17.0.2",
+      classpath: "/cp/jr.jar",
     });
-    vi.mocked(buildClasspath).mockReturnValue("/cp/jr.jar");
 
     // Mock promptDataSource → empty data source
     vi.mocked(vscode.window.showQuickPick).mockResolvedValue({
@@ -198,15 +108,12 @@ describe("previewReport", () => {
   });
 
   it("previews PDF successfully as base64", async () => {
-    vscode.window.activeTextEditor = {
-      document: { fileName: "/test/report.jrxml" },
-    };
-    vi.mocked(resolveJavaExecutable).mockReturnValue("/usr/bin/java");
-    vi.mocked(validateJava).mockResolvedValue({
-      ok: true,
-      version: "17.0.2",
+    vi.mocked(resolveActiveJrxmlPath).mockReturnValue("/test/report.jrxml");
+    vi.mocked(resolveJavaEnv).mockResolvedValue({
+      javaPath: "/usr/bin/java",
+      javaVersion: "17.0.2",
+      classpath: "/cp/jr.jar",
     });
-    vi.mocked(buildClasspath).mockReturnValue("/cp/jr.jar");
 
     // Set up existing config with PDF format
     vscode.workspace.workspaceFolders = [

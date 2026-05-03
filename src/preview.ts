@@ -3,8 +3,7 @@ import * as path from "path";
 import * as fs from "fs";
 import * as os from "os";
 import { execFile } from "child_process";
-import { resolveJavaExecutable, validateJava } from "./java";
-import { buildClasspath } from "./compiler";
+import { resolveActiveJrxmlPath, resolveJavaEnv } from "./compiler";
 import { getOutputChannel } from "./logger";
 import {
   type PreviewFormat,
@@ -24,45 +23,11 @@ export async function previewReport(
   viewColumn: vscode.ViewColumn = vscode.ViewColumn.Active,
   jrxmlPath?: string,
 ): Promise<void> {
-  const filePath =
-    jrxmlPath ?? vscode.window.activeTextEditor?.document.fileName;
-  if (!filePath || !filePath.endsWith(".jrxml")) {
-    vscode.window.showErrorMessage(
-      "No .jrxml file is open. Open a JRXML file and try again.",
-    );
-    return;
-  }
+  const filePath = resolveActiveJrxmlPath(jrxmlPath);
+  if (!filePath) return;
 
-  // Resolve Java
-  const javaPath = resolveJavaExecutable();
-  if (!javaPath) {
-    vscode.window.showErrorMessage(
-      "Java not found. Set 'jasperreports.java.home' or install Java.",
-    );
-    return;
-  }
-
-  const javaResult = await validateJava(javaPath);
-  if (!javaResult.ok) {
-    vscode.window.showErrorMessage(javaResult.error);
-    return;
-  }
-
-  // Build classpath
-  const classpath = buildClasspath(context.extensionPath);
-  if (!classpath) {
-    const action = await vscode.window.showErrorMessage(
-      "JasperReports classpath is not configured. Set 'jasperreports.classpath' in settings.",
-      "Open Settings",
-    );
-    if (action === "Open Settings") {
-      vscode.commands.executeCommand(
-        "workbench.action.openSettings",
-        "jasperreports.classpath",
-      );
-    }
-    return;
-  }
+  const env = await resolveJavaEnv(context.extensionPath);
+  if (!env) return;
 
   // Resolve per-file config
   let fileConfig = getPreviewConfig(context, filePath);
@@ -81,7 +46,7 @@ export async function previewReport(
 
   const channel = getOutputChannel();
   channel.appendLine(`Previewing ${fileName} (${format})...`);
-  channel.appendLine(`  Java: ${javaPath} (${javaResult.version})`);
+  channel.appendLine(`  Java: ${env.javaPath} (${env.javaVersion})`);
   channel.appendLine(`  File: ${filePath}`);
   if (dataSourcePath) {
     channel.appendLine(`  Data source: ${dataSourcePath}`);
@@ -95,8 +60,8 @@ export async function previewReport(
     },
     async () => {
       const output = await runPreview(
-        javaPath,
-        classpath,
+        env.javaPath,
+        env.classpath,
         filePath,
         format,
         dataSourcePath,
