@@ -3,11 +3,12 @@ import * as path from "path";
 import { compileReport } from "./compiler";
 import { downloadDependencies } from "./dependencies";
 import { disposeOutputChannel, getOutputChannel } from "./logger";
-import { JrxmlOutlineProvider, revealPosition } from "./outline";
+import { JrxmlOutlineProvider, OutlineItem, revealPosition } from "./outline";
 import { previewReport, disposePreviewPanel } from "./preview";
 import { configurePreview } from "./previewConfig";
 import { NodePosition } from "./jrxml-parser";
 import { PropertiesViewProvider } from "./properties/PropertiesViewProvider";
+import { addElement, addBand, deleteElement } from "./outline-actions";
 
 const XML_EXTENSION_ID = "redhat.vscode-xml";
 
@@ -94,6 +95,22 @@ function registerOutlineView(context: vscode.ExtensionContext): void {
     vscode.commands.registerCommand(
       "jasperreports.outline.reveal",
       (position: NodePosition) => revealPosition(position),
+    ),
+  );
+
+  // Outline context menu actions
+  context.subscriptions.push(
+    vscode.commands.registerCommand(
+      "jasperreports.outline.add",
+      (item: OutlineItem) => addElement(item),
+    ),
+    vscode.commands.registerCommand(
+      "jasperreports.outline.addBand",
+      (item: OutlineItem) => addBand(item),
+    ),
+    vscode.commands.registerCommand(
+      "jasperreports.outline.delete",
+      (item: OutlineItem) => deleteElement(item),
     ),
   );
 

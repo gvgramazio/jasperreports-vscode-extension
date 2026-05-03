@@ -2,6 +2,7 @@ import * as vscode from "vscode";
 import { JrxmlNode } from "../jrxml-parser";
 import { formatNodeProperties } from "./formatNode";
 import { getPropertiesHtml } from "./getPropertiesHtml";
+import { handleEditMessage, EditMessage } from "./editHandler";
 
 export class PropertiesViewProvider implements vscode.WebviewViewProvider {
   public static readonly viewType = "jasperreports-properties";
@@ -20,6 +21,12 @@ export class PropertiesViewProvider implements vscode.WebviewViewProvider {
       enableScripts: true,
       localResourceRoots: [vscode.Uri.joinPath(this._extensionUri, "dist")],
     };
+
+    webviewView.webview.onDidReceiveMessage((message: EditMessage) => {
+      if (message.type === "edit") {
+        handleEditMessage(message);
+      }
+    });
 
     this.showEmpty();
   }

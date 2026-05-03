@@ -37,6 +37,7 @@ describe("PropertiesViewProvider", () => {
           (uri: { fsPath: string }) => `vscode-webview:///${uri.fsPath}`,
         ),
         cspSource: "https://webview.example",
+        onDidReceiveMessage: vi.fn().mockReturnValue({ dispose: vi.fn() }),
       },
     };
   });

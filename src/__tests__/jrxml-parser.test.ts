@@ -207,4 +207,59 @@ describe("jrxml-parser", () => {
     const field = doc.root!.children.find((c) => c.tag === "field");
     expect(field!.text).toBeUndefined();
   });
+
+  it("tracks attribute positions with correct byte offsets", () => {
+    const xml = `<jasperReport name="Test" pageWidth="595">
+</jasperReport>`;
+    const doc = parseJrxml(xml);
+    const root = doc.root!;
+    expect(root.attributePositions).toBeDefined();
+    expect(root.attributePositions!["name"]).toBeDefined();
+    expect(root.attributePositions!["pageWidth"]).toBeDefined();
+
+    // Verify the value offsets point to correct content
+    const namePos = root.attributePositions!["name"];
+    expect(xml.substring(namePos.valueStart, namePos.valueEnd)).toBe("Test");
+
+    const pwPos = root.attributePositions!["pageWidth"];
+    expect(xml.substring(pwPos.valueStart, pwPos.valueEnd)).toBe("595");
+  });
+
+  it("tracks attribute name positions", () => {
+    const xml = `<field name="id" class="java.lang.Integer"/>`;
+    const doc = parseJrxml(xml);
+    const field = doc.root!;
+    const namePos = field.attributePositions!["name"];
+    expect(xml.substring(namePos.nameStart, namePos.nameEnd)).toBe("name");
+
+    const classPos = field.attributePositions!["class"];
+    expect(xml.substring(classPos.nameStart, classPos.nameEnd)).toBe("class");
+  });
+
+  it("handles multi-line attribute positions", () => {
+    const xml = `<element
+  kind="textField"
+  x="10"
+  y="20"/>`;
+    const doc = parseJrxml(xml);
+    const el = doc.root!;
+    expect(el.attributePositions).toBeDefined();
+
+    const kindPos = el.attributePositions!["kind"];
+    expect(xml.substring(kindPos.valueStart, kindPos.valueEnd)).toBe(
+      "textField",
+    );
+
+    const xPos = el.attributePositions!["x"];
+    expect(xml.substring(xPos.valueStart, xPos.valueEnd)).toBe("10");
+
+    const yPos = el.attributePositions!["y"];
+    expect(xml.substring(yPos.valueStart, yPos.valueEnd)).toBe("20");
+  });
+
+  it("attributePositions is undefined when no attributes", () => {
+    const xml = `<root></root>`;
+    const doc = parseJrxml(xml);
+    expect(doc.root!.attributePositions).toBeUndefined();
+  });
 });
