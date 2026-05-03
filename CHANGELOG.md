@@ -1,3 +1,10 @@
+# [1.4.0](https://github.com/gvgramazio/jasperreports-vscode-extension/compare/v1.3.0...v1.4.0) (2026-05-03)
+
+
+### Features
+
+* add categories for snippets and visualization in package.json ([556fc86](https://github.com/gvgramazio/jasperreports-vscode-extension/commit/556fc869be7a9ac45b1f6d3cabc6e7d295f2a351))
+
 # [1.3.0](https://github.com/gvgramazio/jasperreports-vscode-extension/compare/v1.2.0...v1.3.0) (2026-05-03)
 
 
