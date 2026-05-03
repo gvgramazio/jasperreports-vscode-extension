@@ -4,6 +4,7 @@ node_modules/
 .vscode-test/
 out/
 lib/build/
+coverage/
 
 # macOS
 .DS_Store
