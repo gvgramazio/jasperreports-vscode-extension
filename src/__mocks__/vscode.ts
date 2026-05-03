@@ -8,6 +8,7 @@ export const workspace = {
     get: vi.fn((_key: string, defaultValue?: unknown) => defaultValue),
     update: vi.fn(),
   }),
+  onDidChangeTextDocument: vi.fn().mockReturnValue({ dispose: vi.fn() }),
 };
 
 export const window = {
@@ -25,7 +26,17 @@ export const window = {
       (_options: unknown, task: (progress: unknown) => Promise<unknown>) =>
         task({ report: vi.fn() }),
     ),
-  activeTextEditor: undefined as { document: { fileName: string } } | undefined,
+  activeTextEditor: undefined as
+    | {
+        document: {
+          fileName: string;
+          languageId?: string;
+          getText?: () => string;
+        };
+        revealRange?: ReturnType<typeof vi.fn>;
+        selection?: unknown;
+      }
+    | undefined,
   createWebviewPanel: vi.fn().mockReturnValue({
     webview: { html: "" },
     reveal: vi.fn(),
@@ -33,8 +44,13 @@ export const window = {
     dispose: vi.fn(),
     title: "",
   }),
+  createTreeView: vi.fn().mockReturnValue({
+    dispose: vi.fn(),
+    reveal: vi.fn(),
+  }),
   showQuickPick: vi.fn().mockResolvedValue(undefined),
   showOpenDialog: vi.fn().mockResolvedValue(undefined),
+  onDidChangeActiveTextEditor: vi.fn().mockReturnValue({ dispose: vi.fn() }),
 };
 
 export const extensions = {
@@ -69,6 +85,88 @@ export enum ViewColumn {
   One = 1,
   Two = 2,
   Three = 3,
+}
+
+export enum TreeItemCollapsibleState {
+  None = 0,
+  Collapsed = 1,
+  Expanded = 2,
+}
+
+export enum TextEditorRevealType {
+  Default = 0,
+  InCenter = 1,
+  InCenterIfOutsideViewport = 2,
+  AtTop = 3,
+}
+
+export class TreeItem {
+  label: string;
+  collapsibleState: TreeItemCollapsibleState;
+  description?: string;
+  iconPath?: unknown;
+  command?: unknown;
+
+  constructor(
+    label: string,
+    collapsibleState: TreeItemCollapsibleState = TreeItemCollapsibleState.None,
+  ) {
+    this.label = label;
+    this.collapsibleState = collapsibleState;
+  }
+}
+
+export class ThemeIcon {
+  id: string;
+  constructor(id: string) {
+    this.id = id;
+  }
+}
+
+export class EventEmitter<T> {
+  private _listeners: Array<(e: T) => void> = [];
+
+  event = (listener: (e: T) => void) => {
+    this._listeners.push(listener);
+    return { dispose: () => {} };
+  };
+
+  fire(data: T): void {
+    for (const listener of this._listeners) {
+      listener(data);
+    }
+  }
+
+  dispose(): void {
+    this._listeners = [];
+  }
+}
+
+export class Position {
+  line: number;
+  character: number;
+  constructor(line: number, character: number) {
+    this.line = line;
+    this.character = character;
+  }
+}
+
+export class Range {
+  start: Position;
+  end: Position;
+  constructor(start: Position, end: Position) {
+    this.start = start;
+    this.end = end;
+  }
+}
+
+export class Selection {
+  anchor: Position;
+  active: Position;
+  constructor(anchor: Position, active: Position) {
+    this.anchor = anchor;
+    this.active = active;
+  }
 }
 
 export function createMockContext(

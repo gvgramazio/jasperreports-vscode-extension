@@ -3,10 +3,15 @@ import * as path from "path";
 import { compileReport } from "./compiler";
 import { downloadDependencies } from "./dependencies";
 import { disposeOutputChannel, getOutputChannel } from "./logger";
+import { JrxmlOutlineProvider, revealPosition } from "./outline";
 import { previewReport, disposePreviewPanel } from "./preview";
 import { configurePreview } from "./previewConfig";
+import { NodePosition } from "./jrxml-parser";
 
 const XML_EXTENSION_ID = "redhat.vscode-xml";
+
+let outlineProvider: JrxmlOutlineProvider | undefined;
+let debounceTimer: ReturnType<typeof setTimeout> | undefined;
 
 export async function activate(
   context: vscode.ExtensionContext,
@@ -16,12 +21,17 @@ export async function activate(
 
   registerXmlFileAssociations(context);
   registerCommands(context);
+  registerOutlineView(context);
   await activateXmlExtension();
 }
 
 export function deactivate(): void {
   disposeOutputChannel();
   disposePreviewPanel();
+  if (debounceTimer) {
+    clearTimeout(debounceTimer);
+  }
+  outlineProvider?.dispose();
 }
 
 /**
@@ -45,6 +55,57 @@ function registerCommands(context: vscode.ExtensionContext): void {
       configurePreview(context),
     ),
   );
+}
+
+/**
+ * Registers the JRXML outline tree view and wires up auto-refresh listeners.
+ */
+function registerOutlineView(context: vscode.ExtensionContext): void {
+  outlineProvider = new JrxmlOutlineProvider();
+
+  const treeView = vscode.window.createTreeView("jasperreports-outline", {
+    treeDataProvider: outlineProvider,
+  });
+  context.subscriptions.push(treeView);
+
+  context.subscriptions.push(
+    vscode.commands.registerCommand(
+      "jasperreports.outline.reveal",
+      (position: NodePosition) => revealPosition(position),
+    ),
+  );
+
+  // Initial refresh if there's already an active JRXML editor
+  const activeEditor = vscode.window.activeTextEditor;
+  if (activeEditor && isJrxmlDocument(activeEditor.document)) {
+    outlineProvider.refresh(activeEditor.document.getText());
+  }
+
+  // Auto-refresh on document change (debounced)
+  context.subscriptions.push(
+    vscode.workspace.onDidChangeTextDocument((e) => {
+      if (!isJrxmlDocument(e.document)) return;
+      if (debounceTimer) clearTimeout(debounceTimer);
+      debounceTimer = setTimeout(() => {
+        outlineProvider?.refresh(e.document.getText());
+      }, 300);
+    }),
+  );
+
+  // Refresh when active editor changes
+  context.subscriptions.push(
+    vscode.window.onDidChangeActiveTextEditor((editor) => {
+      if (editor && isJrxmlDocument(editor.document)) {
+        outlineProvider?.refresh(editor.document.getText());
+      } else {
+        outlineProvider?.refresh();
+      }
+    }),
+  );
+}
+
+function isJrxmlDocument(document: vscode.TextDocument): boolean {
+  return document.languageId === "jrxml";
 }
 
 /**

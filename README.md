@@ -84,6 +84,20 @@ Automatically download JasperReports JARs and all transitive dependencies into y
 - Automatically updates `jasperreports.classpath` in workspace settings
 - Requires [Maven](https://maven.apache.org/) installed and available on PATH (or via `MAVEN_HOME`/`M2_HOME`)
 
+### Report Outline
+
+A dedicated activity bar panel showing the structure of the active `.jrxml` file as an interactive tree.
+
+- **Properties** — report-level attributes (page size, margins, etc.)
+- **Styles** — named styles with default indicator
+- **Parameters, Fields, Variables, Sort Fields** — data model elements with type info
+- **Groups** — group definitions with header/footer bands
+- **Sections** — title, page header, detail, page footer, summary, etc. with nested bands and elements
+- Elements display their kind (e.g. `textField`, `staticText`) with position and size (`x,y w×h`)
+- **Click to navigate** — clicking any item reveals and selects the corresponding XML element in the editor
+- **Auto-refresh** — the tree updates automatically when the document changes (300ms debounce)
+- Opens a welcome view when no `.jrxml` file is active
+
 ## Installation
 
 ### From Marketplace
