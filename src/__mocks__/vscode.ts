@@ -47,7 +47,9 @@ export const window = {
   createTreeView: vi.fn().mockReturnValue({
     dispose: vi.fn(),
     reveal: vi.fn(),
+    onDidChangeSelection: vi.fn().mockReturnValue({ dispose: vi.fn() }),
   }),
+  registerWebviewViewProvider: vi.fn().mockReturnValue({ dispose: vi.fn() }),
   showQuickPick: vi.fn().mockResolvedValue(undefined),
   showOpenDialog: vi.fn().mockResolvedValue(undefined),
   onDidChangeActiveTextEditor: vi.fn().mockReturnValue({ dispose: vi.fn() }),
@@ -65,6 +67,10 @@ export const commands = {
 export const Uri = {
   file: (fsPath: string) => ({ fsPath, toString: () => `file://${fsPath}` }),
   parse: (uri: string) => ({ fsPath: uri, toString: () => uri }),
+  joinPath: (base: { fsPath: string }, ...segments: string[]) => {
+    const joined = [base.fsPath, ...segments].join("/");
+    return { fsPath: joined, toString: () => `file://${joined}` };
+  },
 };
 
 export enum ConfigurationTarget {
@@ -175,6 +181,7 @@ export function createMockContext(
   const store = new Map<string, unknown>();
   return {
     extensionPath,
+    extensionUri: Uri.file(extensionPath),
     subscriptions: [],
     workspaceState: {
       get: vi.fn((key: string) => store.get(key)),
