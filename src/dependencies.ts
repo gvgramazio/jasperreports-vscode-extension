@@ -35,9 +35,13 @@ function buildPom(version: string): string {
 
 /**
  * Resolves the `mvn` executable path.
- * Returns `undefined` if Maven is not found.
+ *
+ * Resolution order:
+ * 1. `MAVEN_HOME` environment variable
+ * 2. `M2_HOME` environment variable
+ * 3. `mvn` on the system PATH
  */
-export function resolveMvnExecutable(): string | undefined {
+export function resolveMvnExecutable(): string {
   const mavenHome =
     process.env.MAVEN_HOME?.trim() || process.env.M2_HOME?.trim();
   if (mavenHome) {
@@ -63,12 +67,6 @@ export async function downloadDependencies(): Promise<void> {
   const version = config.get<string>("schema.version", "7.0.6");
 
   const mvnPath = resolveMvnExecutable();
-  if (!mvnPath) {
-    vscode.window.showErrorMessage(
-      "Maven not found. Install Maven or set MAVEN_HOME.",
-    );
-    return;
-  }
 
   const libDir = path.join(workspaceFolder.uri.fsPath, LIB_DIR_NAME);
 

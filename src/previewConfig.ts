@@ -43,17 +43,7 @@ export async function setPreviewConfig(
   await context.workspaceState.update(STORAGE_KEY, map);
 }
 
-export async function clearPreviewConfig(
-  context: vscode.ExtensionContext,
-  jrxmlPath: string,
-): Promise<void> {
-  const key = toRelativePath(jrxmlPath);
-  const map = getConfigMap(context);
-  delete map[key];
-  await context.workspaceState.update(STORAGE_KEY, map);
-}
-
-export function getDefaultFormat(): PreviewFormat {
+function getDefaultFormat(): PreviewFormat {
   const config = vscode.workspace.getConfiguration("jasperreports");
   return config.get<PreviewFormat>("preview.format", "html");
 }

@@ -147,23 +147,3 @@ export function getAttributeType(name: string): AttributeTypeInfo | undefined {
     return { type: "enum", enumValues: ENUM_MAP[name] };
   return undefined;
 }
-
-export function validateAttributeValue(name: string, value: string): boolean {
-  const info = getAttributeType(name);
-  if (!info || value === "") return true;
-
-  switch (info.type) {
-    case "integer":
-      return /^-?\d+$/.test(value);
-    case "decimal":
-      return /^-?\d+(\.\d+)?$/.test(value);
-    case "boolean":
-      return value === "true" || value === "false";
-    case "color":
-      return /^#[0-9a-fA-F]{6}$/.test(value);
-    case "enum":
-      return info.enumValues?.includes(value) ?? true;
-    default:
-      return true;
-  }
-}
