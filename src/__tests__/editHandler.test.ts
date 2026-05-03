@@ -116,4 +116,36 @@ describe("handleEditMessage", () => {
 
     expect(result).toBe(false);
   });
+
+  it("returns false when attribute name at position does not match", async () => {
+    const mockDocument = {
+      getText: () => '<element x="10" y="20"/>',
+      positionAt: (offset: number) => new vscode.Position(0, offset),
+      uri: { fsPath: "/test.jrxml", toString: () => "file:///test.jrxml" },
+    };
+
+    (
+      vscode.window as {
+        activeTextEditor: unknown;
+      }
+    ).activeTextEditor = {
+      document: mockDocument,
+    };
+
+    // Provide offsets that point to "y" but claim attribute is "x"
+    const result = await handleEditMessage({
+      type: "edit",
+      attribute: "x",
+      value: "50",
+      attributePosition: {
+        nameStart: 16,
+        nameEnd: 17,
+        valueStart: 19,
+        valueEnd: 21,
+      },
+    });
+
+    expect(result).toBe(false);
+    expect(vscode.workspace.applyEdit).not.toHaveBeenCalled();
+  });
 });

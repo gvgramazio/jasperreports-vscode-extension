@@ -100,41 +100,49 @@ function runPreview(
 
     const cwd = path.dirname(jrxmlPath);
 
-    execFile(javaPath, args, { cwd }, (err, stdout, stderr) => {
-      const channel = getOutputChannel();
-      if (stdout) {
-        channel.appendLine(stdout);
-      }
-      if (stderr) {
-        channel.appendLine(stderr);
-      }
-
-      if (err) {
-        const errorMsg = stderr || err.message;
-        channel.appendLine(`FAILED: ${errorMsg}`);
-        channel.show(true);
-        reject(new Error(errorMsg.split("\n")[0]));
-        return;
-      }
-
-      try {
-        if (format === "pdf") {
-          const pdfBytes = fs.readFileSync(outputFile);
-          fs.unlinkSync(outputFile);
-          channel.appendLine(`OK → preview rendered (${format})`);
-          resolve(pdfBytes.toString("base64"));
-        } else {
-          const html = fs.readFileSync(outputFile, "utf-8");
-          fs.unlinkSync(outputFile);
-          channel.appendLine(`OK → preview rendered (${format})`);
-          resolve(html);
+    execFile(
+      javaPath,
+      args,
+      { cwd, timeout: 60_000 },
+      (err, stdout, stderr) => {
+        const channel = getOutputChannel();
+        if (stdout) {
+          channel.appendLine(stdout);
         }
-      } catch (readErr) {
-        channel.appendLine(`FAILED: Failed to read preview output: ${readErr}`);
-        channel.show(true);
-        reject(new Error(`Failed to read preview output: ${readErr}`));
-      }
-    });
+        if (stderr) {
+          channel.appendLine(stderr);
+        }
+
+        if (err) {
+          const errorMsg = stderr || err.message;
+          channel.appendLine(`FAILED: ${errorMsg}`);
+          channel.show(true);
+          cleanupTempFile(outputFile);
+          reject(new Error(errorMsg.split("\n")[0]));
+          return;
+        }
+
+        try {
+          if (format === "pdf") {
+            const pdfBytes = fs.readFileSync(outputFile);
+            fs.unlinkSync(outputFile);
+            channel.appendLine(`OK → preview rendered (${format})`);
+            resolve(pdfBytes.toString("base64"));
+          } else {
+            const html = fs.readFileSync(outputFile, "utf-8");
+            fs.unlinkSync(outputFile);
+            channel.appendLine(`OK → preview rendered (${format})`);
+            resolve(html);
+          }
+        } catch (readErr) {
+          channel.appendLine(
+            `FAILED: Failed to read preview output: ${readErr}`,
+          );
+          channel.show(true);
+          reject(new Error(`Failed to read preview output: ${readErr}`));
+        }
+      },
+    );
   });
 }
 
@@ -215,6 +223,14 @@ function setupLiveReload(
     }
   });
   context.subscriptions.push(liveReloadDisposable);
+}
+
+function cleanupTempFile(filePath: string): void {
+  try {
+    fs.unlinkSync(filePath);
+  } catch {
+    // File may not exist if the process failed before writing
+  }
 }
 
 function disposeLiveReload(): void {

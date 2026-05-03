@@ -6,6 +6,7 @@ describe("jrxml-parser", () => {
     const xml = `<jasperReport name="Test" pageWidth="595" pageHeight="842"></jasperReport>`;
     const doc = parseJrxml(xml);
     expect(doc.root).not.toBeNull();
+    expect(doc.hasErrors).toBe(false);
     expect(doc.root!.tag).toBe("jasperReport");
     expect(doc.root!.attributes["name"]).toBe("Test");
     expect(doc.root!.attributes["pageWidth"]).toBe("595");
@@ -146,6 +147,7 @@ describe("jrxml-parser", () => {
     const doc = parseJrxml(xml);
     // Should not throw, returns whatever was parsed
     expect(doc).toBeDefined();
+    expect(doc.hasErrors).toBe(true);
   });
 
   it("parses self-closing elements", () => {
