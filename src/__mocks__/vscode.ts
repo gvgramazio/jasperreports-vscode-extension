@@ -203,6 +203,25 @@ export class WorkspaceEdit {
   }
 }
 
+export class DataTransferItem {
+  readonly value: unknown;
+  constructor(value: unknown) {
+    this.value = value;
+  }
+}
+
+export class DataTransfer {
+  private _items = new Map<string, DataTransferItem>();
+
+  get(mimeType: string): DataTransferItem | undefined {
+    return this._items.get(mimeType);
+  }
+
+  set(mimeType: string, value: DataTransferItem): void {
+    this._items.set(mimeType, value);
+  }
+}
+
 export function createMockContext(
   extensionPath = "/ext",
 ): Record<string, unknown> {

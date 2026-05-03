@@ -119,6 +119,7 @@ Context menu actions available on tree items:
 - **Add** — right-click a group (Fields, Parameters, Variables, Sort Fields, Groups) to add a new element with a prompted name
 - **Add Band** — right-click a section (Title, Detail, etc.) to add a new band
 - **Delete** — right-click any field, parameter, variable, sortField, group, groupHeader, groupFooter, section, band, element, or style to delete it (with confirmation)
+- **Drag & Drop Reorder** — drag sibling items within the same parent to reorder them; drop on a sibling to insert before it, or drop on the parent to move to the end
 
 ## Installation
 
