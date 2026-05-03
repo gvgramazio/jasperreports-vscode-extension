@@ -177,4 +177,34 @@ describe("jrxml-parser", () => {
     expect(tags).toContain("pageFooter");
     expect(tags).toContain("summary");
   });
+
+  it("captures CDATA text content", () => {
+    const xml = `<jasperReport name="Test">
+  <variable name="x" class="java.lang.Integer">
+    <expression><![CDATA[$F{amount} + 1]]></expression>
+  </variable>
+</jasperReport>`;
+    const doc = parseJrxml(xml);
+    const variable = doc.root!.children.find((c) => c.tag === "variable");
+    const expr = variable!.children.find((c) => c.tag === "expression");
+    expect(expr!.text).toBe("$F{amount} + 1");
+  });
+
+  it("captures plain text content", () => {
+    const xml = `<jasperReport name="Test">
+  <property name="key">value</property>
+</jasperReport>`;
+    const doc = parseJrxml(xml);
+    const prop = doc.root!.children.find((c) => c.tag === "property");
+    expect(prop!.text).toBe("value");
+  });
+
+  it("text is undefined when element has no text content", () => {
+    const xml = `<jasperReport name="Test">
+  <field name="id" class="java.lang.Integer"/>
+</jasperReport>`;
+    const doc = parseJrxml(xml);
+    const field = doc.root!.children.find((c) => c.tag === "field");
+    expect(field!.text).toBeUndefined();
+  });
 });

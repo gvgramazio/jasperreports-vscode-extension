@@ -7,6 +7,7 @@ import { JrxmlOutlineProvider, revealPosition } from "./outline";
 import { previewReport, disposePreviewPanel } from "./preview";
 import { configurePreview } from "./previewConfig";
 import { NodePosition } from "./jrxml-parser";
+import { PropertiesViewProvider } from "./properties/PropertiesViewProvider";
 
 const XML_EXTENSION_ID = "redhat.vscode-xml";
 
@@ -67,6 +68,27 @@ function registerOutlineView(context: vscode.ExtensionContext): void {
     treeDataProvider: outlineProvider,
   });
   context.subscriptions.push(treeView);
+
+  // Properties panel
+  const propertiesProvider = new PropertiesViewProvider(context.extensionUri);
+  context.subscriptions.push(
+    vscode.window.registerWebviewViewProvider(
+      PropertiesViewProvider.viewType,
+      propertiesProvider,
+    ),
+  );
+
+  // Update properties when tree selection changes
+  context.subscriptions.push(
+    treeView.onDidChangeSelection((e) => {
+      const selected = e.selection[0];
+      if (selected) {
+        propertiesProvider.update(selected.node, selected.label as string);
+      } else {
+        propertiesProvider.update(null, "");
+      }
+    }),
+  );
 
   context.subscriptions.push(
     vscode.commands.registerCommand(

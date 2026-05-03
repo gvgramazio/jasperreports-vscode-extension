@@ -98,6 +98,18 @@ A dedicated activity bar panel showing the structure of the active `.jrxml` file
 - **Auto-refresh** — the tree updates automatically when the document changes (300ms debounce)
 - Opens a welcome view when no `.jrxml` file is active
 
+### Properties Panel
+
+A webview panel below the Report Outline showing detailed properties for the selected tree item.
+
+- **Attributes** — all element attributes in a tabular view
+- **Expressions** — expression content (e.g. `textFieldExpression`, `imageExpression`) displayed with CDATA text
+- **Style** — referenced style name
+- **Box & Pen** — border and line properties including per-side pen attributes
+- **Report Element** — common element properties (position, size, key, etc.)
+- Automatically updates when selecting a different node in the outline tree
+- Themed using VS Code CSS variables for seamless integration
+
 ## Installation
 
 ### From Marketplace

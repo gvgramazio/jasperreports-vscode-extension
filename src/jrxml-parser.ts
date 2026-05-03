@@ -12,6 +12,7 @@ export interface JrxmlNode {
   attributes: Record<string, string>;
   children: JrxmlNode[];
   position: NodePosition;
+  text?: string;
 }
 
 export interface JrxmlDocument {
@@ -24,6 +25,7 @@ interface OpenNode {
   children: JrxmlNode[];
   startLine: number;
   startColumn: number;
+  text: string;
 }
 
 export function parseJrxml(text: string): JrxmlDocument {
@@ -42,7 +44,20 @@ export function parseJrxml(text: string): JrxmlDocument {
       children: [],
       startLine: parser.line,
       startColumn: parser.column,
+      text: "",
     });
+  });
+
+  parser.on("text", (text) => {
+    if (stack.length > 0) {
+      stack[stack.length - 1].text += text;
+    }
+  });
+
+  parser.on("cdata", (cdata) => {
+    if (stack.length > 0) {
+      stack[stack.length - 1].text += cdata;
+    }
   });
 
   parser.on("closetag", () => {
@@ -59,6 +74,7 @@ export function parseJrxml(text: string): JrxmlDocument {
         endLine: parser.line,
         endColumn: parser.column,
       },
+      text: completed.text || undefined,
     };
 
     if (stack.length > 0) {
