@@ -89,4 +89,83 @@ describe("extension", () => {
     expect(mockActivate).not.toHaveBeenCalled();
     expect(vscode.window.showInformationMessage).not.toHaveBeenCalled();
   });
+
+  it("installs xml extension when user clicks Install", async () => {
+    const context = {
+      extensionPath: "/mock/extension/path",
+      subscriptions: [],
+      globalStorageUri: { fsPath: "/mock/storage" },
+    } as unknown as vscode.ExtensionContext;
+
+    vi.mocked(vscode.extensions.getExtension).mockReturnValue(undefined);
+    vi.mocked(vscode.window.showInformationMessage).mockResolvedValue(
+      "Install" as never,
+    );
+
+    await extension.activate(context);
+
+    // Allow the `.then()` microtask to resolve
+    await vi.waitFor(() => {
+      expect(vscode.commands.executeCommand).toHaveBeenCalledWith(
+        "workbench.extensions.installExtension",
+        "redhat.vscode-xml",
+      );
+    });
+  });
+
+  it("deactivate does not throw", () => {
+    expect(() => extension.deactivate()).not.toThrow();
+  });
+
+  it("registers commands during activation", async () => {
+    const context = {
+      extensionPath: "/mock/extension/path",
+      subscriptions: [] as { dispose(): void }[],
+      globalStorageUri: { fsPath: "/mock/storage" },
+    } as unknown as vscode.ExtensionContext;
+
+    await extension.activate(context);
+
+    const registeredCommands = vi
+      .mocked(vscode.commands.registerCommand)
+      .mock.calls.map((c) => c[0]);
+    expect(registeredCommands).toContain("jasperreports.compile");
+    expect(registeredCommands).toContain("jasperreports.preview");
+    expect(registeredCommands).toContain("jasperreports.previewToSide");
+    expect(registeredCommands).toContain("jasperreports.downloadDependencies");
+    expect(registeredCommands).toContain("jasperreports.configurePreview");
+    expect(registeredCommands).toContain("jasperreports.outline.reveal");
+    expect(registeredCommands).toContain("jasperreports.outline.add");
+    expect(registeredCommands).toContain("jasperreports.outline.delete");
+  });
+
+  it("creates outline tree view during activation", async () => {
+    const context = {
+      extensionPath: "/mock/extension/path",
+      subscriptions: [] as { dispose(): void }[],
+      globalStorageUri: { fsPath: "/mock/storage" },
+    } as unknown as vscode.ExtensionContext;
+
+    await extension.activate(context);
+
+    expect(vscode.window.createTreeView).toHaveBeenCalledWith(
+      "jasperreports-outline",
+      expect.objectContaining({ treeDataProvider: expect.anything() }),
+    );
+  });
+
+  it("registers properties webview view provider", async () => {
+    const context = {
+      extensionPath: "/mock/extension/path",
+      subscriptions: [] as { dispose(): void }[],
+      globalStorageUri: { fsPath: "/mock/storage" },
+    } as unknown as vscode.ExtensionContext;
+
+    await extension.activate(context);
+
+    expect(vscode.window.registerWebviewViewProvider).toHaveBeenCalledWith(
+      "jasperreports-properties",
+      expect.anything(),
+    );
+  });
 });
