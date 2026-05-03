@@ -4,6 +4,7 @@ import { compileReport } from "./compiler";
 import { downloadDependencies } from "./dependencies";
 import { disposeOutputChannel, getOutputChannel } from "./logger";
 import { JrxmlOutlineProvider, OutlineItem, revealPosition } from "./outline";
+import { OutlineDragAndDropController } from "./outline-dnd";
 import { previewReport, disposePreviewPanel } from "./preview";
 import { configurePreview } from "./previewConfig";
 import { NodePosition } from "./jrxml-parser";
@@ -67,6 +68,7 @@ function registerOutlineView(context: vscode.ExtensionContext): void {
 
   const treeView = vscode.window.createTreeView("jasperreports-outline", {
     treeDataProvider: outlineProvider,
+    dragAndDropController: new OutlineDragAndDropController(),
   });
   context.subscriptions.push(treeView);
 

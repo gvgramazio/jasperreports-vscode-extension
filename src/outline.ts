@@ -55,6 +55,8 @@ type OutlineItemKind =
   | "element";
 
 export class OutlineItem extends vscode.TreeItem {
+  public parent: OutlineItem | null = null;
+
   constructor(
     public readonly label: string,
     public readonly kind: OutlineItemKind,
@@ -77,6 +79,10 @@ export class OutlineItem extends vscode.TreeItem {
         title: "Go to Element",
         arguments: [node.position],
       };
+    }
+    // Set parent on children
+    for (const child of children) {
+      child.parent = this;
     }
   }
 }
