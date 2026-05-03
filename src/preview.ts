@@ -160,6 +160,7 @@ function showPreviewPanel(
     {
       enableScripts: true,
       retainContextWhenHidden: true,
+      localResourceRoots: [],
     },
   );
 
