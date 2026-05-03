@@ -25,19 +25,33 @@ describe("formatNodeProperties", () => {
     const groups = formatNodeProperties(node);
     expect(groups[0].label).toBe("Attributes");
     expect(groups[0].entries).toEqual([
-      { name: "x", value: "10", editable: true, attributePosition: undefined },
-      { name: "y", value: "20", editable: true, attributePosition: undefined },
+      {
+        name: "x",
+        value: "10",
+        editable: true,
+        attributePosition: undefined,
+        typeInfo: { type: "integer" },
+      },
+      {
+        name: "y",
+        value: "20",
+        editable: true,
+        attributePosition: undefined,
+        typeInfo: { type: "integer" },
+      },
       {
         name: "width",
         value: "100",
         editable: true,
         attributePosition: undefined,
+        typeInfo: { type: "integer" },
       },
       {
         name: "height",
         value: "50",
         editable: true,
         attributePosition: undefined,
+        typeInfo: { type: "integer" },
       },
     ]);
   });

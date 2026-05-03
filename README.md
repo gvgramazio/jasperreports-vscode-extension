@@ -116,10 +116,15 @@ A webview panel below the Report Outline showing detailed properties for the sel
 
 Context menu actions available on tree items:
 
-- **Add** — right-click a group (Fields, Parameters, Variables, Sort Fields, Groups) to add a new element with a prompted name
-- **Add Band** — right-click a section (Title, Detail, etc.) to add a new band
+- **Add** — right-click a group (Fields, Parameters, Variables, Sort Fields, Groups, Styles), a section, a band, or a group to add child elements; shows a QuickPick when multiple child types are available (e.g. element types for bands, groupHeader/groupFooter for groups)
 - **Delete** — right-click any field, parameter, variable, sortField, group, groupHeader, groupFooter, section, band, element, or style to delete it (with confirmation)
 - **Drag & Drop Reorder** — drag sibling items within the same parent to reorder them; drop on a sibling to insert before it, or drop on the parent to move to the end
+
+### Property Editing UX
+
+- **Dirty indicator** — a left border accent appears while you are typing an uncommitted change
+- **Applied indicator** — a subtle background tint marks values that have been applied but not yet saved to disk
+- **Input validation** — attributes with known types (integer, decimal, boolean, color, enum) are validated as you type; invalid values are highlighted with an error border
 
 ## Installation
 

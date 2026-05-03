@@ -9,7 +9,7 @@ import { previewReport, disposePreviewPanel } from "./preview";
 import { configurePreview } from "./previewConfig";
 import { NodePosition } from "./jrxml-parser";
 import { PropertiesViewProvider } from "./properties/PropertiesViewProvider";
-import { addElement, addBand, deleteElement } from "./outline-actions";
+import { addElement, deleteElement } from "./outline-actions";
 
 const XML_EXTENSION_ID = "redhat.vscode-xml";
 
@@ -105,10 +105,6 @@ function registerOutlineView(context: vscode.ExtensionContext): void {
     vscode.commands.registerCommand(
       "jasperreports.outline.add",
       (item: OutlineItem) => addElement(item),
-    ),
-    vscode.commands.registerCommand(
-      "jasperreports.outline.addBand",
-      (item: OutlineItem) => addBand(item),
     ),
     vscode.commands.registerCommand(
       "jasperreports.outline.delete",
