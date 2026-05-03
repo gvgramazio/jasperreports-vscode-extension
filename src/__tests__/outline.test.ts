@@ -195,4 +195,105 @@ describe("revealPosition", () => {
     // Should not throw
     revealPosition({ startLine: 1, startColumn: 1, endLine: 1, endColumn: 10 });
   });
+
+  it("sets selection and reveals range when editor is active", () => {
+    const mockRevealRange = vi.fn();
+    (vscode.window as { activeTextEditor: unknown }).activeTextEditor = {
+      document: { getText: () => "" },
+      selection: undefined,
+      revealRange: mockRevealRange,
+    };
+
+    revealPosition({ startLine: 5, startColumn: 3, endLine: 5, endColumn: 20 });
+
+    expect(mockRevealRange).toHaveBeenCalled();
+  });
+});
+
+describe("additional outline scenarios", () => {
+  let provider: JrxmlOutlineProvider;
+
+  beforeEach(() => {
+    provider = new JrxmlOutlineProvider();
+  });
+
+  it("shows sort fields", () => {
+    const xml = `<jasperReport name="Test">
+  <sortField name="city"/>
+  <sortField name="name"/>
+</jasperReport>`;
+    provider.refresh(xml);
+    const roots = provider.getChildren();
+    const sortFields = roots.find((r) => r.label === "Sort Fields");
+    expect(sortFields).toBeDefined();
+    const items = provider.getChildren(sortFields);
+    expect(items).toHaveLength(2);
+    expect(items[0].label).toBe("city");
+    expect(items[1].label).toBe("name");
+  });
+
+  it("shows lastPageFooter section", () => {
+    const xml = `<jasperReport name="Test">
+  <lastPageFooter>
+    <band height="30"/>
+  </lastPageFooter>
+</jasperReport>`;
+    provider.refresh(xml);
+    const roots = provider.getChildren();
+    const labels = roots.map((r) => r.label);
+    expect(labels).toContain("Last Page Footer");
+  });
+
+  it("shows noData section", () => {
+    const xml = `<jasperReport name="Test">
+  <noData>
+    <band height="50"/>
+  </noData>
+</jasperReport>`;
+    provider.refresh(xml);
+    const roots = provider.getChildren();
+    const labels = roots.map((r) => r.label);
+    expect(labels).toContain("No Data");
+  });
+
+  it("shows background section", () => {
+    const xml = `<jasperReport name="Test">
+  <background>
+    <band height="10"/>
+  </background>
+</jasperReport>`;
+    provider.refresh(xml);
+    const roots = provider.getChildren();
+    const labels = roots.map((r) => r.label);
+    expect(labels).toContain("Background");
+  });
+
+  it("shows section with elements but no band wrapper", () => {
+    const xml = `<jasperReport name="Test">
+  <title height="50">
+    <element kind="staticText" x="0" y="0" width="100" height="20"/>
+  </title>
+</jasperReport>`;
+    provider.refresh(xml);
+    const roots = provider.getChildren();
+    const title = roots.find((r) => r.label === "Title");
+    expect(title).toBeDefined();
+    const children = provider.getChildren(title);
+    expect(children).toHaveLength(1);
+    expect(children[0].label).toBe("staticText");
+  });
+
+  it("getTreeItem returns the element itself", () => {
+    const xml = `<jasperReport name="Test">
+  <field name="id" class="java.lang.Integer"/>
+</jasperReport>`;
+    provider.refresh(xml);
+    const roots = provider.getChildren();
+    const item = roots[0];
+    expect(provider.getTreeItem(item)).toBe(item);
+  });
+
+  it("dispose does not throw", () => {
+    expect(() => provider.dispose()).not.toThrow();
+  });
 });

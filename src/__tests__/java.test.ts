@@ -1,6 +1,12 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import * as vscode from "vscode";
-import { resolveJavaExecutable } from "../java";
+import { resolveJavaExecutable, validateJava } from "../java";
+
+vi.mock("child_process", () => ({
+  execFile: vi.fn(),
+}));
+
+import { execFile } from "child_process";
 
 beforeEach(() => {
   vi.clearAllMocks();
@@ -54,5 +60,61 @@ describe("resolveJavaExecutable", () => {
     vi.stubEnv("JAVA_HOME", "");
 
     expect(resolveJavaExecutable()).toBe("java");
+  });
+});
+
+describe("validateJava", () => {
+  it("returns ok with version on success", async () => {
+    vi.mocked(execFile).mockImplementation(
+      (_cmd: unknown, _args: unknown, cb: unknown) => {
+        (cb as (err: null, stdout: string, stderr: string) => void)(
+          null,
+          "",
+          'openjdk version "17.0.2" 2022-01-18\nOpenJDK Runtime',
+        );
+        return undefined as never;
+      },
+    );
+
+    const result = await validateJava("/usr/bin/java");
+    expect(result).toEqual({
+      ok: true,
+      version: 'openjdk version "17.0.2" 2022-01-18',
+    });
+  });
+
+  it("returns error when execFile fails", async () => {
+    vi.mocked(execFile).mockImplementation(
+      (_cmd: unknown, _args: unknown, cb: unknown) => {
+        (cb as (err: Error, stdout: string, stderr: string) => void)(
+          new Error("ENOENT"),
+          "",
+          "",
+        );
+        return undefined as never;
+      },
+    );
+
+    const result = await validateJava("/missing/java");
+    expect(result).toEqual({
+      ok: false,
+      error: expect.stringContaining("Cannot run '/missing/java'"),
+    });
+  });
+
+  it("returns 'unknown' when stderr is empty", async () => {
+    vi.mocked(execFile).mockImplementation(
+      (_cmd: unknown, _args: unknown, cb: unknown) => {
+        (cb as (err: null, stdout: string, stderr: string) => void)(
+          null,
+          "",
+          "",
+        );
+        return undefined as never;
+      },
+    );
+
+    const result = await validateJava("/usr/bin/java");
+    expect(result).toEqual({ ok: true, version: "" });
   });
 });

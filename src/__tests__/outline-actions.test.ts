@@ -270,4 +270,70 @@ describe("deleteElement", () => {
 
     expect(vscode.window.showWarningMessage).not.toHaveBeenCalled();
   });
+
+  it("does nothing when no active editor", async () => {
+    const node = makeNode();
+    const item = new OutlineItem("testField", "field", node, [], "String");
+
+    (vscode.window as { activeTextEditor: undefined }).activeTextEditor =
+      undefined;
+
+    await deleteElement(item);
+
+    expect(vscode.window.showWarningMessage).not.toHaveBeenCalled();
+  });
+});
+
+describe("addElement — additional scenarios", () => {
+  it("inserts sort field with name prompt", async () => {
+    const item = makeGroupItem("group-sortFields");
+    (vscode.window.showInputBox as ReturnType<typeof vi.fn>).mockResolvedValue(
+      "city",
+    );
+    setupEditor("<jasperReport>\n</jasperReport>");
+
+    await addElement(item);
+
+    expect(vscode.window.showInputBox).toHaveBeenCalledTimes(1);
+    expect(vscode.workspace.applyEdit).toHaveBeenCalledTimes(1);
+  });
+
+  it("inserts parameter with name prompt", async () => {
+    const item = makeGroupItem("group-parameters");
+    (vscode.window.showInputBox as ReturnType<typeof vi.fn>).mockResolvedValue(
+      "myParam",
+    );
+    setupEditor("<jasperReport>\n</jasperReport>");
+
+    await addElement(item);
+
+    expect(vscode.window.showInputBox).toHaveBeenCalledTimes(1);
+    expect(vscode.workspace.applyEdit).toHaveBeenCalledTimes(1);
+  });
+
+  it("inserts variable with name prompt", async () => {
+    const item = makeGroupItem("group-variables");
+    (vscode.window.showInputBox as ReturnType<typeof vi.fn>).mockResolvedValue(
+      "myVar",
+    );
+    setupEditor("<jasperReport>\n</jasperReport>");
+
+    await addElement(item);
+
+    expect(vscode.window.showInputBox).toHaveBeenCalledTimes(1);
+    expect(vscode.workspace.applyEdit).toHaveBeenCalledTimes(1);
+  });
+
+  it("inserts group with name prompt", async () => {
+    const item = makeGroupItem("group-groups");
+    (vscode.window.showInputBox as ReturnType<typeof vi.fn>).mockResolvedValue(
+      "CityGroup",
+    );
+    setupEditor("<jasperReport>\n</jasperReport>");
+
+    await addElement(item);
+
+    expect(vscode.window.showInputBox).toHaveBeenCalledTimes(1);
+    expect(vscode.workspace.applyEdit).toHaveBeenCalledTimes(1);
+  });
 });

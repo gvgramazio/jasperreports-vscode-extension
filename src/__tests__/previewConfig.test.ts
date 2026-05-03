@@ -172,4 +172,74 @@ describe("configurePreview", () => {
       expect.stringContaining(".jrxml"),
     );
   });
+
+  it("shows error when active file is not jrxml", async () => {
+    vscode.window.activeTextEditor = {
+      document: { fileName: "/test/file.xml" },
+    };
+
+    const { configurePreview } = await import("../previewConfig");
+    await configurePreview(mockContext as unknown as vscode.ExtensionContext);
+
+    expect(vscode.window.showErrorMessage).toHaveBeenCalledWith(
+      expect.stringContaining(".jrxml"),
+    );
+  });
+
+  it("returns when user cancels data source prompt", async () => {
+    vscode.window.activeTextEditor = {
+      document: { fileName: "/workspace/report.jrxml" },
+    };
+    vi.mocked(vscode.window.showQuickPick).mockResolvedValue(undefined);
+
+    const { configurePreview } = await import("../previewConfig");
+    await configurePreview(mockContext as unknown as vscode.ExtensionContext);
+
+    expect(vscode.window.showInformationMessage).not.toHaveBeenCalled();
+  });
+
+  it("returns when user cancels format prompt", async () => {
+    vscode.window.activeTextEditor = {
+      document: { fileName: "/workspace/report.jrxml" },
+    };
+    // First showQuickPick → data source selection
+    vi.mocked(vscode.window.showQuickPick)
+      .mockResolvedValueOnce({
+        label: "Empty",
+        value: undefined,
+      } as unknown as vscode.QuickPickItem)
+      // Second showQuickPick → format selection → cancelled
+      .mockResolvedValueOnce(undefined);
+
+    const { configurePreview } = await import("../previewConfig");
+    await configurePreview(mockContext as unknown as vscode.ExtensionContext);
+
+    expect(vscode.window.showInformationMessage).not.toHaveBeenCalled();
+  });
+
+  it("saves config and shows success message", async () => {
+    vscode.window.activeTextEditor = {
+      document: { fileName: "/workspace/report.jrxml" },
+    };
+    vi.mocked(vscode.window.showQuickPick)
+      .mockResolvedValueOnce({
+        label: "Empty",
+        value: undefined,
+      } as unknown as vscode.QuickPickItem)
+      .mockResolvedValueOnce({
+        label: "PDF",
+        value: "pdf",
+      } as unknown as vscode.QuickPickItem);
+
+    const { configurePreview, getPreviewConfig } =
+      await import("../previewConfig");
+    const ctx = mockContext as unknown as vscode.ExtensionContext;
+    await configurePreview(ctx);
+
+    expect(vscode.window.showInformationMessage).toHaveBeenCalledWith(
+      expect.stringContaining("Preview configured"),
+    );
+    const saved = getPreviewConfig(ctx, "/workspace/report.jrxml");
+    expect(saved?.format).toBe("pdf");
+  });
 });

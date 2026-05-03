@@ -2,6 +2,23 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import * as vscode from "vscode";
 import { resolveMvnExecutable } from "../dependencies";
 
+vi.mock("child_process", () => ({
+  execFile: vi.fn(),
+}));
+
+vi.mock("fs", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("fs")>();
+  return {
+    ...actual,
+    mkdtempSync: vi.fn(() => "/tmp/jr-deps-mock"),
+    writeFileSync: vi.fn(),
+    rmSync: vi.fn(),
+  };
+});
+
+import { execFile } from "child_process";
+import * as fs from "fs";
+
 beforeEach(() => {
   vi.clearAllMocks();
 });
@@ -46,5 +63,130 @@ describe("downloadDependencies", () => {
     expect(vscode.window.showErrorMessage).toHaveBeenCalledWith(
       expect.stringContaining("No workspace folder"),
     );
+  });
+
+  it("downloads successfully and updates classpath", async () => {
+    vi.mocked(vscode.workspace).workspaceFolders = [
+      { uri: { fsPath: "/workspace" }, name: "ws", index: 0 },
+    ];
+
+    const mockGet = vi.fn((key: string, defaultValue?: unknown) => {
+      if (key === "schema.version") return "7.0.6";
+      if (key === "classpath") return [];
+      return defaultValue;
+    });
+    const mockUpdate = vi.fn().mockResolvedValue(undefined);
+    vi.mocked(vscode.workspace.getConfiguration).mockReturnValue({
+      get: mockGet,
+      update: mockUpdate,
+    } as unknown as vscode.WorkspaceConfiguration);
+
+    vi.mocked(execFile).mockImplementation(
+      (_cmd: unknown, _args: unknown, _opts: unknown, cb: unknown) => {
+        (cb as (err: null, stdout: string, stderr: string) => void)(
+          null,
+          "",
+          "",
+        );
+        return undefined as never;
+      },
+    );
+
+    const { downloadDependencies } = await import("../dependencies");
+    await downloadDependencies();
+
+    // Verify Maven was called
+    expect(execFile).toHaveBeenCalled();
+    // Verify temp pom was written
+    expect(fs.writeFileSync).toHaveBeenCalledWith(
+      expect.stringContaining("pom.xml"),
+      expect.stringContaining("<artifactId>jasperreports</artifactId>"),
+    );
+    // Verify temp dir was cleaned up
+    expect(fs.rmSync).toHaveBeenCalled();
+    // Verify classpath was updated
+    expect(mockUpdate).toHaveBeenCalledWith(
+      "classpath",
+      expect.arrayContaining([expect.stringContaining(".jasperreports")]),
+      vscode.ConfigurationTarget.Workspace,
+    );
+    // Verify success message
+    expect(vscode.window.showInformationMessage).toHaveBeenCalledWith(
+      expect.stringContaining("downloaded"),
+    );
+  });
+
+  it("does not duplicate classpath when glob already exists", async () => {
+    vi.mocked(vscode.workspace).workspaceFolders = [
+      { uri: { fsPath: "/workspace" }, name: "ws", index: 0 },
+    ];
+
+    const existingGlob = "/workspace/.jasperreports/*";
+    const mockGet = vi.fn((key: string, defaultValue?: unknown) => {
+      if (key === "schema.version") return "7.0.6";
+      if (key === "classpath") return [existingGlob];
+      return defaultValue;
+    });
+    const mockUpdate = vi.fn();
+    vi.mocked(vscode.workspace.getConfiguration).mockReturnValue({
+      get: mockGet,
+      update: mockUpdate,
+    } as unknown as vscode.WorkspaceConfiguration);
+
+    vi.mocked(execFile).mockImplementation(
+      (_cmd: unknown, _args: unknown, _opts: unknown, cb: unknown) => {
+        (cb as (err: null, stdout: string, stderr: string) => void)(
+          null,
+          "",
+          "",
+        );
+        return undefined as never;
+      },
+    );
+
+    const { downloadDependencies } = await import("../dependencies");
+    await downloadDependencies();
+
+    // classpath should not be updated since glob already present
+    expect(mockUpdate).not.toHaveBeenCalled();
+  });
+
+  it("rejects when Maven fails", async () => {
+    vi.mocked(vscode.workspace).workspaceFolders = [
+      { uri: { fsPath: "/workspace" }, name: "ws", index: 0 },
+    ];
+
+    vi.mocked(vscode.workspace.getConfiguration).mockReturnValue({
+      get: vi.fn((key: string, defaultValue?: unknown) => {
+        if (key === "schema.version") return "7.0.6";
+        if (key === "classpath") return [];
+        return defaultValue;
+      }),
+      update: vi.fn(),
+    } as unknown as vscode.WorkspaceConfiguration);
+
+    vi.mocked(execFile).mockImplementation(
+      (_cmd: unknown, _args: unknown, _opts: unknown, cb: unknown) => {
+        (cb as (err: Error, stdout: string, stderr: string) => void)(
+          new Error("exit code 1"),
+          "",
+          "BUILD FAILURE\nDetails...",
+        );
+        return undefined as never;
+      },
+    );
+
+    // withProgress will invoke the task, which calls runMavenDownload, which rejects
+    vi.mocked(vscode.window.withProgress).mockImplementation(
+      async (_opts: unknown, task: (progress: unknown) => Promise<unknown>) => {
+        await expect(task({ report: vi.fn() })).rejects.toThrow("Maven failed");
+      },
+    );
+
+    const { downloadDependencies } = await import("../dependencies");
+    await downloadDependencies();
+
+    // Verify cleanup happened
+    expect(fs.rmSync).toHaveBeenCalled();
   });
 });

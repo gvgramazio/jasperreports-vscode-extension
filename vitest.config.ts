@@ -15,6 +15,17 @@ export default defineConfig({
       provider: "v8",
       reporter: ["text", "lcov"],
       reportsDirectory: "./coverage",
+      include: ["src/**/*.ts"],
+      exclude: [
+        "src/__mocks__/**",
+        "src/__tests__/**",
+        "src/properties/webview-main.ts",
+      ],
+      thresholds: {
+        lines: 80,
+        branches: 70,
+        functions: 75,
+      },
     },
   },
 });
