@@ -152,4 +152,16 @@ describe("formatNodeProperties", () => {
     const exprGroup = groups.find((g) => g.label === "Expressions");
     expect(exprGroup!.entries[0].value).toBe("$P{logo}");
   });
+
+  it("marks uuid attribute as read-only", () => {
+    const node = makeNode({
+      attributes: { uuid: "abc-123", x: "10" },
+    });
+    const groups = formatNodeProperties(node);
+    const attrGroup = groups.find((g) => g.label === "Attributes")!;
+    const uuidEntry = attrGroup.entries.find((e) => e.name === "uuid");
+    const xEntry = attrGroup.entries.find((e) => e.name === "x");
+    expect(uuidEntry!.editable).toBe(false);
+    expect(xEntry!.editable).toBe(true);
+  });
 });

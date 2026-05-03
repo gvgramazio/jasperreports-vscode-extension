@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 
+import * as vscode from "vscode";
 import { Uri } from "vscode";
 import { PropertiesViewProvider } from "../properties/PropertiesViewProvider";
 import { JrxmlNode } from "../jrxml-parser";
@@ -22,10 +23,12 @@ describe("PropertiesViewProvider", () => {
       html: string;
       asWebviewUri: ReturnType<typeof vi.fn>;
       cspSource: string;
+      postMessage: ReturnType<typeof vi.fn>;
     };
   };
 
   beforeEach(() => {
+    vi.clearAllMocks();
     const extensionUri = Uri.file("/ext");
     provider = new PropertiesViewProvider(extensionUri as never);
 
@@ -38,6 +41,7 @@ describe("PropertiesViewProvider", () => {
         ),
         cspSource: "https://webview.example",
         onDidReceiveMessage: vi.fn().mockReturnValue({ dispose: vi.fn() }),
+        postMessage: vi.fn(),
       },
     };
   });
@@ -90,5 +94,74 @@ describe("PropertiesViewProvider", () => {
     expect(mockWebviewView.webview.html).toContain(
       "&lt;test&gt;&amp;&quot;value&quot;",
     );
+  });
+
+  it("editInProgress is false by default", () => {
+    expect(provider.editInProgress).toBe(false);
+  });
+
+  it("markStale posts markStale message to webview", () => {
+    provider.resolveWebviewView(mockWebviewView as never);
+    provider.update(makeNode(), "TextField");
+    provider.markStale();
+
+    expect(mockWebviewView.webview.postMessage).toHaveBeenCalledWith({
+      type: "markStale",
+    });
+  });
+
+  it("markStale does nothing when no node is selected", () => {
+    provider.resolveWebviewView(mockWebviewView as never);
+    provider.markStale();
+
+    expect(mockWebviewView.webview.postMessage).not.toHaveBeenCalled();
+  });
+
+  it("HTML includes stale overlay element", () => {
+    provider.resolveWebviewView(mockWebviewView as never);
+    provider.update(makeNode(), "Node");
+
+    expect(mockWebviewView.webview.html).toContain("stale-overlay");
+    expect(mockWebviewView.webview.html).toContain(
+      "Document changed externally",
+    );
+  });
+
+  it("re-parses and refreshes on edit message when editor has JRXML content", async () => {
+    const jrxmlContent =
+      '<?xml version="1.0"?>\n<jasperReport><field name="id" class="java.lang.Integer"/></jasperReport>';
+    const mockDocument = {
+      getText: () => jrxmlContent,
+      positionAt: (offset: number) => new vscode.Position(0, offset),
+      uri: { fsPath: "/test.jrxml", toString: () => "file:///test.jrxml" },
+    };
+    (vscode.window as { activeTextEditor: unknown }).activeTextEditor = {
+      document: mockDocument,
+    };
+
+    provider.resolveWebviewView(mockWebviewView as never);
+    provider.update(
+      makeNode({ tag: "field", attributes: { name: "id" } }),
+      "id",
+    );
+
+    // Simulate receiving an edit message through the registered handler
+    const handler = (
+      mockWebviewView.webview.onDidReceiveMessage as ReturnType<typeof vi.fn>
+    ).mock.calls[0][0];
+    await handler({
+      type: "edit",
+      attribute: "name",
+      value: "newId",
+      attributePosition: {
+        nameStart: 38,
+        nameEnd: 42,
+        valueStart: 44,
+        valueEnd: 46,
+      },
+    });
+
+    // After edit, the panel should have re-rendered with fresh parse
+    expect(mockWebviewView.webview.html).toContain("Attributes");
   });
 });

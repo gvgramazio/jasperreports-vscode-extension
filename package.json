@@ -201,7 +201,7 @@
         },
         {
           "command": "jasperreports.outline.delete",
-          "when": "view == jasperreports-outline && viewItem =~ /^(field|parameter|variable|sortField|group|band|style)$/",
+          "when": "view == jasperreports-outline && viewItem =~ /^(style|parameter|field|variable|sortField|group|groupHeader|groupFooter|section|band|element)$/",
           "group": "inline"
         }
       ]

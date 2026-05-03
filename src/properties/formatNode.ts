@@ -33,6 +33,8 @@ const EXPRESSION_TAGS = new Set([
 
 const BOX_SIDES = ["top", "bottom", "left", "right"] as const;
 
+const READONLY_ATTRS = new Set(["uuid"]);
+
 export function formatNodeProperties(node: JrxmlNode): PropertyGroup[] {
   const groups: PropertyGroup[] = [];
 
@@ -40,7 +42,7 @@ export function formatNodeProperties(node: JrxmlNode): PropertyGroup[] {
   const attrEntries = Object.entries(node.attributes).map(([name, value]) => ({
     name,
     value,
-    editable: true,
+    editable: !READONLY_ATTRS.has(name),
     attributePosition: node.attributePositions?.[name],
   }));
   if (attrEntries.length > 0) {
