@@ -141,12 +141,6 @@
         "icon": "$(add)"
       },
       {
-        "command": "jasperreports.outline.addBand",
-        "title": "Add Band",
-        "category": "JasperReports",
-        "icon": "$(add)"
-      },
-      {
         "command": "jasperreports.outline.delete",
         "title": "Delete Element",
         "category": "JasperReports",
@@ -180,10 +174,6 @@
           "when": "false"
         },
         {
-          "command": "jasperreports.outline.addBand",
-          "when": "false"
-        },
-        {
           "command": "jasperreports.outline.delete",
           "when": "false"
         }
@@ -191,12 +181,7 @@
       "view/item/context": [
         {
           "command": "jasperreports.outline.add",
-          "when": "view == jasperreports-outline && viewItem =~ /^group-(fields|parameters|variables|sortFields|groups)$/",
-          "group": "inline"
-        },
-        {
-          "command": "jasperreports.outline.addBand",
-          "when": "view == jasperreports-outline && viewItem == section",
+          "when": "view == jasperreports-outline && viewItem =~ /^(group-(fields|parameters|variables|sortFields|groups|styles)|section|band|group)$/",
           "group": "inline"
         },
         {

@@ -198,6 +198,19 @@ export class WorkspaceEdit {
     this._edits.push({ type: "delete", uri, range });
   }
 
+  entries(): Array<[unknown, Array<{ range?: Range; newText?: string }>]> {
+    const byUri = new Map<
+      unknown,
+      Array<{ range?: Range; newText?: string }>
+    >();
+    for (const edit of this._edits) {
+      const key = edit.uri;
+      if (!byUri.has(key)) byUri.set(key, []);
+      byUri.get(key)!.push({ range: edit.range, newText: edit.newText });
+    }
+    return [...byUri.entries()];
+  }
+
   get size(): number {
     return this._edits.length;
   }

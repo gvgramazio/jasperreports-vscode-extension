@@ -1,10 +1,12 @@
 import { JrxmlNode, AttributePosition } from "../jrxml-parser";
+import { getAttributeType, AttributeTypeInfo } from "./attributeTypes";
 
 export interface PropertyEntry {
   name: string;
   value: string;
   editable?: boolean;
   attributePosition?: AttributePosition;
+  typeInfo?: AttributeTypeInfo;
 }
 
 export interface PropertyGroup {
@@ -44,6 +46,7 @@ export function formatNodeProperties(node: JrxmlNode): PropertyGroup[] {
     value,
     editable: !READONLY_ATTRS.has(name),
     attributePosition: node.attributePositions?.[name],
+    typeInfo: getAttributeType(name),
   }));
   if (attrEntries.length > 0) {
     groups.push({ label: "Attributes", entries: attrEntries });

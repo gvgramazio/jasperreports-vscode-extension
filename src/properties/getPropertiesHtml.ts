@@ -63,6 +63,15 @@ export function getPropertiesHtml(
     .edit-input:focus {
       outline: 1px solid var(--vscode-focusBorder);
     }
+    .edit-input.dirty {
+      border-left: 2px solid var(--vscode-focusBorder);
+    }
+    .edit-input.applied {
+      background-color: var(--vscode-diffEditor-insertedTextBackground);
+    }
+    .edit-input.invalid {
+      border-color: var(--vscode-inputValidation-errorBorder);
+    }
     .stale-overlay {
       display: none;
       position: fixed;
@@ -111,7 +120,7 @@ function renderGroup(group: PropertyGroup): string {
               <input class="edit-input" type="text"
                 value="${escapeAttr(e.value)}"
                 data-attr="${escapeAttr(e.name)}"
-                data-pos="${escapeAttr(JSON.stringify(e.attributePosition))}" />
+                data-pos="${escapeAttr(JSON.stringify(e.attributePosition))}"${e.typeInfo ? ` data-type="${escapeAttr(e.typeInfo.type)}"` : ""}${e.typeInfo?.enumValues ? ` data-enum="${escapeAttr(JSON.stringify(e.typeInfo.enumValues))}"` : ""} />
             </vscode-table-cell>`
           : `<vscode-table-cell class="value-cell">${escapeHtml(e.value)}</vscode-table-cell>`;
 
