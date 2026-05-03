@@ -1,5 +1,6 @@
 import * as vscode from "vscode";
 import * as path from "path";
+import { resolveActiveJrxmlPath } from "./compiler";
 
 export type PreviewFormat = "html" | "pdf";
 
@@ -146,13 +147,8 @@ export async function promptFormat(
 export async function configurePreview(
   context: vscode.ExtensionContext,
 ): Promise<void> {
-  const filePath = vscode.window.activeTextEditor?.document.fileName;
-  if (!filePath || !filePath.endsWith(".jrxml")) {
-    vscode.window.showErrorMessage(
-      "No .jrxml file is open. Open a JRXML file and try again.",
-    );
-    return;
-  }
+  const filePath = resolveActiveJrxmlPath();
+  if (!filePath) return;
 
   const existing = getPreviewConfig(context, filePath);
 

@@ -376,3 +376,22 @@ export function revealPosition(position: NodePosition): void {
   editor.selection = new vscode.Selection(startPos, startPos);
   editor.revealRange(range, vscode.TextEditorRevealType.InCenter);
 }
+
+export function nodeToFullLineRange(
+  document: vscode.TextDocument,
+  position: NodePosition,
+): vscode.Range {
+  const startLine = position.startLine - 1; // 0-based
+  const endLine = position.endLine; // line after
+
+  const start = new vscode.Position(startLine, 0);
+  const end =
+    endLine < document.lineCount
+      ? new vscode.Position(endLine, 0)
+      : new vscode.Position(
+          document.lineCount - 1,
+          document.lineAt(document.lineCount - 1).text.length,
+        );
+
+  return new vscode.Range(start, end);
+}

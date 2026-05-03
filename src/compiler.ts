@@ -5,6 +5,67 @@ import { resolveJavaExecutable, validateJava } from "./java";
 import { getOutputChannel } from "./logger";
 
 /**
+ * Resolves the active .jrxml file path from an explicit argument or the active editor.
+ * Shows an error message and returns undefined if no .jrxml file is available.
+ */
+export function resolveActiveJrxmlPath(jrxmlPath?: string): string | undefined {
+  const filePath =
+    jrxmlPath ?? vscode.window.activeTextEditor?.document.fileName;
+  if (!filePath || !filePath.endsWith(".jrxml")) {
+    vscode.window.showErrorMessage(
+      "No .jrxml file is open. Open a JRXML file and try again.",
+    );
+    return undefined;
+  }
+  return filePath;
+}
+
+export interface JavaEnv {
+  javaPath: string;
+  javaVersion: string;
+  classpath: string;
+}
+
+/**
+ * Resolves and validates the Java executable and classpath.
+ * Shows appropriate error messages and returns undefined on failure.
+ */
+export async function resolveJavaEnv(
+  extensionPath: string,
+): Promise<JavaEnv | undefined> {
+  const javaPath = resolveJavaExecutable();
+  if (!javaPath) {
+    vscode.window.showErrorMessage(
+      "Java not found. Set 'jasperreports.java.home' or install Java.",
+    );
+    return undefined;
+  }
+
+  const javaResult = await validateJava(javaPath);
+  if (!javaResult.ok) {
+    vscode.window.showErrorMessage(javaResult.error);
+    return undefined;
+  }
+
+  const classpath = buildClasspath(extensionPath);
+  if (!classpath) {
+    const action = await vscode.window.showErrorMessage(
+      "JasperReports classpath is not configured. Set 'jasperreports.classpath' in settings.",
+      "Open Settings",
+    );
+    if (action === "Open Settings") {
+      vscode.commands.executeCommand(
+        "workbench.action.openSettings",
+        "jasperreports.classpath",
+      );
+    }
+    return undefined;
+  }
+
+  return { javaPath, javaVersion: javaResult.version, classpath };
+}
+
+/**
  * Builds the classpath string for running the JR compiler.
  * Includes the bundled jr-compiler.jar and all user-configured classpath entries.
  */
@@ -28,53 +89,16 @@ export async function compileReport(
   extensionPath: string,
   jrxmlPath?: string,
 ): Promise<void> {
+  const filePath = resolveActiveJrxmlPath(jrxmlPath);
+  if (!filePath) return;
+
+  const env = await resolveJavaEnv(extensionPath);
+  if (!env) return;
+
   const channel = getOutputChannel();
-
-  // Resolve the file to compile
-  const filePath =
-    jrxmlPath ?? vscode.window.activeTextEditor?.document.fileName;
-  if (!filePath || !filePath.endsWith(".jrxml")) {
-    vscode.window.showErrorMessage(
-      "No .jrxml file is open. Open a JRXML file and try again.",
-    );
-    return;
-  }
-
-  // Resolve Java
-  const javaPath = resolveJavaExecutable();
-  if (!javaPath) {
-    vscode.window.showErrorMessage(
-      "Java not found. Set 'jasperreports.java.home' or install Java.",
-    );
-    return;
-  }
-
-  const javaResult = await validateJava(javaPath);
-  if (!javaResult.ok) {
-    vscode.window.showErrorMessage(javaResult.error);
-    return;
-  }
-
-  // Build classpath
-  const classpath = buildClasspath(extensionPath);
-  if (!classpath) {
-    const action = await vscode.window.showErrorMessage(
-      "JasperReports classpath is not configured. Set 'jasperreports.classpath' in settings.",
-      "Open Settings",
-    );
-    if (action === "Open Settings") {
-      vscode.commands.executeCommand(
-        "workbench.action.openSettings",
-        "jasperreports.classpath",
-      );
-    }
-    return;
-  }
-
-  // Compile
   const fileName = path.basename(filePath);
   channel.appendLine(`Compiling ${fileName}...`);
-  channel.appendLine(`  Java: ${javaPath} (${javaResult.version})`);
+  channel.appendLine(`  Java: ${env.javaPath} (${env.javaVersion})`);
   channel.appendLine(`  File: ${filePath}`);
 
   await vscode.window.withProgress(
@@ -83,7 +107,7 @@ export async function compileReport(
       title: `Compiling ${fileName}`,
       cancellable: false,
     },
-    () => runCompiler(javaPath, classpath, filePath, channel),
+    () => runCompiler(env.javaPath, env.classpath, filePath, channel),
   );
 }
 
