@@ -10,7 +10,9 @@
     "vscode": "^1.110.0"
   },
   "categories": [
-    "Programming Languages"
+    "Programming Languages",
+    "Snippets",
+    "Visualization"
   ],
   "activationEvents": [
     "onLanguage:jrxml",
