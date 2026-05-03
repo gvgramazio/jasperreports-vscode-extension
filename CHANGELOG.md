@@ -1,3 +1,15 @@
+# [1.5.0](https://github.com/gvgramazio/jasperreports-vscode-extension/compare/v1.4.0...v1.5.0) (2026-05-03)
+
+
+### Bug Fixes
+
+* ensure Codecov token is correctly referenced in CI configuration ([7bf1438](https://github.com/gvgramazio/jasperreports-vscode-extension/commit/7bf143824b4bfc5bca0ce4b1c6e681b83ee7fbd3))
+
+
+### Features
+
+* add code coverage reporting and update CI configuration ([9ed1096](https://github.com/gvgramazio/jasperreports-vscode-extension/commit/9ed10964fbc781b14f04b95e8866100245736b54))
+
 # [1.4.0](https://github.com/gvgramazio/jasperreports-vscode-extension/compare/v1.3.0...v1.4.0) (2026-05-03)
 
 
