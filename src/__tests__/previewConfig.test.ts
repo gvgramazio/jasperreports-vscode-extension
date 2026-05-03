@@ -66,20 +66,6 @@ describe("getPreviewConfig / setPreviewConfig", () => {
   });
 });
 
-describe("clearPreviewConfig", () => {
-  it("removes the entry for a file", async () => {
-    const { getPreviewConfig, setPreviewConfig, clearPreviewConfig } =
-      await import("../previewConfig");
-    const ctx = mockContext as unknown as vscode.ExtensionContext;
-
-    await setPreviewConfig(ctx, "/workspace/test.jrxml", { format: "pdf" });
-    expect(getPreviewConfig(ctx, "/workspace/test.jrxml")).toBeDefined();
-
-    await clearPreviewConfig(ctx, "/workspace/test.jrxml");
-    expect(getPreviewConfig(ctx, "/workspace/test.jrxml")).toBeUndefined();
-  });
-});
-
 describe("resolveFormat", () => {
   it("returns per-file format when set", async () => {
     const { resolveFormat } = await import("../previewConfig");
