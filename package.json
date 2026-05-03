@@ -133,6 +133,24 @@
         "command": "jasperreports.outline.reveal",
         "title": "Go to Element",
         "category": "JasperReports"
+      },
+      {
+        "command": "jasperreports.outline.add",
+        "title": "Add Element",
+        "category": "JasperReports",
+        "icon": "$(add)"
+      },
+      {
+        "command": "jasperreports.outline.addBand",
+        "title": "Add Band",
+        "category": "JasperReports",
+        "icon": "$(add)"
+      },
+      {
+        "command": "jasperreports.outline.delete",
+        "title": "Delete Element",
+        "category": "JasperReports",
+        "icon": "$(trash)"
       }
     ],
     "menus": {
@@ -156,6 +174,35 @@
         {
           "command": "jasperreports.outline.reveal",
           "when": "false"
+        },
+        {
+          "command": "jasperreports.outline.add",
+          "when": "false"
+        },
+        {
+          "command": "jasperreports.outline.addBand",
+          "when": "false"
+        },
+        {
+          "command": "jasperreports.outline.delete",
+          "when": "false"
+        }
+      ],
+      "view/item/context": [
+        {
+          "command": "jasperreports.outline.add",
+          "when": "view == jasperreports-outline && viewItem =~ /^group-(fields|parameters|variables|sortFields|groups)$/",
+          "group": "inline"
+        },
+        {
+          "command": "jasperreports.outline.addBand",
+          "when": "view == jasperreports-outline && viewItem == section",
+          "group": "inline"
+        },
+        {
+          "command": "jasperreports.outline.delete",
+          "when": "view == jasperreports-outline && viewItem =~ /^(field|parameter|variable|sortField|group|band|style)$/",
+          "group": "inline"
         }
       ]
     },

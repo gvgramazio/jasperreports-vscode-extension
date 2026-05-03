@@ -70,6 +70,7 @@ export class OutlineItem extends vscode.TreeItem {
     );
     this.description = description;
     this.iconPath = getIcon(kind);
+    this.contextValue = kind;
     if (node?.position) {
       this.command = {
         command: "jasperreports.outline.reveal",

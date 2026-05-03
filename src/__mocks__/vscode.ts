@@ -9,6 +9,7 @@ export const workspace = {
     update: vi.fn(),
   }),
   onDidChangeTextDocument: vi.fn().mockReturnValue({ dispose: vi.fn() }),
+  applyEdit: vi.fn().mockResolvedValue(true),
 };
 
 export const window = {
@@ -51,6 +52,7 @@ export const window = {
   }),
   registerWebviewViewProvider: vi.fn().mockReturnValue({ dispose: vi.fn() }),
   showQuickPick: vi.fn().mockResolvedValue(undefined),
+  showInputBox: vi.fn().mockResolvedValue(undefined),
   showOpenDialog: vi.fn().mockResolvedValue(undefined),
   onDidChangeActiveTextEditor: vi.fn().mockReturnValue({ dispose: vi.fn() }),
 };
@@ -172,6 +174,32 @@ export class Selection {
   constructor(anchor: Position, active: Position) {
     this.anchor = anchor;
     this.active = active;
+  }
+}
+
+export class WorkspaceEdit {
+  private _edits: Array<{
+    type: string;
+    uri?: unknown;
+    range?: Range;
+    newText?: string;
+    position?: Position;
+  }> = [];
+
+  replace(uri: unknown, range: Range, newText: string): void {
+    this._edits.push({ type: "replace", uri, range, newText });
+  }
+
+  insert(uri: unknown, position: Position, newText: string): void {
+    this._edits.push({ type: "insert", uri, position, newText });
+  }
+
+  delete(uri: unknown, range: Range): void {
+    this._edits.push({ type: "delete", uri, range });
+  }
+
+  get size(): number {
+    return this._edits.length;
   }
 }
 

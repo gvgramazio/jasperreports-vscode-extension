@@ -50,6 +50,19 @@ export function getPropertiesHtml(
     .value-cell {
       word-break: break-all;
     }
+    .edit-input {
+      width: 100%;
+      box-sizing: border-box;
+      background: var(--vscode-input-background);
+      color: var(--vscode-input-foreground);
+      border: 1px solid var(--vscode-input-border, transparent);
+      padding: 2px 4px;
+      font-family: var(--vscode-editor-font-family, monospace);
+      font-size: var(--vscode-font-size);
+    }
+    .edit-input:focus {
+      outline: 1px solid var(--vscode-focusBorder);
+    }
   </style>
 </head>
 <body>
@@ -62,13 +75,22 @@ export function getPropertiesHtml(
 
 function renderGroup(group: PropertyGroup): string {
   const rows = group.entries
-    .map(
-      (e) =>
-        `<vscode-table-row>
+    .map((e) => {
+      const valueCell =
+        e.editable && e.attributePosition
+          ? `<vscode-table-cell class="value-cell">
+              <input class="edit-input" type="text"
+                value="${escapeAttr(e.value)}"
+                data-attr="${escapeAttr(e.name)}"
+                data-pos="${escapeAttr(JSON.stringify(e.attributePosition))}" />
+            </vscode-table-cell>`
+          : `<vscode-table-cell class="value-cell">${escapeHtml(e.value)}</vscode-table-cell>`;
+
+      return `<vscode-table-row>
           <vscode-table-cell>${escapeHtml(e.name)}</vscode-table-cell>
-          <vscode-table-cell class="value-cell">${escapeHtml(e.value)}</vscode-table-cell>
-        </vscode-table-row>`,
-    )
+          ${valueCell}
+        </vscode-table-row>`;
+    })
     .join("\n");
 
   return `<vscode-collapsible title="${escapeHtml(group.label)}" open>
@@ -90,6 +112,14 @@ function escapeHtml(text: string): string {
     .replace(/</g, "&lt;")
     .replace(/>/g, "&gt;")
     .replace(/"/g, "&quot;");
+}
+
+function escapeAttr(text: string): string {
+  return text
+    .replace(/&/g, "&amp;")
+    .replace(/"/g, "&quot;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;");
 }
 
 function getNonce(): string {
