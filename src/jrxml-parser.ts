@@ -25,6 +25,7 @@ export interface JrxmlNode {
 
 export interface JrxmlDocument {
   root: JrxmlNode | null;
+  hasErrors: boolean;
 }
 
 interface OpenNode {
@@ -41,6 +42,7 @@ export function parseJrxml(text: string): JrxmlDocument {
   const parser = new SaxesParser({ xmlns: false, position: true });
   const stack: OpenNode[] = [];
   let root: JrxmlNode | null = null;
+  let hasErrors = false;
   const lines = text.split("\n");
 
   parser.on("opentag", (node) => {
@@ -109,6 +111,7 @@ export function parseJrxml(text: string): JrxmlDocument {
 
   parser.on("error", () => {
     // Gracefully ignore parse errors — return whatever was built so far
+    hasErrors = true;
     parser.resume();
   });
 
@@ -116,9 +119,10 @@ export function parseJrxml(text: string): JrxmlDocument {
     parser.write(text).close();
   } catch {
     // If parsing fails completely, return what we have
+    hasErrors = true;
   }
 
-  return { root };
+  return { root, hasErrors };
 }
 
 /**

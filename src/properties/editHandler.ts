@@ -21,7 +21,7 @@ export async function handleEditMessage(
   const document = editor.document;
   const text = document.getText();
 
-  const { attributePosition, value } = message;
+  const { attributePosition, attribute, value } = message;
 
   // Validate offsets are within document bounds
   if (
@@ -32,7 +32,14 @@ export async function handleEditMessage(
     return false;
   }
 
-  // Verify the range is still at expected position (document may have changed)
+  // Verify the attribute name at the recorded position still matches
+  const nameAtPosition = text.substring(
+    attributePosition.nameStart,
+    attributePosition.nameEnd,
+  );
+  if (nameAtPosition !== attribute) {
+    return false;
+  }
   const startPos = document.positionAt(attributePosition.valueStart);
   const endPos = document.positionAt(attributePosition.valueEnd);
   const range = new vscode.Range(startPos, endPos);
