@@ -1,3 +1,10 @@
+# [1.6.0](https://github.com/gvgramazio/jasperreports-vscode-extension/compare/v1.5.0...v1.6.0) (2026-05-03)
+
+
+### Features
+
+* enhance testing coverage with additional test cases and mock implementations ([e985652](https://github.com/gvgramazio/jasperreports-vscode-extension/commit/e9856526b252d85a831dd3226b3c62922fb3bff8))
+
 # [1.5.0](https://github.com/gvgramazio/jasperreports-vscode-extension/compare/v1.4.0...v1.5.0) (2026-05-03)
 
 
