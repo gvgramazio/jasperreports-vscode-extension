@@ -147,6 +147,193 @@ describe("previewReport", () => {
       expect.objectContaining({ preview: true }),
     );
   });
+
+  it("shows error when PDF exec fails with stderr", async () => {
+    vi.mocked(resolveActiveJrxmlPath).mockReturnValue("/test/report.jrxml");
+    vi.mocked(resolveJavaEnv).mockResolvedValue({
+      javaPath: "/usr/bin/java",
+      javaVersion: "17.0.2",
+      classpath: "/cp/jr.jar",
+    });
+
+    vscode.workspace.workspaceFolders = [
+      { uri: { fsPath: "/test" }, name: "test", index: 0 },
+    ];
+    const ctx = mockContext as unknown as vscode.ExtensionContext;
+    const { setPreviewConfig } = await import("../previewConfig");
+    await setPreviewConfig(ctx, "/test/report.jrxml", { format: "pdf" });
+
+    vi.mocked(execFile).mockImplementation(
+      (_cmd: unknown, _args: unknown, _opts: unknown, cb: unknown) => {
+        (cb as (err: Error, stdout: string, stderr: string) => void)(
+          new Error("java crashed"),
+          "",
+          "java.lang.OutOfMemoryError",
+        );
+        return undefined as never;
+      },
+    );
+
+    const { previewReport, disposePreviewPanel } = await import("../preview");
+    disposePreviewPanel();
+    await previewReport(ctx);
+
+    expect(vscode.window.showErrorMessage).toHaveBeenCalledWith(
+      expect.stringContaining("Preview failed"),
+    );
+    expect(fs.unlinkSync).toHaveBeenCalled();
+  });
+
+  it("shows error when PDF exec fails without stderr", async () => {
+    vi.mocked(resolveActiveJrxmlPath).mockReturnValue("/test/report.jrxml");
+    vi.mocked(resolveJavaEnv).mockResolvedValue({
+      javaPath: "/usr/bin/java",
+      javaVersion: "17.0.2",
+      classpath: "/cp/jr.jar",
+    });
+
+    vscode.workspace.workspaceFolders = [
+      { uri: { fsPath: "/test" }, name: "test", index: 0 },
+    ];
+    const ctx = mockContext as unknown as vscode.ExtensionContext;
+    const { setPreviewConfig } = await import("../previewConfig");
+    await setPreviewConfig(ctx, "/test/report.jrxml", { format: "pdf" });
+
+    vi.mocked(execFile).mockImplementation(
+      (_cmd: unknown, _args: unknown, _opts: unknown, cb: unknown) => {
+        (cb as (err: Error, stdout: string, stderr: string) => void)(
+          new Error("timeout"),
+          "some stdout",
+          "",
+        );
+        return undefined as never;
+      },
+    );
+
+    const { previewReport, disposePreviewPanel } = await import("../preview");
+    disposePreviewPanel();
+    await previewReport(ctx);
+
+    expect(vscode.window.showErrorMessage).toHaveBeenCalledWith(
+      expect.stringContaining("timeout"),
+    );
+  });
+
+  it("shows error when PDF output file is missing after exec", async () => {
+    vi.mocked(resolveActiveJrxmlPath).mockReturnValue("/test/report.jrxml");
+    vi.mocked(resolveJavaEnv).mockResolvedValue({
+      javaPath: "/usr/bin/java",
+      javaVersion: "17.0.2",
+      classpath: "/cp/jr.jar",
+    });
+
+    vscode.workspace.workspaceFolders = [
+      { uri: { fsPath: "/test" }, name: "test", index: 0 },
+    ];
+    const ctx = mockContext as unknown as vscode.ExtensionContext;
+    const { setPreviewConfig } = await import("../previewConfig");
+    await setPreviewConfig(ctx, "/test/report.jrxml", { format: "pdf" });
+
+    vi.mocked(execFile).mockImplementation(
+      (_cmd: unknown, _args: unknown, _opts: unknown, cb: unknown) => {
+        (cb as (err: null, stdout: string, stderr: string) => void)(
+          null,
+          "",
+          "",
+        );
+        return undefined as never;
+      },
+    );
+
+    vi.mocked(fs.existsSync).mockReturnValue(false);
+
+    const { previewReport, disposePreviewPanel } = await import("../preview");
+    disposePreviewPanel();
+    await previewReport(ctx);
+
+    expect(vscode.window.showErrorMessage).toHaveBeenCalledWith(
+      "PDF output file was not created",
+    );
+  });
+
+  it("logs stdout and stderr from PDF preview", async () => {
+    vi.mocked(resolveActiveJrxmlPath).mockReturnValue("/test/report.jrxml");
+    vi.mocked(resolveJavaEnv).mockResolvedValue({
+      javaPath: "/usr/bin/java",
+      javaVersion: "17.0.2",
+      classpath: "/cp/jr.jar",
+    });
+
+    vscode.workspace.workspaceFolders = [
+      { uri: { fsPath: "/test" }, name: "test", index: 0 },
+    ];
+    const ctx = mockContext as unknown as vscode.ExtensionContext;
+    const { setPreviewConfig } = await import("../previewConfig");
+    await setPreviewConfig(ctx, "/test/report.jrxml", { format: "pdf" });
+
+    vi.mocked(execFile).mockImplementation(
+      (_cmd: unknown, _args: unknown, _opts: unknown, cb: unknown) => {
+        (cb as (err: null, stdout: string, stderr: string) => void)(
+          null,
+          "pdf stdout output",
+          "pdf stderr output",
+        );
+        return undefined as never;
+      },
+    );
+
+    vi.mocked(fs.existsSync).mockReturnValue(true);
+
+    const { previewReport, disposePreviewPanel } = await import("../preview");
+    disposePreviewPanel();
+    await previewReport(ctx);
+
+    expect(vscode.commands.executeCommand).toHaveBeenCalledWith(
+      "vscode.open",
+      expect.objectContaining({ fsPath: expect.stringContaining(".pdf") }),
+      expect.objectContaining({ preview: true }),
+    );
+  });
+
+  it("passes dataSource to PDF preview args", async () => {
+    vi.mocked(resolveActiveJrxmlPath).mockReturnValue("/test/report.jrxml");
+    vi.mocked(resolveJavaEnv).mockResolvedValue({
+      javaPath: "/usr/bin/java",
+      javaVersion: "17.0.2",
+      classpath: "/cp/jr.jar",
+    });
+
+    vscode.workspace.workspaceFolders = [
+      { uri: { fsPath: "/test" }, name: "test", index: 0 },
+    ];
+    const ctx = mockContext as unknown as vscode.ExtensionContext;
+    const { setPreviewConfig } = await import("../previewConfig");
+    await setPreviewConfig(ctx, "/test/report.jrxml", {
+      format: "pdf",
+      dataSourcePath: "/test/data.json",
+    });
+
+    vi.mocked(execFile).mockImplementation(
+      (_cmd: unknown, _args: unknown, _opts: unknown, cb: unknown) => {
+        (cb as (err: null, stdout: string, stderr: string) => void)(
+          null,
+          "",
+          "",
+        );
+        return undefined as never;
+      },
+    );
+
+    vi.mocked(fs.existsSync).mockReturnValue(true);
+
+    const { previewReport, disposePreviewPanel } = await import("../preview");
+    disposePreviewPanel();
+    await previewReport(ctx);
+
+    const execCalls = vi.mocked(execFile).mock.calls;
+    const lastArgs = execCalls[execCalls.length - 1][1] as string[];
+    expect(lastArgs).toContain("/test/data.json");
+  });
 });
 
 describe("disposePreviewPanel", () => {

@@ -109,6 +109,26 @@ describe("compileJavaSources", () => {
     );
   });
 
+  it("logs stdout when javac produces output", async () => {
+    vi.mocked(fs.readdirSync).mockReturnValue([
+      { name: "Foo.java", isFile: () => true, isDirectory: () => false },
+    ] as unknown as fs.Dirent[]);
+
+    vi.mocked(execFile).mockImplementation(
+      (_cmd: unknown, _args: unknown, cb: unknown) => {
+        (cb as (err: null, stdout: string, stderr: string) => void)(
+          null,
+          "Note: Some notes about compilation",
+          "some warning",
+        );
+        return undefined as never;
+      },
+    );
+
+    const result = await compileJavaSources("/libs/jr.jar", ["/src"]);
+    expect(result).toBe("/tmp/jr-sources-abc");
+  });
+
   it("returns undefined and shows error on compilation failure", async () => {
     vi.mocked(fs.readdirSync).mockReturnValue([
       { name: "Bad.java", isFile: () => true, isDirectory: () => false },
@@ -200,6 +220,90 @@ describe("copyResourceFiles", () => {
     });
 
     expect(() => copyResourceFiles(["/noaccess"], "/tmp/out")).not.toThrow();
+  });
+
+  it("logs copied files when channel is provided", () => {
+    vi.mocked(fs.readdirSync).mockImplementation((dir) => {
+      const d = String(dir);
+      if (d === "/src") {
+        return [
+          {
+            name: "config.properties",
+            isFile: () => true,
+            isDirectory: () => false,
+          },
+        ] as unknown as fs.Dirent[];
+      }
+      return [] as unknown as fs.Dirent[];
+    });
+
+    const channel = { appendLine: vi.fn() };
+    const count = copyResourceFiles(["/src"], "/tmp/out", channel);
+
+    expect(count).toBe(1);
+    expect(channel.appendLine).toHaveBeenCalledWith(
+      expect.stringContaining("Copied resource: config.properties"),
+    );
+  });
+
+  it("handles copyFileSync failure gracefully", () => {
+    vi.mocked(fs.readdirSync).mockImplementation((dir) => {
+      const d = String(dir);
+      if (d === "/src") {
+        return [
+          {
+            name: "data.xml",
+            isFile: () => true,
+            isDirectory: () => false,
+          },
+        ] as unknown as fs.Dirent[];
+      }
+      return [] as unknown as fs.Dirent[];
+    });
+    vi.mocked(fs.copyFileSync).mockImplementation(() => {
+      throw new Error("EPERM");
+    });
+
+    const count = copyResourceFiles(["/src"], "/tmp/out");
+    expect(count).toBe(0);
+  });
+
+  it("copies from multiple source paths", () => {
+    vi.mocked(fs.copyFileSync).mockImplementation(() => {});
+    vi.mocked(fs.readdirSync).mockImplementation((dir) => {
+      const d = String(dir);
+      if (d === "/src1") {
+        return [
+          {
+            name: "a.properties",
+            isFile: () => true,
+            isDirectory: () => false,
+          },
+        ] as unknown as fs.Dirent[];
+      }
+      if (d === "/src2") {
+        return [
+          {
+            name: "b.properties",
+            isFile: () => true,
+            isDirectory: () => false,
+          },
+        ] as unknown as fs.Dirent[];
+      }
+      return [] as unknown as fs.Dirent[];
+    });
+
+    const count = copyResourceFiles(["/src1", "/src2"], "/tmp/out");
+
+    expect(count).toBe(2);
+    expect(fs.copyFileSync).toHaveBeenCalledWith(
+      "/src1/a.properties",
+      "/tmp/out/a.properties",
+    );
+    expect(fs.copyFileSync).toHaveBeenCalledWith(
+      "/src2/b.properties",
+      "/tmp/out/b.properties",
+    );
   });
 });
 
