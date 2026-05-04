@@ -46,13 +46,15 @@ Compile `.jrxml` files to `.jasper` directly from VS Code.
 - Progress notification during compilation
 - Errors shown in the output channel and as notifications
 - Requires Java (JRE 8+) and JasperReports JARs on the classpath
+- Optionally compiles custom `.java` source files before JRXML compilation (requires a JDK)
 
 #### Compile Settings
 
-| Setting                   | Description                                                                                   |
-| ------------------------- | --------------------------------------------------------------------------------------------- |
-| `jasperreports.java.home` | Path to a JRE/JDK installation (auto-detects `JAVA_HOME` if empty)                            |
-| `jasperreports.classpath` | Array of paths to JasperReports JARs and dependencies (supports globs like `/path/to/libs/*`) |
+| Setting                          | Description                                                                                                                                      |
+| -------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `jasperreports.java.home`        | Path to a JRE/JDK installation (auto-detects `JAVA_HOME` if empty)                                                                               |
+| `jasperreports.classpath`        | Array of paths to JasperReports JARs and dependencies (supports globs like `/path/to/libs/*`)                                                    |
+| `jasperreports.java.sourcePaths` | Directories containing `.java` source files (e.g. custom scriptlets). Compiled automatically before JRXML compilation. Requires a JDK (`javac`). |
 
 ### Preview Report
 

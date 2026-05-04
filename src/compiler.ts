@@ -2,6 +2,7 @@ import * as vscode from "vscode";
 import * as path from "path";
 import { execFile } from "child_process";
 import { resolveJavaExecutable, validateJava } from "./java";
+import { compileJavaSources, cleanupTempDir } from "./java-sources";
 import { getOutputChannel } from "./logger";
 
 /**
@@ -24,6 +25,7 @@ export interface JavaEnv {
   javaPath: string;
   javaVersion: string;
   classpath: string;
+  tempClassDir?: string;
 }
 
 /**
@@ -60,6 +62,23 @@ export async function resolveJavaEnv(
       );
     }
     return undefined;
+  }
+
+  const config = vscode.workspace.getConfiguration("jasperreports");
+  const sourcePaths = config.get<string[]>("java.sourcePaths", []);
+
+  if (sourcePaths.length > 0) {
+    const tempClassDir = await compileJavaSources(classpath, sourcePaths);
+    if (!tempClassDir) {
+      return undefined;
+    }
+    const separator = process.platform === "win32" ? ";" : ":";
+    return {
+      javaPath,
+      javaVersion: javaResult.version,
+      classpath: classpath + separator + tempClassDir,
+      tempClassDir,
+    };
   }
 
   return { javaPath, javaVersion: javaResult.version, classpath };
@@ -101,14 +120,20 @@ export async function compileReport(
   channel.appendLine(`  Java: ${env.javaPath} (${env.javaVersion})`);
   channel.appendLine(`  File: ${filePath}`);
 
-  await vscode.window.withProgress(
-    {
-      location: vscode.ProgressLocation.Notification,
-      title: `Compiling ${fileName}`,
-      cancellable: false,
-    },
-    () => runCompiler(env.javaPath, env.classpath, filePath, channel),
-  );
+  try {
+    await vscode.window.withProgress(
+      {
+        location: vscode.ProgressLocation.Notification,
+        title: `Compiling ${fileName}`,
+        cancellable: false,
+      },
+      () => runCompiler(env.javaPath, env.classpath, filePath, channel),
+    );
+  } finally {
+    if (env.tempClassDir) {
+      cleanupTempDir(env.tempClassDir);
+    }
+  }
 }
 
 function runCompiler(

@@ -4,6 +4,7 @@ import * as fs from "fs";
 import * as os from "os";
 import { execFile } from "child_process";
 import { resolveActiveJrxmlPath, resolveJavaEnv } from "./compiler";
+import { cleanupTempDir } from "./java-sources";
 import { getOutputChannel } from "./logger";
 import {
   type PreviewFormat,
@@ -52,25 +53,31 @@ export async function previewReport(
     channel.appendLine(`  Data source: ${dataSourcePath}`);
   }
 
-  await vscode.window.withProgress(
-    {
-      location: vscode.ProgressLocation.Notification,
-      title: `Previewing ${fileName}`,
-      cancellable: false,
-    },
-    async () => {
-      const output = await runPreview(
-        env.javaPath,
-        env.classpath,
-        filePath,
-        format,
-        dataSourcePath,
-      );
-      if (output !== undefined) {
-        showPreviewPanel(fileName, output, format, viewColumn);
-      }
-    },
-  );
+  try {
+    await vscode.window.withProgress(
+      {
+        location: vscode.ProgressLocation.Notification,
+        title: `Previewing ${fileName}`,
+        cancellable: false,
+      },
+      async () => {
+        const output = await runPreview(
+          env.javaPath,
+          env.classpath,
+          filePath,
+          format,
+          dataSourcePath,
+        );
+        if (output !== undefined) {
+          showPreviewPanel(fileName, output, format, viewColumn);
+        }
+      },
+    );
+  } finally {
+    if (env.tempClassDir) {
+      cleanupTempDir(env.tempClassDir);
+    }
+  }
 
   setupLiveReload(context, filePath, viewColumn);
 }
