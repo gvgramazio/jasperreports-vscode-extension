@@ -1,3 +1,16 @@
+# [1.9.0](https://github.com/gvgramazio/jasperreports-vscode-extension/compare/v1.8.0...v1.9.0) (2026-05-04)
+
+
+### Bug Fixes
+
+* enhance PDF preview functionality and refactor preview handling ([9fd6363](https://github.com/gvgramazio/jasperreports-vscode-extension/commit/9fd6363813bf64dd857bc55f130f52909d7adec1))
+
+
+### Features
+
+* add additional JasperReports dependencies to POM generation ([abf9a2e](https://github.com/gvgramazio/jasperreports-vscode-extension/commit/abf9a2e1cb197299d1dc5ef3ecca0cc4f7865dd8))
+* add resource file copying functionality and update Maven POM dependencies ([5e0f3e0](https://github.com/gvgramazio/jasperreports-vscode-extension/commit/5e0f3e0261e3efcdf0e03fa03459fa998b4fd875))
+
 # [1.8.0](https://github.com/gvgramazio/jasperreports-vscode-extension/compare/v1.7.0...v1.8.0) (2026-05-04)
 
 

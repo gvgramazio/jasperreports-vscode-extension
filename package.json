@@ -2,7 +2,7 @@
   "name": "jasperreports",
   "displayName": "JasperReports",
   "description": "Viewer & editor for Jasper files and projects",
-  "version": "1.8.0",
+  "version": "1.9.0",
   "publisher": "gvgramazio",
   "license": "MIT",
   "packageManager": "pnpm@10.33.2",
