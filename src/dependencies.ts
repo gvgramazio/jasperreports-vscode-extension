@@ -28,6 +28,16 @@ function buildPom(version: string): string {
       <artifactId>${ARTIFACT_ID}-fonts</artifactId>
       <version>${version}</version>
     </dependency>
+    <dependency>
+      <groupId>${GROUP_ID}</groupId>
+      <artifactId>${ARTIFACT_ID}-jdt</artifactId>
+      <version>${version}</version>
+    </dependency>
+    <dependency>
+      <groupId>${GROUP_ID}</groupId>
+      <artifactId>${ARTIFACT_ID}-pdf</artifactId>
+      <version>${version}</version>
+    </dependency>
   </dependencies>
 </project>
 `;

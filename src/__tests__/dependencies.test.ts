@@ -97,10 +97,18 @@ describe("downloadDependencies", () => {
 
     // Verify Maven was called
     expect(execFile).toHaveBeenCalled();
-    // Verify temp pom was written
+    // Verify temp pom was written with all required dependencies
     expect(fs.writeFileSync).toHaveBeenCalledWith(
       expect.stringContaining("pom.xml"),
       expect.stringContaining("<artifactId>jasperreports</artifactId>"),
+    );
+    expect(fs.writeFileSync).toHaveBeenCalledWith(
+      expect.stringContaining("pom.xml"),
+      expect.stringContaining("<artifactId>jasperreports-jdt</artifactId>"),
+    );
+    expect(fs.writeFileSync).toHaveBeenCalledWith(
+      expect.stringContaining("pom.xml"),
+      expect.stringContaining("<artifactId>jasperreports-pdf</artifactId>"),
     );
     // Verify temp dir was cleaned up
     expect(fs.rmSync).toHaveBeenCalled();

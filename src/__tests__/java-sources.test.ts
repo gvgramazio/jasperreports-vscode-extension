@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import {
   findJavaFiles,
   compileJavaSources,
+  copyResourceFiles,
   cleanupTempDir,
 } from "../java-sources";
 
@@ -20,6 +21,8 @@ vi.mock("fs", async (importOriginal) => {
     ...actual,
     readdirSync: vi.fn(() => []),
     mkdtempSync: vi.fn(() => "/tmp/jr-sources-abc"),
+    mkdirSync: vi.fn(),
+    copyFileSync: vi.fn(),
     rmSync: vi.fn(),
   };
 });
@@ -144,6 +147,59 @@ describe("compileJavaSources", () => {
     expect(vscode.window.showErrorMessage).toHaveBeenCalledWith(
       expect.stringContaining("JDK required"),
     );
+  });
+});
+
+describe("copyResourceFiles", () => {
+  it("copies non-java files preserving relative paths", () => {
+    vi.mocked(fs.readdirSync).mockImplementation((dir) => {
+      const d = String(dir);
+      if (d === "/src") {
+        return [
+          {
+            name: "jasperreports_extension.properties",
+            isFile: () => true,
+            isDirectory: () => false,
+          },
+          { name: "Main.java", isFile: () => true, isDirectory: () => false },
+          { name: "sub", isFile: () => false, isDirectory: () => true },
+        ] as unknown as fs.Dirent[];
+      }
+      if (d === "/src/sub") {
+        return [
+          {
+            name: "messages.properties",
+            isFile: () => true,
+            isDirectory: () => false,
+          },
+        ] as unknown as fs.Dirent[];
+      }
+      return [] as unknown as fs.Dirent[];
+    });
+
+    copyResourceFiles(["/src"], "/tmp/out");
+
+    expect(fs.copyFileSync).toHaveBeenCalledWith(
+      "/src/jasperreports_extension.properties",
+      "/tmp/out/jasperreports_extension.properties",
+    );
+    expect(fs.copyFileSync).toHaveBeenCalledWith(
+      "/src/sub/messages.properties",
+      "/tmp/out/sub/messages.properties",
+    );
+    // .java files should NOT be copied
+    expect(fs.copyFileSync).not.toHaveBeenCalledWith(
+      expect.stringContaining("Main.java"),
+      expect.anything(),
+    );
+  });
+
+  it("skips unreadable directories", () => {
+    vi.mocked(fs.readdirSync).mockImplementation(() => {
+      throw new Error("EACCES");
+    });
+
+    expect(() => copyResourceFiles(["/noaccess"], "/tmp/out")).not.toThrow();
   });
 });
 

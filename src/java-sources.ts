@@ -83,11 +83,65 @@ export async function compileJavaSources(
         );
         resolve(undefined);
       } else {
-        channel.appendLine(`Java sources compiled to ${outDir}`);
+        const copied = copyResourceFiles(sourcePaths, outDir, channel);
+        channel.appendLine(
+          `Java sources compiled to ${outDir} (${copied} resource file(s) copied)`,
+        );
         resolve(outDir);
       }
     });
   });
+}
+
+/**
+ * Copies non-`.java` resource files from source directories into the output
+ * directory, preserving relative paths. This ensures that files like
+ * `jasperreports_extension.properties` (which register custom functions,
+ * fonts, etc.) are on the classpath alongside the compiled classes.
+ */
+export function copyResourceFiles(
+  sourcePaths: string[],
+  outDir: string,
+  channel?: { appendLine(value: string): void },
+): number {
+  let count = 0;
+  for (const srcDir of sourcePaths) {
+    count += copyResources(srcDir, srcDir, outDir, channel);
+  }
+  return count;
+}
+
+function copyResources(
+  baseDir: string,
+  dir: string,
+  outDir: string,
+  channel?: { appendLine(value: string): void },
+): number {
+  let entries: fs.Dirent[];
+  try {
+    entries = fs.readdirSync(dir, { withFileTypes: true });
+  } catch {
+    return 0;
+  }
+  let count = 0;
+  for (const entry of entries) {
+    const full = path.join(dir, entry.name);
+    if (entry.isDirectory()) {
+      count += copyResources(baseDir, full, outDir, channel);
+    } else if (entry.isFile() && !entry.name.endsWith(".java")) {
+      const relative = path.relative(baseDir, full);
+      const dest = path.join(outDir, relative);
+      try {
+        fs.mkdirSync(path.dirname(dest), { recursive: true });
+        fs.copyFileSync(full, dest);
+        channel?.appendLine(`  Copied resource: ${relative}`);
+        count++;
+      } catch {
+        // best-effort copy
+      }
+    }
+  }
+  return count;
 }
 
 export function cleanupTempDir(dir: string): void {

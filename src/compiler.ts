@@ -119,6 +119,7 @@ export async function compileReport(
   channel.appendLine(`Compiling ${fileName}...`);
   channel.appendLine(`  Java: ${env.javaPath} (${env.javaVersion})`);
   channel.appendLine(`  File: ${filePath}`);
+  channel.appendLine(`  Classpath: ${env.classpath}`);
 
   try {
     await vscode.window.withProgress(
