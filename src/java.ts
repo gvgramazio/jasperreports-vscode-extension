@@ -29,6 +29,50 @@ export function resolveJavaExecutable(): string | undefined {
 }
 
 /**
+ * Resolves the path to the `javac` executable, derived from the same
+ * resolution logic as `resolveJavaExecutable`.
+ *
+ * Returns `undefined` if no JDK home is configured and `JAVA_HOME` is unset.
+ * Falls back to `"javac"` on PATH as a last resort.
+ */
+export function resolveJavacExecutable(): string {
+  const config = vscode.workspace.getConfiguration("jasperreports");
+  const configuredHome = config.get<string>("java.home", "").trim();
+
+  if (configuredHome) {
+    return `${configuredHome}/bin/javac`;
+  }
+
+  const javaHome = process.env.JAVA_HOME?.trim();
+  if (javaHome) {
+    return `${javaHome}/bin/javac`;
+  }
+
+  return "javac";
+}
+
+/**
+ * Validates that the resolved javac executable actually runs.
+ * Returns success or an error message on failure.
+ */
+export function validateJavac(
+  javacPath: string,
+): Promise<{ ok: true } | { ok: false; error: string }> {
+  return new Promise((resolve) => {
+    execFile(javacPath, ["-version"], (err) => {
+      if (err) {
+        resolve({
+          ok: false,
+          error: `JDK required for source path compilation. Cannot run '${javacPath}': ${err.message}`,
+        });
+        return;
+      }
+      resolve({ ok: true });
+    });
+  });
+}
+
+/**
  * Validates that the resolved java executable actually runs.
  * Returns the version string on success, or an error message on failure.
  */

@@ -227,6 +227,14 @@
           "default": [],
           "markdownDescription": "Paths to JasperReports JARs and dependencies. Supports glob patterns (e.g. `/path/to/libs/*`). Required for the compile command."
         },
+        "jasperreports.java.sourcePaths": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": [],
+          "markdownDescription": "Directories containing `.java` source files (e.g. custom scriptlets or functions). These are compiled automatically before JRXML compilation. Requires a JDK (`javac`)."
+        },
         "jasperreports.preview.format": {
           "type": "string",
           "default": "html",
