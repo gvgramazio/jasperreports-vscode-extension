@@ -13,9 +13,6 @@ import { addElement, deleteElement } from "./outline-actions";
 
 const XML_EXTENSION_ID = "redhat.vscode-xml";
 
-let outlineProvider: JrxmlOutlineProvider | undefined;
-let debounceTimer: ReturnType<typeof setTimeout> | undefined;
-
 export async function activate(
   context: vscode.ExtensionContext,
 ): Promise<void> {
@@ -25,16 +22,15 @@ export async function activate(
   await registerXmlFileAssociations(context);
   registerCommands(context);
   registerOutlineView(context);
+  context.subscriptions.push(
+    { dispose: () => disposePreviewPanel() },
+    { dispose: () => disposeOutputChannel() },
+  );
   await activateXmlExtension();
 }
 
 export function deactivate(): void {
-  disposeOutputChannel();
-  disposePreviewPanel();
-  if (debounceTimer) {
-    clearTimeout(debounceTimer);
-  }
-  outlineProvider?.dispose();
+  // All cleanup is handled via context.subscriptions
 }
 
 /**
@@ -64,7 +60,15 @@ function registerCommands(context: vscode.ExtensionContext): void {
  * Registers the JRXML outline tree view and wires up auto-refresh listeners.
  */
 function registerOutlineView(context: vscode.ExtensionContext): void {
-  outlineProvider = new JrxmlOutlineProvider();
+  const outlineProvider = new JrxmlOutlineProvider();
+  let debounceTimer: ReturnType<typeof setTimeout> | undefined;
+
+  context.subscriptions.push({
+    dispose: () => {
+      if (debounceTimer) clearTimeout(debounceTimer);
+      outlineProvider.dispose();
+    },
+  });
 
   const treeView = vscode.window.createTreeView("jasperreports-outline", {
     treeDataProvider: outlineProvider,
@@ -124,7 +128,7 @@ function registerOutlineView(context: vscode.ExtensionContext): void {
       if (!isJrxmlDocument(e.document)) return;
       if (debounceTimer) clearTimeout(debounceTimer);
       debounceTimer = setTimeout(() => {
-        outlineProvider?.refresh(e.document.getText());
+        outlineProvider.refresh(e.document.getText());
       }, 300);
 
       // Mark properties panel stale for external edits
@@ -138,9 +142,9 @@ function registerOutlineView(context: vscode.ExtensionContext): void {
   context.subscriptions.push(
     vscode.window.onDidChangeActiveTextEditor((editor) => {
       if (editor && isJrxmlDocument(editor.document)) {
-        outlineProvider?.refresh(editor.document.getText());
+        outlineProvider.refresh(editor.document.getText());
       } else {
-        outlineProvider?.refresh();
+        outlineProvider.refresh();
       }
     }),
   );
