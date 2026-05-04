@@ -164,4 +164,230 @@ describe("PropertiesViewProvider", () => {
     // After edit, the panel should have re-rendered with fresh parse
     expect(mockWebviewView.webview.html).toContain("Attributes");
   });
+
+  it("does not re-parse when edit message fails", async () => {
+    // No active editor → handleEditMessage returns false
+    (vscode.window as { activeTextEditor: unknown }).activeTextEditor =
+      undefined;
+
+    provider.resolveWebviewView(mockWebviewView as never);
+    provider.update(makeNode({ tag: "field", attributes: { name: "x" } }), "x");
+
+    const htmlBefore = mockWebviewView.webview.html;
+
+    const handler = (
+      mockWebviewView.webview.onDidReceiveMessage as ReturnType<typeof vi.fn>
+    ).mock.calls[0][0];
+    await handler({
+      type: "edit",
+      attribute: "name",
+      value: "y",
+      attributePosition: {
+        nameStart: 0,
+        nameEnd: 4,
+        valueStart: 6,
+        valueEnd: 7,
+      },
+    });
+
+    // HTML should not have changed (no re-parse)
+    expect(mockWebviewView.webview.html).toBe(htmlBefore);
+    expect(provider.editInProgress).toBe(false);
+  });
+
+  it("resets editInProgress even when handleEditMessage throws", async () => {
+    // Set up an editor that will cause applyEdit to reject
+    const mockDocument = {
+      getText: () => "",
+      positionAt: () => new vscode.Position(0, 0),
+      uri: { fsPath: "/test.jrxml", toString: () => "file:///test.jrxml" },
+    };
+    (vscode.window as { activeTextEditor: unknown }).activeTextEditor = {
+      document: mockDocument,
+    };
+    vi.mocked(vscode.workspace.applyEdit).mockRejectedValueOnce(
+      new Error("fail"),
+    );
+
+    provider.resolveWebviewView(mockWebviewView as never);
+    provider.update(makeNode(), "Node");
+
+    const handler = (
+      mockWebviewView.webview.onDidReceiveMessage as ReturnType<typeof vi.fn>
+    ).mock.calls[0][0];
+
+    await handler({
+      type: "edit",
+      attribute: "kind",
+      value: "newVal",
+      attributePosition: {
+        nameStart: 0,
+        nameEnd: 4,
+        valueStart: 6,
+        valueEnd: 12,
+      },
+    });
+
+    expect(provider.editInProgress).toBe(false);
+  });
+
+  it("re-parses on refresh message", async () => {
+    const jrxmlContent =
+      '<?xml version="1.0"?>\n<jasperReport><field name="f1" class="java.lang.String"/></jasperReport>';
+    const mockDocument = {
+      getText: () => jrxmlContent,
+      positionAt: (offset: number) => new vscode.Position(0, offset),
+      uri: { fsPath: "/test.jrxml", toString: () => "file:///test.jrxml" },
+    };
+    (vscode.window as { activeTextEditor: unknown }).activeTextEditor = {
+      document: mockDocument,
+    };
+
+    provider.resolveWebviewView(mockWebviewView as never);
+    provider.update(
+      makeNode({ tag: "field", attributes: { name: "f1" } }),
+      "f1",
+    );
+
+    const handler = (
+      mockWebviewView.webview.onDidReceiveMessage as ReturnType<typeof vi.fn>
+    ).mock.calls[0][0];
+    await handler({ type: "refresh" });
+
+    expect(mockWebviewView.webview.html).toContain("Attributes");
+  });
+
+  it("reParseAndRefresh does nothing with no active editor", async () => {
+    (vscode.window as { activeTextEditor: unknown }).activeTextEditor =
+      undefined;
+
+    provider.resolveWebviewView(mockWebviewView as never);
+    provider.update(
+      makeNode({ tag: "field", attributes: { name: "f1" } }),
+      "f1",
+    );
+
+    const htmlBefore = mockWebviewView.webview.html;
+
+    const handler = (
+      mockWebviewView.webview.onDidReceiveMessage as ReturnType<typeof vi.fn>
+    ).mock.calls[0][0];
+    await handler({ type: "refresh" });
+
+    expect(mockWebviewView.webview.html).toBe(htmlBefore);
+  });
+
+  it("reParseAndRefresh does nothing when parse returns no root", async () => {
+    const mockDocument = {
+      getText: () => "not valid xml at all",
+      positionAt: (offset: number) => new vscode.Position(0, offset),
+      uri: { fsPath: "/test.jrxml", toString: () => "file:///test.jrxml" },
+    };
+    (vscode.window as { activeTextEditor: unknown }).activeTextEditor = {
+      document: mockDocument,
+    };
+
+    provider.resolveWebviewView(mockWebviewView as never);
+    provider.update(
+      makeNode({ tag: "field", attributes: { name: "f1" } }),
+      "f1",
+    );
+
+    const htmlBefore = mockWebviewView.webview.html;
+
+    const handler = (
+      mockWebviewView.webview.onDidReceiveMessage as ReturnType<typeof vi.fn>
+    ).mock.calls[0][0];
+    await handler({ type: "refresh" });
+
+    expect(mockWebviewView.webview.html).toBe(htmlBefore);
+  });
+
+  it("reParseAndRefresh does nothing when node not found after re-parse", async () => {
+    const jrxmlContent =
+      '<?xml version="1.0"?>\n<jasperReport><field name="other"/></jasperReport>';
+    const mockDocument = {
+      getText: () => jrxmlContent,
+      positionAt: (offset: number) => new vscode.Position(0, offset),
+      uri: { fsPath: "/test.jrxml", toString: () => "file:///test.jrxml" },
+    };
+    (vscode.window as { activeTextEditor: unknown }).activeTextEditor = {
+      document: mockDocument,
+    };
+
+    provider.resolveWebviewView(mockWebviewView as never);
+    // Set current node to something that won't be found in the re-parsed doc
+    provider.update(
+      makeNode({ tag: "field", attributes: { name: "missing" } }),
+      "missing",
+    );
+
+    const htmlBefore = mockWebviewView.webview.html;
+
+    const handler = (
+      mockWebviewView.webview.onDidReceiveMessage as ReturnType<typeof vi.fn>
+    ).mock.calls[0][0];
+    await handler({ type: "refresh" });
+
+    expect(mockWebviewView.webview.html).toBe(htmlBefore);
+  });
+
+  it("reParseAndRefresh does nothing when no node is selected", async () => {
+    const mockDocument = {
+      getText: () => "<jasperReport/>",
+      positionAt: (offset: number) => new vscode.Position(0, offset),
+      uri: { fsPath: "/test.jrxml", toString: () => "file:///test.jrxml" },
+    };
+    (vscode.window as { activeTextEditor: unknown }).activeTextEditor = {
+      document: mockDocument,
+    };
+
+    provider.resolveWebviewView(mockWebviewView as never);
+    // Don't call update, so _currentNodeId is null
+
+    const handler = (
+      mockWebviewView.webview.onDidReceiveMessage as ReturnType<typeof vi.fn>
+    ).mock.calls[0][0];
+    await handler({ type: "refresh" });
+
+    // Should show empty state, not crash
+    expect(mockWebviewView.webview.html).toContain("Select an element");
+  });
+
+  it("markStale before resolveWebviewView does not throw", () => {
+    expect(() => provider.markStale()).not.toThrow();
+  });
+
+  it("findNodeByIdentity traverses nested children", async () => {
+    const jrxmlContent = `<?xml version="1.0"?>
+<jasperReport>
+  <detail>
+    <band>
+      <textField name="deep"/>
+    </band>
+  </detail>
+</jasperReport>`;
+    const mockDocument = {
+      getText: () => jrxmlContent,
+      positionAt: (offset: number) => new vscode.Position(0, offset),
+      uri: { fsPath: "/test.jrxml", toString: () => "file:///test.jrxml" },
+    };
+    (vscode.window as { activeTextEditor: unknown }).activeTextEditor = {
+      document: mockDocument,
+    };
+
+    provider.resolveWebviewView(mockWebviewView as never);
+    provider.update(
+      makeNode({ tag: "textField", attributes: { name: "deep" } }),
+      "deep",
+    );
+
+    const handler = (
+      mockWebviewView.webview.onDidReceiveMessage as ReturnType<typeof vi.fn>
+    ).mock.calls[0][0];
+    await handler({ type: "refresh" });
+
+    // The deeply-nested textField should be found and rendered
+    expect(mockWebviewView.webview.html).toContain("Attributes");
+  });
 });
