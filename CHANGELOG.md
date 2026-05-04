@@ -1,3 +1,10 @@
+# [1.8.0](https://github.com/gvgramazio/jasperreports-vscode-extension/compare/v1.7.0...v1.8.0) (2026-05-04)
+
+
+### Features
+
+* implement Java source compilation and cleanup in the compiler process ([2c6b358](https://github.com/gvgramazio/jasperreports-vscode-extension/commit/2c6b3581e4b8d919fedcde14e62d4c30b12f1e7f))
+
 # [1.7.0](https://github.com/gvgramazio/jasperreports-vscode-extension/compare/v1.6.0...v1.7.0) (2026-05-03)
 
 
