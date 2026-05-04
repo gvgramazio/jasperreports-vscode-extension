@@ -83,7 +83,7 @@ describe("promptDataSource", () => {
   it("returns 'cancelled' when user dismisses quick pick", async () => {
     vi.mocked(vscode.window.showQuickPick).mockResolvedValue(undefined);
 
-    const { promptDataSource } = await import("../previewConfig");
+    const { promptDataSource } = await import("../previewConfigUI");
     const result = await promptDataSource();
     expect(result).toBe("cancelled");
   });
@@ -94,7 +94,7 @@ describe("promptDataSource", () => {
       value: undefined,
     } as unknown as vscode.QuickPickItem);
 
-    const { promptDataSource } = await import("../previewConfig");
+    const { promptDataSource } = await import("../previewConfigUI");
     const result = await promptDataSource();
     expect(result).toBeUndefined();
   });
@@ -106,7 +106,7 @@ describe("promptDataSource", () => {
     } as unknown as vscode.QuickPickItem);
     vi.mocked(vscode.window.showOpenDialog).mockResolvedValue(undefined);
 
-    const { promptDataSource } = await import("../previewConfig");
+    const { promptDataSource } = await import("../previewConfigUI");
     const result = await promptDataSource();
     expect(result).toBe("cancelled");
   });
@@ -120,7 +120,7 @@ describe("promptDataSource", () => {
       { fsPath: "/workspace/data/test.json" },
     ] as unknown as vscode.Uri[]);
 
-    const { promptDataSource } = await import("../previewConfig");
+    const { promptDataSource } = await import("../previewConfigUI");
     const result = await promptDataSource();
     expect(result).toBe("/workspace/data/test.json");
   });
@@ -130,7 +130,7 @@ describe("promptFormat", () => {
   it("returns 'cancelled' when user dismisses quick pick", async () => {
     vi.mocked(vscode.window.showQuickPick).mockResolvedValue(undefined);
 
-    const { promptFormat } = await import("../previewConfig");
+    const { promptFormat } = await import("../previewConfigUI");
     const result = await promptFormat();
     expect(result).toBe("cancelled");
   });
@@ -141,7 +141,7 @@ describe("promptFormat", () => {
       value: "pdf",
     } as unknown as vscode.QuickPickItem);
 
-    const { promptFormat } = await import("../previewConfig");
+    const { promptFormat } = await import("../previewConfigUI");
     const result = await promptFormat();
     expect(result).toBe("pdf");
   });
@@ -151,7 +151,7 @@ describe("configurePreview", () => {
   it("shows error when no jrxml file is open", async () => {
     vscode.window.activeTextEditor = undefined;
 
-    const { configurePreview } = await import("../previewConfig");
+    const { configurePreview } = await import("../previewConfigUI");
     await configurePreview(mockContext as unknown as vscode.ExtensionContext);
 
     expect(vscode.window.showErrorMessage).toHaveBeenCalledWith(
@@ -164,7 +164,7 @@ describe("configurePreview", () => {
       document: { fileName: "/test/file.xml" },
     };
 
-    const { configurePreview } = await import("../previewConfig");
+    const { configurePreview } = await import("../previewConfigUI");
     await configurePreview(mockContext as unknown as vscode.ExtensionContext);
 
     expect(vscode.window.showErrorMessage).toHaveBeenCalledWith(
@@ -178,7 +178,7 @@ describe("configurePreview", () => {
     };
     vi.mocked(vscode.window.showQuickPick).mockResolvedValue(undefined);
 
-    const { configurePreview } = await import("../previewConfig");
+    const { configurePreview } = await import("../previewConfigUI");
     await configurePreview(mockContext as unknown as vscode.ExtensionContext);
 
     expect(vscode.window.showInformationMessage).not.toHaveBeenCalled();
@@ -197,7 +197,7 @@ describe("configurePreview", () => {
       // Second showQuickPick → format selection → cancelled
       .mockResolvedValueOnce(undefined);
 
-    const { configurePreview } = await import("../previewConfig");
+    const { configurePreview } = await import("../previewConfigUI");
     await configurePreview(mockContext as unknown as vscode.ExtensionContext);
 
     expect(vscode.window.showInformationMessage).not.toHaveBeenCalled();
@@ -217,8 +217,8 @@ describe("configurePreview", () => {
         value: "pdf",
       } as unknown as vscode.QuickPickItem);
 
-    const { configurePreview, getPreviewConfig } =
-      await import("../previewConfig");
+    const { configurePreview } = await import("../previewConfigUI");
+    const { getPreviewConfig } = await import("../previewConfig");
     const ctx = mockContext as unknown as vscode.ExtensionContext;
     await configurePreview(ctx);
 
