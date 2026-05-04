@@ -25,7 +25,32 @@ function buildPom(version: string): string {
     </dependency>
     <dependency>
       <groupId>${GROUP_ID}</groupId>
+      <artifactId>${ARTIFACT_ID}-barcode4j</artifactId>
+      <version>${version}</version>
+    </dependency>
+    <dependency>
+      <groupId>${GROUP_ID}</groupId>
+      <artifactId>${ARTIFACT_ID}-charts</artifactId>
+      <version>${version}</version>
+    </dependency>
+    <dependency>
+      <groupId>${GROUP_ID}</groupId>
+      <artifactId>${ARTIFACT_ID}-data-adapters</artifactId>
+      <version>${version}</version>
+    </dependency>
+    <dependency>
+      <groupId>${GROUP_ID}</groupId>
+      <artifactId>${ARTIFACT_ID}-excel-poi</artifactId>
+      <version>${version}</version>
+    </dependency>
+    <dependency>
+      <groupId>${GROUP_ID}</groupId>
       <artifactId>${ARTIFACT_ID}-fonts</artifactId>
+      <version>${version}</version>
+    </dependency>
+    <dependency>
+      <groupId>${GROUP_ID}</groupId>
+      <artifactId>${ARTIFACT_ID}-functions</artifactId>
       <version>${version}</version>
     </dependency>
     <dependency>
@@ -35,7 +60,17 @@ function buildPom(version: string): string {
     </dependency>
     <dependency>
       <groupId>${GROUP_ID}</groupId>
+      <artifactId>${ARTIFACT_ID}-json</artifactId>
+      <version>${version}</version>
+    </dependency>
+    <dependency>
+      <groupId>${GROUP_ID}</groupId>
       <artifactId>${ARTIFACT_ID}-pdf</artifactId>
+      <version>${version}</version>
+    </dependency>
+    <dependency>
+      <groupId>${GROUP_ID}</groupId>
+      <artifactId>${ARTIFACT_ID}-xalan</artifactId>
       <version>${version}</version>
     </dependency>
   </dependencies>

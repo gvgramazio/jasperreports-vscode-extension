@@ -98,18 +98,27 @@ describe("downloadDependencies", () => {
     // Verify Maven was called
     expect(execFile).toHaveBeenCalled();
     // Verify temp pom was written with all required dependencies
-    expect(fs.writeFileSync).toHaveBeenCalledWith(
-      expect.stringContaining("pom.xml"),
-      expect.stringContaining("<artifactId>jasperreports</artifactId>"),
-    );
-    expect(fs.writeFileSync).toHaveBeenCalledWith(
-      expect.stringContaining("pom.xml"),
-      expect.stringContaining("<artifactId>jasperreports-jdt</artifactId>"),
-    );
-    expect(fs.writeFileSync).toHaveBeenCalledWith(
-      expect.stringContaining("pom.xml"),
-      expect.stringContaining("<artifactId>jasperreports-pdf</artifactId>"),
-    );
+    const pomContent = vi
+      .mocked(fs.writeFileSync)
+      .mock.calls.find((call) =>
+        (call[0] as string).includes("pom.xml"),
+      )?.[1] as string;
+    expect(pomContent).toBeDefined();
+    for (const dep of [
+      "jasperreports",
+      "jasperreports-barcode4j",
+      "jasperreports-charts",
+      "jasperreports-data-adapters",
+      "jasperreports-excel-poi",
+      "jasperreports-fonts",
+      "jasperreports-functions",
+      "jasperreports-jdt",
+      "jasperreports-json",
+      "jasperreports-pdf",
+      "jasperreports-xalan",
+    ]) {
+      expect(pomContent).toContain(`<artifactId>${dep}</artifactId>`);
+    }
     // Verify temp dir was cleaned up
     expect(fs.rmSync).toHaveBeenCalled();
     // Verify classpath was updated
