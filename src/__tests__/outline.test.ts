@@ -296,4 +296,65 @@ describe("additional outline scenarios", () => {
   it("dispose does not throw", () => {
     expect(() => provider.dispose()).not.toThrow();
   });
+
+  it("shows variable without calculation in description", () => {
+    const xml = `<jasperReport name="Test">
+  <variable name="Total" class="java.math.BigDecimal"/>
+</jasperReport>`;
+    provider.refresh(xml);
+    const roots = provider.getChildren();
+    const variables = roots.find((r) => r.label === "Variables");
+    const varItems = provider.getChildren(variables);
+    expect(varItems).toHaveLength(1);
+    expect(varItems[0].label).toBe("Total");
+    expect(varItems[0].description).toBe("BigDecimal");
+  });
+
+  it("shows group with only header (no footer)", () => {
+    const xml = `<jasperReport name="Test">
+  <group name="TestGroup">
+    <groupHeader>
+      <band height="20"/>
+    </groupHeader>
+  </group>
+</jasperReport>`;
+    provider.refresh(xml);
+    const roots = provider.getChildren();
+    const groups = roots.find((r) => r.label === "Groups");
+    const groupItems = provider.getChildren(groups);
+    const groupChildren = provider.getChildren(groupItems[0]);
+    const labels = groupChildren.map((c) => c.label);
+    expect(labels).toContain("Header");
+    expect(labels).not.toContain("Footer");
+  });
+
+  it("shows group with only footer (no header)", () => {
+    const xml = `<jasperReport name="Test">
+  <group name="TestGroup">
+    <groupFooter>
+      <band height="20"/>
+    </groupFooter>
+  </group>
+</jasperReport>`;
+    provider.refresh(xml);
+    const roots = provider.getChildren();
+    const groups = roots.find((r) => r.label === "Groups");
+    const groupItems = provider.getChildren(groups);
+    const groupChildren = provider.getChildren(groupItems[0]);
+    const labels = groupChildren.map((c) => c.label);
+    expect(labels).not.toContain("Header");
+    expect(labels).toContain("Footer");
+  });
+
+  it("shows empty section (no bands, no elements)", () => {
+    const xml = `<jasperReport name="Test">
+  <title/>
+</jasperReport>`;
+    provider.refresh(xml);
+    const roots = provider.getChildren();
+    const title = roots.find((r) => r.label === "Title");
+    expect(title).toBeDefined();
+    const children = provider.getChildren(title);
+    expect(children).toHaveLength(0);
+  });
 });

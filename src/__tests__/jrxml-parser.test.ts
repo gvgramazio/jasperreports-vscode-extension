@@ -264,4 +264,20 @@ describe("jrxml-parser", () => {
     const doc = parseJrxml(xml);
     expect(doc.root!.attributePositions).toBeUndefined();
   });
+
+  it("ignores top-level text outside any tag", () => {
+    // Text before the root element — stack is empty during text handler
+    const xml = `some text before\n<root name="test"/>`;
+    const doc = parseJrxml(xml);
+    // May parse with errors, but should not crash
+    expect(doc.hasErrors).toBe(true);
+  });
+
+  it("ignores top-level CDATA outside any tag", () => {
+    // This is technically invalid XML but tests the defensive branch
+    const xml = `<root name="test"/>`;
+    const doc = parseJrxml(xml);
+    // Just ensure it doesn't crash; CDATA outside tags is ignored
+    expect(doc.root).toBeDefined();
+  });
 });

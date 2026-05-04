@@ -248,5 +248,66 @@ describe("OutlineDragAndDropController", () => {
 
       expect(vscode.workspace.applyEdit).toHaveBeenCalledTimes(1);
     });
+
+    it("returns early when source is already at end (drop on parent)", async () => {
+      const text =
+        '<jasperReport>\n  <field name="a"/>\n  <field name="b"/>\n</jasperReport>\n';
+      setupEditor(text);
+
+      const nodeA = makeNode({
+        tag: "field",
+        attributes: { name: "a" },
+        position: { startLine: 2, startColumn: 3, endLine: 2, endColumn: 20 },
+      });
+      const nodeB = makeNode({
+        tag: "field",
+        attributes: { name: "b" },
+        position: { startLine: 3, startColumn: 3, endLine: 3, endColumn: 20 },
+      });
+
+      const itemA = new OutlineItem("a", "field" as never, nodeA, []);
+      const itemB = new OutlineItem("b", "field" as never, nodeB, []);
+      const parent = new OutlineItem("Fields", "group-fields" as never, null, [
+        itemA,
+        itemB,
+      ]);
+
+      // Drag B (last sibling) onto parent → already at end → no-op
+      const transfer = new vscode.DataTransfer();
+      const token = { isCancellationRequested: false } as never;
+
+      controller.handleDrag([itemB], transfer, token);
+      await controller.handleDrop(parent, transfer, token);
+
+      expect(vscode.workspace.applyEdit).not.toHaveBeenCalled();
+    });
+
+    it("returns early when last sibling has no position (drop on parent)", async () => {
+      const text = '<jasperReport>\n  <field name="a"/>\n</jasperReport>\n';
+      setupEditor(text);
+
+      const nodeA = makeNode({
+        tag: "field",
+        attributes: { name: "a" },
+        position: { startLine: 2, startColumn: 3, endLine: 2, endColumn: 20 },
+      });
+
+      const itemA = new OutlineItem("a", "field" as never, nodeA, []);
+      // Last sibling has no node/position
+      const itemB = new OutlineItem("b", "field" as never, null, []);
+      const parent = new OutlineItem("Fields", "group-fields" as never, null, [
+        itemA,
+        itemB,
+      ]);
+
+      // Drag A onto parent → last sibling (B) has no position → return
+      const transfer = new vscode.DataTransfer();
+      const token = { isCancellationRequested: false } as never;
+
+      controller.handleDrag([itemA], transfer, token);
+      await controller.handleDrop(parent, transfer, token);
+
+      expect(vscode.workspace.applyEdit).not.toHaveBeenCalled();
+    });
   });
 });
