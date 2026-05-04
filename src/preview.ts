@@ -181,13 +181,14 @@ function showPreviewPanel(
 }
 
 function wrapHtml(jasperHtml: string): string {
-  return jasperHtml.replace(
-    "</head>",
-    `<style>
+  const style = `<style>
       body { margin: 0; padding: 16px; background: white; }
-    </style>
-    </head>`,
-  );
+    </style>`;
+
+  if (jasperHtml.includes("</head>")) {
+    return jasperHtml.replace("</head>", `${style}\n    </head>`);
+  }
+  return `${style}\n${jasperHtml}`;
 }
 
 function wrapPdf(base64Pdf: string): string {
