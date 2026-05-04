@@ -178,4 +178,31 @@ describe("formatNodeProperties", () => {
     expect(uuidEntry!.editable).toBe(false);
     expect(xEntry!.editable).toBe(true);
   });
+
+  it("skips Box group when box child has no attributes and no pens", () => {
+    const node = makeNode({
+      children: [makeNode({ tag: "box", attributes: {}, children: [] })],
+    });
+    const groups = formatNodeProperties(node);
+    const boxGroup = groups.find((g) => g.label === "Box");
+    expect(boxGroup).toBeUndefined();
+  });
+
+  it("skips Pen group when pen child has no attributes", () => {
+    const node = makeNode({
+      children: [makeNode({ tag: "pen", attributes: {} })],
+    });
+    const groups = formatNodeProperties(node);
+    const penGroup = groups.find((g) => g.label === "Pen");
+    expect(penGroup).toBeUndefined();
+  });
+
+  it("skips Report Element group when reportElement has no attributes", () => {
+    const node = makeNode({
+      children: [makeNode({ tag: "reportElement", attributes: {} })],
+    });
+    const groups = formatNodeProperties(node);
+    const reGroup = groups.find((g) => g.label === "Report Element");
+    expect(reGroup).toBeUndefined();
+  });
 });
