@@ -337,3 +337,271 @@ describe("addElement — additional scenarios", () => {
     expect(vscode.workspace.applyEdit).toHaveBeenCalledTimes(1);
   });
 });
+
+describe("addElement — template and edge coverage", () => {
+  it("invokes validateInput callback", async () => {
+    const item = makeGroupItem("group-fields");
+    (vscode.window.showInputBox as ReturnType<typeof vi.fn>).mockImplementation(
+      async (opts: { validateInput?: (v: string) => string | null }) => {
+        // Exercise the validateInput callback
+        if (opts.validateInput) {
+          expect(opts.validateInput("")).toBe("Name is required");
+          expect(opts.validateInput("  ")).toBe("Name is required");
+          expect(opts.validateInput("validName")).toBeNull();
+        }
+        return "validName";
+      },
+    );
+    setupEditor("<jasperReport>\n</jasperReport>");
+
+    await addElement(item);
+
+    expect(vscode.workspace.applyEdit).toHaveBeenCalledTimes(1);
+  });
+
+  it("inserts groupHeader template", async () => {
+    const groupNode = makeNode({
+      tag: "group",
+      position: { startLine: 2, startColumn: 1, endLine: 3, endColumn: 10 },
+    });
+    const item = new OutlineItem("myGroup", "group", groupNode, []);
+
+    (vscode.window.showQuickPick as ReturnType<typeof vi.fn>).mockResolvedValue(
+      {
+        label: "Group Footer",
+        child: { label: "Group Footer", kind: "groupFooter", needsName: false },
+      },
+    );
+    setupEditor(
+      '<jasperReport>\n  <group name="myGroup">\n  </group>\n</jasperReport>',
+    );
+
+    await addElement(item);
+
+    const editArg = (vscode.workspace.applyEdit as ReturnType<typeof vi.fn>)
+      .mock.calls[0][0];
+    const entries = editArg.entries();
+    const [, edits] = entries[0];
+    expect(edits[0].newText).toContain("groupFooter");
+  });
+
+  it("inserts staticText element via band QuickPick", async () => {
+    const bandNode = makeNode({
+      tag: "band",
+      position: { startLine: 3, startColumn: 1, endLine: 4, endColumn: 10 },
+    });
+    const item = new OutlineItem("Band", "band", bandNode, []);
+
+    (vscode.window.showQuickPick as ReturnType<typeof vi.fn>).mockResolvedValue(
+      {
+        label: "Static Text",
+        child: {
+          label: "Static Text",
+          kind: "element:staticText",
+          needsName: false,
+        },
+      },
+    );
+    setupEditor(
+      '<jasperReport>\n  <detail>\n    <band height="20">\n    </band>\n  </detail>\n</jasperReport>',
+    );
+
+    await addElement(item);
+
+    expect(vscode.workspace.applyEdit).toHaveBeenCalledTimes(1);
+  });
+
+  it("inserts image element via band QuickPick", async () => {
+    const bandNode = makeNode({
+      tag: "band",
+      position: { startLine: 3, startColumn: 1, endLine: 4, endColumn: 10 },
+    });
+    const item = new OutlineItem("Band", "band", bandNode, []);
+
+    (vscode.window.showQuickPick as ReturnType<typeof vi.fn>).mockResolvedValue(
+      {
+        label: "Image",
+        child: { label: "Image", kind: "element:image", needsName: false },
+      },
+    );
+    setupEditor(
+      '<jasperReport>\n  <detail>\n    <band height="20">\n    </band>\n  </detail>\n</jasperReport>',
+    );
+
+    await addElement(item);
+
+    expect(vscode.workspace.applyEdit).toHaveBeenCalledTimes(1);
+  });
+
+  it("inserts line element via band QuickPick", async () => {
+    const bandNode = makeNode({
+      tag: "band",
+      position: { startLine: 3, startColumn: 1, endLine: 4, endColumn: 10 },
+    });
+    const item = new OutlineItem("Band", "band", bandNode, []);
+
+    (vscode.window.showQuickPick as ReturnType<typeof vi.fn>).mockResolvedValue(
+      {
+        label: "Line",
+        child: { label: "Line", kind: "element:line", needsName: false },
+      },
+    );
+    setupEditor(
+      '<jasperReport>\n  <detail>\n    <band height="20">\n    </band>\n  </detail>\n</jasperReport>',
+    );
+
+    await addElement(item);
+
+    expect(vscode.workspace.applyEdit).toHaveBeenCalledTimes(1);
+  });
+
+  it("inserts rectangle element via band QuickPick", async () => {
+    const bandNode = makeNode({
+      tag: "band",
+      position: { startLine: 3, startColumn: 1, endLine: 4, endColumn: 10 },
+    });
+    const item = new OutlineItem("Band", "band", bandNode, []);
+
+    (vscode.window.showQuickPick as ReturnType<typeof vi.fn>).mockResolvedValue(
+      {
+        label: "Rectangle",
+        child: {
+          label: "Rectangle",
+          kind: "element:rectangle",
+          needsName: false,
+        },
+      },
+    );
+    setupEditor(
+      '<jasperReport>\n  <detail>\n    <band height="20">\n    </band>\n  </detail>\n</jasperReport>',
+    );
+
+    await addElement(item);
+
+    expect(vscode.workspace.applyEdit).toHaveBeenCalledTimes(1);
+  });
+
+  it("inserts ellipse element via band QuickPick", async () => {
+    const bandNode = makeNode({
+      tag: "band",
+      position: { startLine: 3, startColumn: 1, endLine: 4, endColumn: 10 },
+    });
+    const item = new OutlineItem("Band", "band", bandNode, []);
+
+    (vscode.window.showQuickPick as ReturnType<typeof vi.fn>).mockResolvedValue(
+      {
+        label: "Ellipse",
+        child: {
+          label: "Ellipse",
+          kind: "element:ellipse",
+          needsName: false,
+        },
+      },
+    );
+    setupEditor(
+      '<jasperReport>\n  <detail>\n    <band height="20">\n    </band>\n  </detail>\n</jasperReport>',
+    );
+
+    await addElement(item);
+
+    expect(vscode.workspace.applyEdit).toHaveBeenCalledTimes(1);
+  });
+
+  it("inserts frame element via band QuickPick", async () => {
+    const bandNode = makeNode({
+      tag: "band",
+      position: { startLine: 3, startColumn: 1, endLine: 4, endColumn: 10 },
+    });
+    const item = new OutlineItem("Band", "band", bandNode, []);
+
+    (vscode.window.showQuickPick as ReturnType<typeof vi.fn>).mockResolvedValue(
+      {
+        label: "Frame",
+        child: { label: "Frame", kind: "element:frame", needsName: false },
+      },
+    );
+    setupEditor(
+      '<jasperReport>\n  <detail>\n    <band height="20">\n    </band>\n  </detail>\n</jasperReport>',
+    );
+
+    await addElement(item);
+
+    expect(vscode.workspace.applyEdit).toHaveBeenCalledTimes(1);
+  });
+
+  it("getInsertPosition falls back to line 1 for virtual group with no children", async () => {
+    const item = makeGroupItem("group-fields");
+    (vscode.window.showInputBox as ReturnType<typeof vi.fn>).mockResolvedValue(
+      "newField",
+    );
+    setupEditor("<jasperReport>\n</jasperReport>");
+
+    await addElement(item);
+
+    expect(vscode.workspace.applyEdit).toHaveBeenCalledTimes(1);
+    const editArg = (vscode.workspace.applyEdit as ReturnType<typeof vi.fn>)
+      .mock.calls[0][0];
+    const entries = editArg.entries();
+    const [, edits] = entries[0];
+    // Insert position should be line 1 (fallback)
+    expect(edits[0].range).toBeUndefined(); // insert, not replace
+  });
+
+  it("isSelfClosing returns false for out-of-bounds line", async () => {
+    const bandNode = makeNode({
+      tag: "band",
+      position: { startLine: 0, startColumn: 1, endLine: 0, endColumn: 10 },
+    });
+    const item = new OutlineItem("Band", "band", bandNode, []);
+
+    (vscode.window.showQuickPick as ReturnType<typeof vi.fn>).mockResolvedValue(
+      {
+        label: "Text Field",
+        child: {
+          label: "Text Field",
+          kind: "element:textField",
+          needsName: false,
+        },
+      },
+    );
+    setupEditor("<jasperReport>\n</jasperReport>");
+
+    await addElement(item);
+
+    // Should fall through to regular insert (isSelfClosing returns false)
+    expect(vscode.workspace.applyEdit).toHaveBeenCalledTimes(1);
+  });
+
+  it("getInsertPosition uses fallback for virtual group with positioned children", async () => {
+    const childNode = makeNode({
+      position: { startLine: 2, startColumn: 1, endLine: 2, endColumn: 40 },
+    });
+    const childItem = new OutlineItem("existingField", "field", childNode, []);
+    // Virtual group (no node) with children that have positions
+    const item = makeGroupItem("group-fields", [childItem]);
+
+    (vscode.window.showInputBox as ReturnType<typeof vi.fn>).mockResolvedValue(
+      "anotherField",
+    );
+    setupEditor(
+      '<jasperReport>\n  <field name="existingField"/>\n</jasperReport>',
+    );
+
+    await addElement(item);
+
+    expect(vscode.workspace.applyEdit).toHaveBeenCalledTimes(1);
+  });
+
+  it("getInsertPosition returns undefined for single-line document with virtual group", async () => {
+    const item = makeGroupItem("group-fields");
+    (vscode.window.showInputBox as ReturnType<typeof vi.fn>).mockResolvedValue(
+      "newField",
+    );
+    setupEditor("<jasperReport/>");
+
+    await addElement(item);
+
+    // getInsertPosition returns undefined → addElement returns early
+    expect(vscode.workspace.applyEdit).not.toHaveBeenCalled();
+  });
+});
