@@ -22,9 +22,9 @@ export default defineConfig({
         "src/properties/webview-main.ts",
       ],
       thresholds: {
-        lines: 80,
-        branches: 70,
-        functions: 75,
+        lines: 95,
+        branches: 85,
+        functions: 90,
       },
     },
   },
