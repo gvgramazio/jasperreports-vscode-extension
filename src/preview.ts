@@ -61,15 +61,31 @@ export async function previewReport(
         cancellable: false,
       },
       async () => {
-        const output = await runPreview(
-          env.javaPath,
-          env.classpath,
-          filePath,
-          format,
-          dataSourcePath,
-        );
-        if (output !== undefined) {
-          showPreviewPanel(fileName, output, format, viewColumn);
+        if (format === "pdf") {
+          const pdfPath = await runPdfPreview(
+            env.javaPath,
+            env.classpath,
+            filePath,
+            dataSourcePath,
+          );
+          if (pdfPath) {
+            const uri = vscode.Uri.file(pdfPath);
+            await vscode.commands.executeCommand("vscode.open", uri, {
+              viewColumn,
+              preview: true,
+            });
+          }
+        } else {
+          const output = await runPreview(
+            env.javaPath,
+            env.classpath,
+            filePath,
+            format,
+            dataSourcePath,
+          );
+          if (output !== undefined) {
+            showPreviewPanel(fileName, output, format, viewColumn);
+          }
         }
       },
     );
@@ -91,8 +107,7 @@ function runPreview(
 ): Promise<string | undefined> {
   return new Promise((resolve) => {
     const tmpDir = os.tmpdir();
-    const ext = format === "pdf" ? "pdf" : "html";
-    const outputFile = path.join(tmpDir, `jr-preview-${Date.now()}.${ext}`);
+    const outputFile = path.join(tmpDir, `jr-preview-${Date.now()}.html`);
 
     const args = [
       "-cp",
@@ -135,17 +150,10 @@ function runPreview(
         }
 
         try {
-          if (format === "pdf") {
-            const pdfBytes = fs.readFileSync(outputFile);
-            fs.unlinkSync(outputFile);
-            channel.appendLine(`OK → preview rendered (${format})`);
-            resolve(pdfBytes.toString("base64"));
-          } else {
-            const html = fs.readFileSync(outputFile, "utf-8");
-            fs.unlinkSync(outputFile);
-            channel.appendLine(`OK → preview rendered (${format})`);
-            resolve(html);
-          }
+          const html = fs.readFileSync(outputFile, "utf-8");
+          fs.unlinkSync(outputFile);
+          channel.appendLine(`OK → preview rendered (${format})`);
+          resolve(html);
         } catch (readErr) {
           channel.appendLine(
             `FAILED: Failed to read preview output: ${readErr}`,
@@ -161,13 +169,78 @@ function runPreview(
   });
 }
 
+function runPdfPreview(
+  javaPath: string,
+  classpath: string,
+  jrxmlPath: string,
+  dataSourcePath?: string,
+): Promise<string | undefined> {
+  return new Promise((resolve) => {
+    const tmpDir = os.tmpdir();
+    const outputFile = path.join(tmpDir, `jr-preview-${Date.now()}.pdf`);
+
+    const args = [
+      "-cp",
+      classpath,
+      "JrCompiler",
+      "preview",
+      jrxmlPath,
+      outputFile,
+      "pdf",
+    ];
+    if (dataSourcePath) {
+      args.push(dataSourcePath);
+    }
+
+    const cwd = path.dirname(jrxmlPath);
+
+    execFile(
+      javaPath,
+      args,
+      { cwd, timeout: 60_000 },
+      (err, stdout, stderr) => {
+        const channel = getOutputChannel();
+        if (stdout) {
+          channel.appendLine(stdout);
+        }
+        if (stderr) {
+          channel.appendLine(stderr);
+        }
+
+        if (err) {
+          const errorMsg = stderr || err.message;
+          channel.appendLine(`FAILED: ${errorMsg}`);
+          channel.show(true);
+          cleanupTempFile(outputFile);
+          vscode.window.showErrorMessage(
+            `Preview failed: ${errorMsg.split("\n")[0]}`,
+          );
+          resolve(undefined);
+          return;
+        }
+
+        if (!fs.existsSync(outputFile)) {
+          channel.appendLine("FAILED: PDF output file was not created");
+          channel.show(true);
+          vscode.window.showErrorMessage("PDF output file was not created");
+          resolve(undefined);
+          return;
+        }
+
+        channel.appendLine("OK → preview rendered (pdf)");
+        resolve(outputFile);
+      },
+    );
+  });
+}
+
 function showPreviewPanel(
   fileName: string,
   content: string,
   format: PreviewFormat,
   column: vscode.ViewColumn,
 ): void {
-  const html = format === "pdf" ? wrapPdf(content) : wrapHtml(content);
+  const html = wrapHtml(content);
 
   if (currentPanel) {
     currentPanel.title = `Preview: ${fileName}`;
@@ -204,21 +277,6 @@ function wrapHtml(jasperHtml: string): string {
     return jasperHtml.replace("</head>", `${style}\n    </head>`);
   }
   return `${style}\n${jasperHtml}`;
-}
-
-function wrapPdf(base64Pdf: string): string {
-  return `<!DOCTYPE html>
-<html>
-<head><meta charset="UTF-8"></head>
-<body style="margin:0;padding:0;overflow:hidden;">
-  <object data="data:application/pdf;base64,${base64Pdf}"
-    type="application/pdf"
-    style="width:100%;height:100vh;">
-    <p>PDF preview is not supported in this environment.
-       Use the "Configure Preview" command to switch to HTML format.</p>
-  </object>
-</body>
-</html>`;
 }
 
 function setupLiveReload(
