@@ -6,7 +6,7 @@ import { disposeOutputChannel, getOutputChannel } from "./logger";
 import { JrxmlOutlineProvider, OutlineItem, revealPosition } from "./outline";
 import { OutlineDragAndDropController } from "./outline-dnd";
 import { previewReport, disposePreviewPanel } from "./preview";
-import { configurePreview } from "./previewConfig";
+import { configurePreview } from "./previewConfigUI";
 import { NodePosition } from "./jrxml-parser";
 import { PropertiesViewProvider } from "./properties/PropertiesViewProvider";
 import { addElement, deleteElement } from "./outline-actions";

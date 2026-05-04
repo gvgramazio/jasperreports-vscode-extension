@@ -10,8 +10,8 @@ import {
   getPreviewConfig,
   setPreviewConfig,
   resolveFormat,
-  promptDataSource,
 } from "./previewConfig";
+import { promptDataSource } from "./previewConfigUI";
 
 const PREVIEW_PANEL_TYPE = "jasperreportsPreview";
 
