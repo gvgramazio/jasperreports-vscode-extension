@@ -10,6 +10,7 @@ vi.mock("fs", async (importOriginal) => {
   const actual = await importOriginal<typeof import("fs")>();
   return {
     ...actual,
+    existsSync: vi.fn(),
     readFileSync: vi.fn(),
     unlinkSync: vi.fn(),
   };
@@ -107,7 +108,7 @@ describe("previewReport", () => {
     expect(vscode.window.createWebviewPanel).toHaveBeenCalled();
   });
 
-  it("previews PDF successfully as base64", async () => {
+  it("previews PDF by opening file in VS Code", async () => {
     vi.mocked(resolveActiveJrxmlPath).mockReturnValue("/test/report.jrxml");
     vi.mocked(resolveJavaEnv).mockResolvedValue({
       javaPath: "/usr/bin/java",
@@ -134,23 +135,17 @@ describe("previewReport", () => {
       },
     );
 
-    const pdfBuffer = Buffer.from("fake-pdf-content");
-    vi.mocked(fs.readFileSync).mockReturnValue(pdfBuffer);
+    vi.mocked(fs.existsSync).mockReturnValue(true);
 
     const { previewReport } = await import("../preview");
     await previewReport(ctx);
 
-    expect(fs.readFileSync).toHaveBeenCalled();
-    // Panel may be reused from prior test (module-level state), so check
-    // that either a new panel was created or an existing one was revealed
-    const panelCreated = vi.mocked(vscode.window.createWebviewPanel).mock.calls
-      .length;
-    const panelMock = vi.mocked(vscode.window.createWebviewPanel).mock.results;
-    if (panelCreated > 0) {
-      expect(panelMock[panelCreated - 1].value).toBeDefined();
-    }
-    // The key assertion: readFileSync was called to read the PDF output
-    expect(fs.unlinkSync).toHaveBeenCalled();
+    // PDF should be opened via vscode.open command, not in a webview
+    expect(vscode.commands.executeCommand).toHaveBeenCalledWith(
+      "vscode.open",
+      expect.objectContaining({ fsPath: expect.stringContaining(".pdf") }),
+      expect.objectContaining({ preview: true }),
+    );
   });
 });
 
