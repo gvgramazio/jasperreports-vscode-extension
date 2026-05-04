@@ -66,7 +66,9 @@ export async function previewReport(
         format,
         dataSourcePath,
       );
-      showPreviewPanel(fileName, output, format, viewColumn);
+      if (output !== undefined) {
+        showPreviewPanel(fileName, output, format, viewColumn);
+      }
     },
   );
 
@@ -79,8 +81,8 @@ function runPreview(
   jrxmlPath: string,
   format: PreviewFormat,
   dataSourcePath?: string,
-): Promise<string> {
-  return new Promise((resolve, reject) => {
+): Promise<string | undefined> {
+  return new Promise((resolve) => {
     const tmpDir = os.tmpdir();
     const ext = format === "pdf" ? "pdf" : "html";
     const outputFile = path.join(tmpDir, `jr-preview-${Date.now()}.${ext}`);
@@ -118,7 +120,10 @@ function runPreview(
           channel.appendLine(`FAILED: ${errorMsg}`);
           channel.show(true);
           cleanupTempFile(outputFile);
-          reject(new Error(errorMsg.split("\n")[0]));
+          vscode.window.showErrorMessage(
+            `Preview failed: ${errorMsg.split("\n")[0]}`,
+          );
+          resolve(undefined);
           return;
         }
 
@@ -139,7 +144,10 @@ function runPreview(
             `FAILED: Failed to read preview output: ${readErr}`,
           );
           channel.show(true);
-          reject(new Error(`Failed to read preview output: ${readErr}`));
+          vscode.window.showErrorMessage(
+            `Failed to read preview output: ${readErr}`,
+          );
+          resolve(undefined);
         }
       },
     );
