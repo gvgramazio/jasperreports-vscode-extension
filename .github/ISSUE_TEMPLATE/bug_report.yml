@@ -1,0 +1,93 @@
+name: Bug Report
+description: Report a bug to help us improve the extension
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for taking the time to report a bug!
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Describe the bug
+      description: A clear and concise description of what the bug is.
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      description: Steps to reproduce the behavior.
+      placeholder: |
+        1. Open a `.jrxml` file
+        2. Run command '...'
+        3. See error
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+      description: A clear and concise description of what you expected to happen.
+    validations:
+      required: true
+
+  - type: input
+    id: vscode-version
+    attributes:
+      label: VS Code version
+      description: "Run `code --version` or check Help > About."
+      placeholder: e.g. 1.110.0
+    validations:
+      required: true
+
+  - type: input
+    id: extension-version
+    attributes:
+      label: Extension version
+      description: Find it in the Extensions view or `code --list-extensions --show-versions`.
+      placeholder: e.g. 1.9.0
+    validations:
+      required: true
+
+  - type: dropdown
+    id: os
+    attributes:
+      label: Operating System
+      options:
+        - macOS
+        - Windows
+        - Linux
+    validations:
+      required: true
+
+  - type: input
+    id: java-version
+    attributes:
+      label: Java version
+      description: "Run `java -version`. Relevant for compile and preview features."
+      placeholder: e.g. 21.0.2
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Extension output logs
+      description: |
+        Paste any relevant output from the **JasperReports** output channel.
+        Open it via View > Output, then select "JasperReports" from the dropdown.
+      render: text
+
+  - type: textarea
+    id: screenshots
+    attributes:
+      label: Screenshots
+      description: If applicable, add screenshots to help explain your problem.
+
+  - type: textarea
+    id: additional
+    attributes:
+      label: Additional context
+      description: Add any other context about the problem here (e.g. relevant settings, JRXML snippets).
