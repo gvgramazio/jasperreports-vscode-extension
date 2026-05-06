@@ -94,6 +94,7 @@ A dedicated activity bar panel showing the structure of the active `.jrxml` file
 - **Styles** — named styles with default indicator
 - **Parameters, Fields, Variables, Sort Fields** — data model elements with type info
 - **Groups** — group definitions with header/footer bands
+- All data groups are always visible, even when empty (shown with an `(empty)` indicator)
 - **Sections** — title, page header, detail, page footer, summary, etc. with nested bands and elements
 - Elements display their kind (e.g. `textField`, `staticText`) with position and size (`x,y w×h`)
 - **Click to navigate** — clicking any item reveals and selects the corresponding XML element in the editor
