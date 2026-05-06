@@ -1,3 +1,18 @@
+# [1.10.0](https://github.com/gvgramazio/jasperreports-vscode-extension/compare/v1.9.0...v1.10.0) (2026-05-06)
+
+
+### Bug Fixes
+
+* add missing `break` and `elementGroup` to element kind enumerations ([4a77f8c](https://github.com/gvgramazio/jasperreports-vscode-extension/commit/4a77f8c3814413686bcc51df505e8f6364ff60d6))
+* **properties:** use uuid to re-locate node after edit refresh ([1cbdad8](https://github.com/gvgramazio/jasperreports-vscode-extension/commit/1cbdad8a9721ff2bf16fbe5f0d8a6a7edd432f15))
+
+
+### Features
+
+* **properties:** add color picker for color attributes ([#33](https://github.com/gvgramazio/jasperreports-vscode-extension/issues/33)) ([4de004c](https://github.com/gvgramazio/jasperreports-vscode-extension/commit/4de004c5d5a58b1ea645505fc691ae7a85350f60))
+* **properties:** render enum attributes as select dropdowns ([#32](https://github.com/gvgramazio/jasperreports-vscode-extension/issues/32)) ([a818396](https://github.com/gvgramazio/jasperreports-vscode-extension/commit/a81839644b83ca1232b4ff687f4ee4f87766ea68))
+* **properties:** three-state checkbox for boolean attributes ([#34](https://github.com/gvgramazio/jasperreports-vscode-extension/issues/34)) ([a005e3e](https://github.com/gvgramazio/jasperreports-vscode-extension/commit/a005e3e0658887238c8ba5627799066dc62399d1))
+
 # [1.9.0](https://github.com/gvgramazio/jasperreports-vscode-extension/compare/v1.8.0...v1.9.0) (2026-05-04)
 
 
