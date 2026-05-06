@@ -390,4 +390,43 @@ describe("PropertiesViewProvider", () => {
     // The deeply-nested textField should be found and rendered
     expect(mockWebviewView.webview.html).toContain("Attributes");
   });
+
+  it("findNodeByIdentity matches by uuid for elements without name", async () => {
+    const jrxmlContent = `<?xml version="1.0"?>
+<jasperReport>
+  <title>
+    <band>
+      <element kind="staticText" uuid="aaa-111" x="0" y="0"/>
+      <element kind="textField" uuid="bbb-222" x="10" y="20"/>
+    </band>
+  </title>
+</jasperReport>`;
+    const mockDocument = {
+      getText: () => jrxmlContent,
+      positionAt: (offset: number) => new vscode.Position(0, offset),
+      uri: { fsPath: "/test.jrxml", toString: () => "file:///test.jrxml" },
+    };
+    (vscode.window as { activeTextEditor: unknown }).activeTextEditor = {
+      document: mockDocument,
+    };
+
+    provider.resolveWebviewView(mockWebviewView as never);
+    // Select the second element (textField with uuid bbb-222)
+    provider.update(
+      makeNode({
+        tag: "element",
+        attributes: { kind: "textField", uuid: "bbb-222", x: "10", y: "20" },
+      }),
+      "textField",
+    );
+
+    const handler = (
+      mockWebviewView.webview.onDidReceiveMessage as ReturnType<typeof vi.fn>
+    ).mock.calls[0][0];
+    await handler({ type: "refresh" });
+
+    // Should find the textField (bbb-222), not the staticText (aaa-111)
+    expect(mockWebviewView.webview.html).toContain("textField");
+    expect(mockWebviewView.webview.html).toContain("bbb-222");
+  });
 });

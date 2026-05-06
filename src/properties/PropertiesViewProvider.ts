@@ -7,6 +7,7 @@ import { handleEditMessage, EditMessage } from "./editHandler";
 interface NodeIdentity {
   tag: string;
   name: string;
+  uuid: string;
   label: string;
 }
 
@@ -67,6 +68,7 @@ export class PropertiesViewProvider implements vscode.WebviewViewProvider {
     this._currentNodeId = {
       tag: node.tag,
       name: node.attributes["name"] ?? "",
+      uuid: node.attributes["uuid"] ?? "",
       label,
     };
 
@@ -123,7 +125,15 @@ function findNodeByIdentity(
   const queue: JrxmlNode[] = [root];
   while (queue.length > 0) {
     const node = queue.shift()!;
-    if (node.tag === id.tag && (node.attributes["name"] ?? "") === id.name) {
+    // Prefer uuid match (unique per element), fall back to tag+name
+    if (id.uuid && node.attributes["uuid"] === id.uuid) {
+      return node;
+    }
+    if (
+      !id.uuid &&
+      node.tag === id.tag &&
+      (node.attributes["name"] ?? "") === id.name
+    ) {
       return node;
     }
     queue.push(...node.children);
