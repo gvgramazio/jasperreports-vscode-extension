@@ -94,6 +94,9 @@ export function getPropertiesHtml(
     .edit-color:focus {
       outline: 1px solid var(--vscode-focusBorder);
     }
+    .edit-checkbox.applied {
+      opacity: 0.8;
+    }
     .edit-select {
       width: 100%;
       box-sizing: border-box;
@@ -158,6 +161,8 @@ function renderGroup(group: PropertyGroup): string {
           valueCell = renderEnumCell(e);
         } else if (e.typeInfo?.type === "color") {
           valueCell = renderColorCell(e);
+        } else if (e.typeInfo?.type === "boolean") {
+          valueCell = renderBooleanCell(e);
         } else {
           valueCell = renderInputCell(e);
         }
@@ -210,6 +215,17 @@ function renderEnumCell(e: PropertyEntry): string {
                 <option value=""${blankSelected}>\u2014</option>
                 ${options}
               </select>
+            </vscode-table-cell>`;
+}
+
+function renderBooleanCell(e: PropertyEntry): string {
+  const checked = e.value === "true" ? " checked" : "";
+  const indeterminate =
+    e.value !== "true" && e.value !== "false" ? " indeterminate" : "";
+  return `<vscode-table-cell class="value-cell">
+              <vscode-checkbox class="edit-checkbox"
+                data-attr="${escapeHtml(e.name)}"
+                data-pos="${escapeHtml(JSON.stringify(e.attributePosition))}"${checked}${indeterminate}></vscode-checkbox>
             </vscode-table-cell>`;
 }
 

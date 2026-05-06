@@ -104,7 +104,7 @@ A dedicated activity bar panel showing the structure of the active `.jrxml` file
 
 A webview panel below the Report Outline showing detailed properties for the selected tree item.
 
-- **Attributes** — all element attributes in a tabular view, **editable inline** (blur or Enter commits, Escape reverts); enum attributes use dropdown selectors; color attributes include a visual color picker; `uuid` is read-only
+- **Attributes** — all element attributes in a tabular view, **editable inline** (blur or Enter commits, Escape reverts); enum attributes use dropdown selectors; color attributes include a visual color picker; boolean attributes use three-state checkboxes (checked/unchecked/indeterminate); `uuid` is read-only
 - **Expressions** — expression content (e.g. `textFieldExpression`, `imageExpression`) displayed with CDATA text
 - **Style** — referenced style name
 - **Box & Pen** — border and line properties including per-side pen attributes
