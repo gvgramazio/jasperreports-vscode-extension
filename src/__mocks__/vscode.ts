@@ -199,15 +199,21 @@ export class WorkspaceEdit {
     this._edits.push({ type: "delete", uri, range });
   }
 
-  entries(): Array<[unknown, Array<{ range?: Range; newText?: string }>]> {
+  entries(): Array<
+    [unknown, Array<{ range?: Range; newText?: string; position?: Position }>]
+  > {
     const byUri = new Map<
       unknown,
-      Array<{ range?: Range; newText?: string }>
+      Array<{ range?: Range; newText?: string; position?: Position }>
     >();
     for (const edit of this._edits) {
       const key = edit.uri;
       if (!byUri.has(key)) byUri.set(key, []);
-      byUri.get(key)!.push({ range: edit.range, newText: edit.newText });
+      byUri.get(key)!.push({
+        range: edit.range,
+        newText: edit.newText,
+        position: edit.position,
+      });
     }
     return [...byUri.entries()];
   }

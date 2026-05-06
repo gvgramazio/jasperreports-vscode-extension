@@ -1,6 +1,40 @@
 import * as vscode from "vscode";
 import { OutlineItem, nodeToFullLineRange } from "./outline";
-import { NodePosition } from "./jrxml-parser";
+import { NodePosition, parseJrxml } from "./jrxml-parser";
+
+/**
+ * Canonical ordering of child elements under <jasperReport>,
+ * matching the XSD xs:sequence.
+ */
+export const JRXML_ELEMENT_ORDER = [
+  "style",
+  "parameter",
+  "query",
+  "field",
+  "sortField",
+  "variable",
+  "group",
+  "background",
+  "title",
+  "pageHeader",
+  "columnHeader",
+  "detail",
+  "columnFooter",
+  "pageFooter",
+  "lastPageFooter",
+  "summary",
+  "noData",
+] as const;
+
+/** Map outline group kinds to their JRXML tag name. */
+const GROUP_KIND_TO_TAG: Record<string, string> = {
+  "group-styles": "style",
+  "group-parameters": "parameter",
+  "group-fields": "field",
+  "group-sortFields": "sortField",
+  "group-variables": "variable",
+  "group-groups": "group",
+};
 
 const ELEMENT_TEMPLATES: Record<string, (name: string) => string> = {
   field: (name) => `  <field name="${name}" class="java.lang.String"/>\n`,
@@ -208,19 +242,79 @@ function getInsertPosition(
     return new vscode.Position(endLine, 0);
   }
 
-  // Fallback: for virtual groups (Parameters, Fields, etc.) that have no node,
-  // look at the first child to determine the insertion region
-  if (children.length > 0 && children[0].node?.position) {
-    // Insert after the last child
-    const lastChild = children[children.length - 1];
-    if (lastChild.node?.position) {
-      return new vscode.Position(lastChild.node.position.endLine, 0);
-    }
+  // For virtual groups (Parameters, Fields, etc.) with no children,
+  // use canonical element ordering to find the correct insertion point.
+  const tag = GROUP_KIND_TO_TAG[groupItem.kind];
+  if (tag) {
+    const pos = getOrderedInsertPosition(document, tag);
+    if (pos) return pos;
   }
 
   // Last resort: insert near the beginning of the document (after root open tag)
   if (document.lineCount > 1) {
     return new vscode.Position(1, 0);
+  }
+
+  return undefined;
+}
+
+/**
+ * Find the correct insertion position for a tag based on the canonical
+ * JRXML element ordering. Scans root children to find the nearest
+ * existing element that comes before or after in the sequence.
+ */
+function getOrderedInsertPosition(
+  document: vscode.TextDocument,
+  tag: string,
+): vscode.Position | undefined {
+  const doc = parseJrxml(document.getText());
+  if (!doc.root) return undefined;
+
+  const orderIndex = JRXML_ELEMENT_ORDER.indexOf(
+    tag as (typeof JRXML_ELEMENT_ORDER)[number],
+  );
+  if (orderIndex === -1) return undefined;
+
+  const rootChildren = doc.root.children;
+
+  // Find the last existing element that should come before this tag
+  let insertAfter: NodePosition | undefined;
+  for (let i = orderIndex - 1; i >= 0; i--) {
+    const precedingTag = JRXML_ELEMENT_ORDER[i];
+    // Find the last child with this tag
+    for (let j = rootChildren.length - 1; j >= 0; j--) {
+      if (rootChildren[j].tag === precedingTag && rootChildren[j].position) {
+        insertAfter = rootChildren[j].position;
+        break;
+      }
+    }
+    if (insertAfter) break;
+  }
+
+  if (insertAfter) {
+    return new vscode.Position(insertAfter.endLine, 0);
+  }
+
+  // No preceding element found — find the first element that comes after
+  let insertBefore: NodePosition | undefined;
+  for (let i = orderIndex + 1; i < JRXML_ELEMENT_ORDER.length; i++) {
+    const followingTag = JRXML_ELEMENT_ORDER[i];
+    for (const child of rootChildren) {
+      if (child.tag === followingTag && child.position) {
+        insertBefore = child.position;
+        break;
+      }
+    }
+    if (insertBefore) break;
+  }
+
+  if (insertBefore) {
+    return new vscode.Position(insertBefore.startLine - 1, 0);
+  }
+
+  // No siblings at all — insert after root open tag
+  if (doc.root.position && document.lineCount > 1) {
+    return new vscode.Position(doc.root.position.startLine, 0);
   }
 
   return undefined;
