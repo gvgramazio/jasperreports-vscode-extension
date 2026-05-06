@@ -43,7 +43,7 @@ describe("jrxml snippets", () => {
     expect(unique.size).toBe(prefixes.length);
   });
 
-  it("covers all 13 element kinds", () => {
+  it("covers all 14 element kinds", () => {
     const kinds = [
       "textField",
       "staticText",
@@ -58,6 +58,7 @@ describe("jrxml snippets", () => {
       "component",
       "elementGroup",
       "generic",
+      "break",
     ];
     const allBodies = Object.values(snippets)
       .flatMap((s) => s.body)

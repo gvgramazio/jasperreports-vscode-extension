@@ -143,6 +143,25 @@
     </xs:restriction>
   </xs:simpleType>
 
+  <xs:simpleType name="elementKindType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="textField"/>
+      <xs:enumeration value="staticText"/>
+      <xs:enumeration value="image"/>
+      <xs:enumeration value="line"/>
+      <xs:enumeration value="rectangle"/>
+      <xs:enumeration value="ellipse"/>
+      <xs:enumeration value="frame"/>
+      <xs:enumeration value="subreport"/>
+      <xs:enumeration value="chart"/>
+      <xs:enumeration value="crosstab"/>
+      <xs:enumeration value="component"/>
+      <xs:enumeration value="elementGroup"/>
+      <xs:enumeration value="generic"/>
+      <xs:enumeration value="break"/>
+    </xs:restriction>
+  </xs:simpleType>
+
   <xs:simpleType name="lineStyleType">
     <xs:restriction base="xs:string">
       <xs:enumeration value="Solid"/>
@@ -812,7 +831,7 @@
     </xs:choice>
 
     <!-- Common element attributes -->
-    <xs:attribute name="kind" type="xs:string"/>
+    <xs:attribute name="kind" type="elementKindType"/>
     <xs:attribute name="uuid" type="xs:string"/>
     <xs:attribute name="key" type="xs:string"/>
     <xs:attribute name="style" type="xs:string"/>

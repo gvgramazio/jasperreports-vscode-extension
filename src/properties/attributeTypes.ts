@@ -132,7 +132,9 @@ const ENUM_MAP: Record<string, string[]> = {
     "chart",
     "crosstab",
     "component",
+    "elementGroup",
     "generic",
+    "break",
   ],
   mode: ["Opaque", "Transparent"],
 };
