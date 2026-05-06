@@ -94,4 +94,66 @@ describe("getPropertiesHtml", () => {
     expect(html).toContain('data-type="boolean"');
     expect(html).toContain("data-enum=");
   });
+
+  it("renders enum attributes as <select> dropdowns", () => {
+    const groups: PropertyGroup[] = [
+      {
+        label: "Attributes",
+        entries: [
+          {
+            name: "hTextAlign",
+            value: "Center",
+            editable: true,
+            attributePosition: {
+              nameStart: 0,
+              nameEnd: 10,
+              valueStart: 12,
+              valueEnd: 18,
+            },
+            typeInfo: {
+              type: "enum",
+              enumValues: ["Left", "Center", "Right", "Justified"],
+            },
+          },
+        ],
+      },
+    ];
+    const html = getPropertiesHtml(makeWebview(), extensionUri, groups, "Node");
+    expect(html).toContain("edit-select");
+    expect(html).toContain("<select");
+    expect(html).toContain('data-attr="hTextAlign"');
+    expect(html).toContain('<option value="">');
+    expect(html).toContain('<option value="Left">Left</option>');
+    expect(html).toContain('<option value="Center" selected>Center</option>');
+    expect(html).toContain('<option value="Right">Right</option>');
+    expect(html).not.toContain('<input class="edit-input"');
+  });
+
+  it("selects blank option when enum value is not in the list", () => {
+    const groups: PropertyGroup[] = [
+      {
+        label: "Attributes",
+        entries: [
+          {
+            name: "hTextAlign",
+            value: "Unknown",
+            editable: true,
+            attributePosition: {
+              nameStart: 0,
+              nameEnd: 10,
+              valueStart: 12,
+              valueEnd: 19,
+            },
+            typeInfo: {
+              type: "enum",
+              enumValues: ["Left", "Center", "Right"],
+            },
+          },
+        ],
+      },
+    ];
+    const html = getPropertiesHtml(makeWebview(), extensionUri, groups, "Node");
+    expect(html).toContain('<option value="" selected>');
+    expect(html).not.toContain('<option value="Left" selected>');
+  });
 });

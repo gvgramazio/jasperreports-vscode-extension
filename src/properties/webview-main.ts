@@ -41,6 +41,37 @@ function setupEditListeners(): void {
   if (!vscode) return;
 
   document
+    .querySelectorAll<HTMLSelectElement>(".edit-select")
+    .forEach((select) => {
+      const originalValue = select.value;
+
+      select.addEventListener("change", () => {
+        const newValue = select.value;
+        if (newValue === originalValue) {
+          select.classList.remove("applied");
+          return;
+        }
+
+        const attr = select.dataset.attr;
+        const posJson = select.dataset.pos;
+        if (!attr || !posJson) return;
+
+        try {
+          const attributePosition = JSON.parse(posJson);
+          vscode.postMessage({
+            type: "edit",
+            attribute: attr,
+            value: newValue,
+            attributePosition,
+          });
+          select.classList.add("applied");
+        } catch {
+          // ignore parse errors
+        }
+      });
+    });
+
+  document
     .querySelectorAll<HTMLInputElement>(".edit-input")
     .forEach((input) => {
       const originalValue = input.value;
