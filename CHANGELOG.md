@@ -1,3 +1,11 @@
+# [1.11.0](https://github.com/gvgramazio/jasperreports-vscode-extension/compare/v1.10.0...v1.11.0) (2026-05-06)
+
+
+### Features
+
+* **outline:** always show data groups even when empty ([#35](https://github.com/gvgramazio/jasperreports-vscode-extension/issues/35)) ([6d66fe4](https://github.com/gvgramazio/jasperreports-vscode-extension/commit/6d66fe453b5506c391221ed67eb28514ecd1b84a))
+* **outline:** canonical insertion position for empty groups ([#36](https://github.com/gvgramazio/jasperreports-vscode-extension/issues/36)) ([446c117](https://github.com/gvgramazio/jasperreports-vscode-extension/commit/446c117bcb61da30fe3520d540693c7f464e7ed0))
+
 # [1.10.0](https://github.com/gvgramazio/jasperreports-vscode-extension/compare/v1.9.0...v1.10.0) (2026-05-06)
 
 
