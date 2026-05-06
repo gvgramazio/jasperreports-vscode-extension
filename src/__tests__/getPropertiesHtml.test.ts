@@ -309,4 +309,34 @@ describe("getPropertiesHtml", () => {
     expect(html).toContain("indeterminate");
     expect(html).not.toContain(" checked");
   });
+
+  it("renders data-enum attribute on input when typeInfo has enumValues but type is not enum", () => {
+    const groups: PropertyGroup[] = [
+      {
+        label: "Attributes",
+        entries: [
+          {
+            name: "custom",
+            value: "10",
+            editable: true,
+            attributePosition: {
+              nameStart: 0,
+              nameEnd: 6,
+              valueStart: 8,
+              valueEnd: 10,
+            },
+            typeInfo: {
+              type: "integer",
+              enumValues: ["10", "20", "30"],
+            },
+          },
+        ],
+      },
+    ];
+    const html = getPropertiesHtml(makeWebview(), extensionUri, groups, "Node");
+    expect(html).toContain('data-type="integer"');
+    expect(html).toContain("data-enum=");
+    expect(html).toContain("edit-input");
+    expect(html).not.toContain("<select");
+  });
 });

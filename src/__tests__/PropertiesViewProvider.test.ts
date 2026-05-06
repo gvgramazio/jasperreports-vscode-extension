@@ -429,4 +429,47 @@ describe("PropertiesViewProvider", () => {
     expect(mockWebviewView.webview.html).toContain("textField");
     expect(mockWebviewView.webview.html).toContain("bbb-222");
   });
+
+  it("reParseAndRefresh is called after a successful edit", async () => {
+    // Content where attribute positions match exactly
+    const jrxmlContent = '<jasperReport><field name="id"/></jasperReport>';
+    // 'name' starts at 21, ends at 25; value 'id' starts at 27, ends at 29
+    const mockDocument = {
+      getText: () => jrxmlContent,
+      positionAt: (offset: number) => new vscode.Position(0, offset),
+      uri: { fsPath: "/test.jrxml", toString: () => "file:///test.jrxml" },
+    };
+    (vscode.window as { activeTextEditor: unknown }).activeTextEditor = {
+      document: mockDocument,
+    };
+
+    // Ensure applyEdit returns true for this test (reset any leftover mocks)
+    vi.mocked(vscode.workspace.applyEdit).mockReset();
+    vi.mocked(vscode.workspace.applyEdit).mockResolvedValue(true);
+
+    provider.resolveWebviewView(mockWebviewView as never);
+    provider.update(
+      makeNode({ tag: "field", attributes: { name: "id" } }),
+      "id",
+    );
+
+    const handler = (
+      mockWebviewView.webview.onDidReceiveMessage as ReturnType<typeof vi.fn>
+    ).mock.calls[0][0];
+    await handler({
+      type: "edit",
+      attribute: "name",
+      value: "newId",
+      attributePosition: {
+        nameStart: 21,
+        nameEnd: 25,
+        valueStart: 27,
+        valueEnd: 29,
+      },
+    });
+
+    // After successful edit, reParseAndRefresh should have been called
+    expect(vscode.workspace.applyEdit).toHaveBeenCalledTimes(1);
+    expect(provider.editInProgress).toBe(false);
+  });
 });
