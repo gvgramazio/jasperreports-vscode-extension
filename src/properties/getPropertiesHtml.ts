@@ -73,6 +73,27 @@ export function getPropertiesHtml(
     .edit-input.invalid {
       border-color: var(--vscode-inputValidation-errorBorder);
     }
+    .color-wrapper {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .color-wrapper .edit-input {
+      flex: 1;
+      min-width: 0;
+    }
+    .edit-color {
+      width: 24px;
+      height: 24px;
+      padding: 0;
+      border: 1px solid var(--vscode-input-border, transparent);
+      background: none;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+    .edit-color:focus {
+      outline: 1px solid var(--vscode-focusBorder);
+    }
     .edit-select {
       width: 100%;
       box-sizing: border-box;
@@ -135,6 +156,8 @@ function renderGroup(group: PropertyGroup): string {
       if (e.editable && e.attributePosition) {
         if (e.typeInfo?.type === "enum" && e.typeInfo.enumValues) {
           valueCell = renderEnumCell(e);
+        } else if (e.typeInfo?.type === "color") {
+          valueCell = renderColorCell(e);
         } else {
           valueCell = renderInputCell(e);
         }
@@ -187,6 +210,24 @@ function renderEnumCell(e: PropertyEntry): string {
                 <option value=""${blankSelected}>\u2014</option>
                 ${options}
               </select>
+            </vscode-table-cell>`;
+}
+
+function renderColorCell(e: PropertyEntry): string {
+  const colorValue =
+    e.value && /^#[0-9a-fA-F]{6}$/.test(e.value) ? e.value : "#000000";
+  return `<vscode-table-cell class="value-cell">
+              <div class="color-wrapper">
+                <input class="edit-color" type="color"
+                  value="${escapeHtml(colorValue)}"
+                  data-attr="${escapeHtml(e.name)}"
+                  data-pos="${escapeHtml(JSON.stringify(e.attributePosition))}" />
+                <input class="edit-input" type="text"
+                  value="${escapeHtml(e.value)}"
+                  data-attr="${escapeHtml(e.name)}"
+                  data-pos="${escapeHtml(JSON.stringify(e.attributePosition))}"
+                  data-type="color" />
+              </div>
             </vscode-table-cell>`;
 }
 

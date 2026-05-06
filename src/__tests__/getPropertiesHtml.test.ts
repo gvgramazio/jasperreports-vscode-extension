@@ -156,4 +156,69 @@ describe("getPropertiesHtml", () => {
     expect(html).toContain('<option value="" selected>');
     expect(html).not.toContain('<option value="Left" selected>');
   });
+
+  it("renders color attributes with a color picker and text input", () => {
+    const groups: PropertyGroup[] = [
+      {
+        label: "Attributes",
+        entries: [
+          {
+            name: "forecolor",
+            value: "#FF0000",
+            editable: true,
+            attributePosition: {
+              nameStart: 0,
+              nameEnd: 9,
+              valueStart: 11,
+              valueEnd: 18,
+            },
+            typeInfo: {
+              type: "color",
+            },
+          },
+        ],
+      },
+    ];
+    const html = getPropertiesHtml(makeWebview(), extensionUri, groups, "Node");
+    expect(html).toContain("color-wrapper");
+    expect(html).toContain('type="color"');
+    expect(html).toContain('class="edit-color"');
+    expect(html).toContain('value="#FF0000"');
+    expect(html).toContain('class="edit-input"');
+    expect(html).toContain('data-attr="forecolor"');
+    expect(html).toContain('data-type="color"');
+  });
+
+  it("defaults color picker to #000000 when value is not a valid hex color", () => {
+    const groups: PropertyGroup[] = [
+      {
+        label: "Attributes",
+        entries: [
+          {
+            name: "forecolor",
+            value: "red",
+            editable: true,
+            attributePosition: {
+              nameStart: 0,
+              nameEnd: 9,
+              valueStart: 11,
+              valueEnd: 14,
+            },
+            typeInfo: {
+              type: "color",
+            },
+          },
+        ],
+      },
+    ];
+    const html = getPropertiesHtml(makeWebview(), extensionUri, groups, "Node");
+    // color picker gets default #000000
+    expect(html).toContain(
+      'class="edit-color" type="color"\n                  value="#000000"',
+    );
+    // text input keeps the original value
+    expect(html).toContain(
+      'class="edit-input" type="text"\n                  value="red"',
+    );
+  });
 });
