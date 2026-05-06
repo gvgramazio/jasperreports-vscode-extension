@@ -529,7 +529,49 @@ describe("addElement — template and edge coverage", () => {
     expect(vscode.workspace.applyEdit).toHaveBeenCalledTimes(1);
   });
 
-  it("getInsertPosition falls back to line 1 for virtual group with no children", async () => {
+  it("getInsertPosition inserts empty group after preceding sibling using canonical order", async () => {
+    const item = makeGroupItem("group-fields");
+    (vscode.window.showInputBox as ReturnType<typeof vi.fn>).mockResolvedValue(
+      "newField",
+    );
+    setupEditor(
+      '<jasperReport>\n  <parameter name="p1" class="java.lang.String"/>\n</jasperReport>',
+    );
+
+    await addElement(item);
+
+    expect(vscode.workspace.applyEdit).toHaveBeenCalledTimes(1);
+    const editArg = (vscode.workspace.applyEdit as ReturnType<typeof vi.fn>)
+      .mock.calls[0][0];
+    const entries = editArg.entries();
+    const [, edits] = entries[0];
+    // Should insert after the parameter (line 2 in 1-based = endLine of parameter)
+    expect(edits[0].position).toBeDefined();
+    expect(edits[0].position!.line).toBe(2);
+  });
+
+  it("getInsertPosition inserts empty group before following sibling when no preceding exists", async () => {
+    const item = makeGroupItem("group-styles");
+    (vscode.window.showInputBox as ReturnType<typeof vi.fn>).mockResolvedValue(
+      "myStyle",
+    );
+    setupEditor(
+      '<jasperReport>\n  <field name="f1" class="java.lang.String"/>\n</jasperReport>',
+    );
+
+    await addElement(item);
+
+    expect(vscode.workspace.applyEdit).toHaveBeenCalledTimes(1);
+    const editArg = (vscode.workspace.applyEdit as ReturnType<typeof vi.fn>)
+      .mock.calls[0][0];
+    const entries = editArg.entries();
+    const [, edits] = entries[0];
+    // Should insert before the field (field starts at line 2, so insert at line 1 = startLine - 1)
+    expect(edits[0].position).toBeDefined();
+    expect(edits[0].position!.line).toBe(1);
+  });
+
+  it("getInsertPosition falls back to after root open tag for empty doc", async () => {
     const item = makeGroupItem("group-fields");
     (vscode.window.showInputBox as ReturnType<typeof vi.fn>).mockResolvedValue(
       "newField",
@@ -543,8 +585,9 @@ describe("addElement — template and edge coverage", () => {
       .mock.calls[0][0];
     const entries = editArg.entries();
     const [, edits] = entries[0];
-    // Insert position should be line 1 (fallback)
-    expect(edits[0].range).toBeUndefined(); // insert, not replace
+    // Root starts at line 1, so insert at line 1 (after root open tag)
+    expect(edits[0].position).toBeDefined();
+    expect(edits[0].position!.line).toBe(1);
   });
 
   it("isSelfClosing returns false for out-of-bounds line", async () => {
