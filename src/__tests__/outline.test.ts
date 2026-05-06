@@ -39,7 +39,7 @@ describe("JrxmlOutlineProvider", () => {
     expect(labels).toContain("Detail");
   });
 
-  it("hides empty sections and groups", () => {
+  it("shows empty data groups with (empty) description, hides empty sections", () => {
     const xml = `<jasperReport name="Test" pageWidth="595">
   <field name="id" class="java.lang.Integer"/>
   <detail>
@@ -49,11 +49,25 @@ describe("JrxmlOutlineProvider", () => {
     provider.refresh(xml);
     const roots = provider.getChildren();
     const labels = roots.map((r) => r.label);
-    expect(labels).not.toContain("Styles");
-    expect(labels).not.toContain("Parameters");
-    expect(labels).not.toContain("Variables");
-    expect(labels).not.toContain("Sort Fields");
-    expect(labels).not.toContain("Groups");
+    // Data groups always visible
+    expect(labels).toContain("Styles");
+    expect(labels).toContain("Parameters");
+    expect(labels).toContain("Variables");
+    expect(labels).toContain("Sort Fields");
+    expect(labels).toContain("Groups");
+    // Empty data groups show "(empty)" description
+    const styles = roots.find((r) => r.label === "Styles");
+    expect(styles?.description).toBe("(empty)");
+    expect(styles?.collapsibleState).toBe(vscode.TreeItemCollapsibleState.None);
+    const params = roots.find((r) => r.label === "Parameters");
+    expect(params?.description).toBe("(empty)");
+    // Fields has one child — not empty
+    const fields = roots.find((r) => r.label === "Fields");
+    expect(fields?.description).toBeUndefined();
+    expect(fields?.collapsibleState).toBe(
+      vscode.TreeItemCollapsibleState.Collapsed,
+    );
+    // Sections still hidden when absent
     expect(labels).not.toContain("Page Header");
     expect(labels).not.toContain("Summary");
   });

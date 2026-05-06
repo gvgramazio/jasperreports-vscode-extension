@@ -54,81 +54,75 @@ export class JrxmlOutlineProvider implements vscode.TreeDataProvider<OutlineItem
 
     // Styles
     const styles = root.children.filter((c) => c.tag === "style");
-    if (styles.length > 0) {
-      items.push(
-        new OutlineItem(
-          "Styles",
-          "group-styles",
-          null,
-          styles.map((s) => this.buildStyleItem(s)),
-        ),
-      );
-    }
+    items.push(
+      new OutlineItem(
+        "Styles",
+        "group-styles",
+        null,
+        styles.map((s) => this.buildStyleItem(s)),
+        styles.length === 0 ? "(empty)" : undefined,
+      ),
+    );
 
     // Parameters
     const params = root.children.filter((c) => c.tag === "parameter");
-    if (params.length > 0) {
-      items.push(
-        new OutlineItem(
-          "Parameters",
-          "group-parameters",
-          null,
-          params.map((p) => this.buildDataItem(p, "parameter")),
-        ),
-      );
-    }
+    items.push(
+      new OutlineItem(
+        "Parameters",
+        "group-parameters",
+        null,
+        params.map((p) => this.buildDataItem(p, "parameter")),
+        params.length === 0 ? "(empty)" : undefined,
+      ),
+    );
 
     // Fields
     const fields = root.children.filter((c) => c.tag === "field");
-    if (fields.length > 0) {
-      items.push(
-        new OutlineItem(
-          "Fields",
-          "group-fields",
-          null,
-          fields.map((f) => this.buildDataItem(f, "field")),
-        ),
-      );
-    }
+    items.push(
+      new OutlineItem(
+        "Fields",
+        "group-fields",
+        null,
+        fields.map((f) => this.buildDataItem(f, "field")),
+        fields.length === 0 ? "(empty)" : undefined,
+      ),
+    );
 
     // Variables
     const variables = root.children.filter((c) => c.tag === "variable");
-    if (variables.length > 0) {
-      items.push(
-        new OutlineItem(
-          "Variables",
-          "group-variables",
-          null,
-          variables.map((v) => this.buildVariableItem(v)),
-        ),
-      );
-    }
+    items.push(
+      new OutlineItem(
+        "Variables",
+        "group-variables",
+        null,
+        variables.map((v) => this.buildVariableItem(v)),
+        variables.length === 0 ? "(empty)" : undefined,
+      ),
+    );
 
     // Sort Fields
     const sortFields = root.children.filter((c) => c.tag === "sortField");
-    if (sortFields.length > 0) {
-      items.push(
-        new OutlineItem(
-          "Sort Fields",
-          "group-sortFields",
-          null,
-          sortFields.map((s) => this.buildDataItem(s, "sortField")),
-        ),
-      );
-    }
+    items.push(
+      new OutlineItem(
+        "Sort Fields",
+        "group-sortFields",
+        null,
+        sortFields.map((s) => this.buildDataItem(s, "sortField")),
+        sortFields.length === 0 ? "(empty)" : undefined,
+      ),
+    );
 
     // Groups
     const groups = root.children.filter((c) => c.tag === "group");
-    if (groups.length > 0) {
-      items.push(
-        new OutlineItem(
-          "Groups",
-          "group-groups",
-          null,
-          groups.map((g) => this.buildGroupItem(g)),
-        ),
-      );
-    }
+    items.push(
+      new OutlineItem(
+        "Groups",
+        "group-groups",
+        null,
+        groups.map((g) => this.buildGroupItem(g)),
+        groups.length === 0 ? "(empty)" : undefined,
+      ),
+    );
 
     // Sections (bands)
     for (const tag of SECTION_TAGS) {
