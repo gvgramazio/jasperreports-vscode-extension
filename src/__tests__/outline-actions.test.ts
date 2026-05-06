@@ -604,4 +604,85 @@ describe("addElement — template and edge coverage", () => {
     // getInsertPosition returns undefined → addElement returns early
     expect(vscode.workspace.applyEdit).not.toHaveBeenCalled();
   });
+
+  it("inserts break element via band QuickPick", async () => {
+    const bandNode = makeNode({
+      tag: "band",
+      position: { startLine: 3, startColumn: 1, endLine: 4, endColumn: 10 },
+    });
+    const item = new OutlineItem("Band", "band", bandNode, []);
+
+    (vscode.window.showQuickPick as ReturnType<typeof vi.fn>).mockResolvedValue(
+      {
+        label: "Break",
+        child: { label: "Break", kind: "element:break", needsName: false },
+      },
+    );
+    setupEditor(
+      '<jasperReport>\n  <detail>\n    <band height="20">\n    </band>\n  </detail>\n</jasperReport>',
+    );
+
+    await addElement(item);
+
+    expect(vscode.workspace.applyEdit).toHaveBeenCalledTimes(1);
+    const editArg = (vscode.workspace.applyEdit as ReturnType<typeof vi.fn>)
+      .mock.calls[0][0];
+    const entries = editArg.entries();
+    const [, edits] = entries[0];
+    expect(edits[0].newText).toContain('kind="break"');
+  });
+
+  it("inserts elementGroup element via band QuickPick", async () => {
+    const bandNode = makeNode({
+      tag: "band",
+      position: { startLine: 3, startColumn: 1, endLine: 4, endColumn: 10 },
+    });
+    const item = new OutlineItem("Band", "band", bandNode, []);
+
+    (vscode.window.showQuickPick as ReturnType<typeof vi.fn>).mockResolvedValue(
+      {
+        label: "Element Group",
+        child: {
+          label: "Element Group",
+          kind: "element:elementGroup",
+          needsName: false,
+        },
+      },
+    );
+    setupEditor(
+      '<jasperReport>\n  <detail>\n    <band height="20">\n    </band>\n  </detail>\n</jasperReport>',
+    );
+
+    await addElement(item);
+
+    expect(vscode.workspace.applyEdit).toHaveBeenCalledTimes(1);
+    const editArg = (vscode.workspace.applyEdit as ReturnType<typeof vi.fn>)
+      .mock.calls[0][0];
+    const entries = editArg.entries();
+    const [, edits] = entries[0];
+    expect(edits[0].newText).toContain('kind="elementGroup"');
+  });
+
+  it("getInsertPosition fallback when last child has no position", async () => {
+    const firstChild = new OutlineItem(
+      "field1",
+      "field",
+      makeNode({
+        position: { startLine: 2, startColumn: 1, endLine: 2, endColumn: 40 },
+      }),
+      [],
+    );
+    const lastChild = new OutlineItem("field2", "field", null, []);
+    const item = makeGroupItem("group-fields", [firstChild, lastChild]);
+
+    (vscode.window.showInputBox as ReturnType<typeof vi.fn>).mockResolvedValue(
+      "newField",
+    );
+    setupEditor('<jasperReport>\n  <field name="field1"/>\n</jasperReport>');
+
+    await addElement(item);
+
+    // Falls through to last-resort insert at line 1
+    expect(vscode.workspace.applyEdit).toHaveBeenCalledTimes(1);
+  });
 });
