@@ -6,6 +6,7 @@ import "@vscode-elements/elements/dist/vscode-table-header-cell/index.js";
 import "@vscode-elements/elements/dist/vscode-table-body/index.js";
 import "@vscode-elements/elements/dist/vscode-table-row/index.js";
 import "@vscode-elements/elements/dist/vscode-table-cell/index.js";
+import "@vscode-elements/elements/dist/vscode-checkbox/index.js";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const vscode = (window as any).acquireVsCodeApi?.();
@@ -39,6 +40,53 @@ function validateValue(input: HTMLInputElement): boolean {
 
 function setupEditListeners(): void {
   if (!vscode) return;
+
+  // Three-state boolean checkboxes: indeterminate → checked → unchecked → indeterminate
+  document
+    .querySelectorAll<HTMLElement>(".edit-checkbox")
+    .forEach((checkbox) => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const cb = checkbox as any;
+
+      // Track logical state: "true" | "false" | "" (indeterminate)
+      let state: string = cb.indeterminate ? "" : cb.checked ? "true" : "false";
+
+      checkbox.addEventListener("change", (ev) => {
+        ev.stopPropagation();
+
+        // Cycle: indeterminate → checked → unchecked → indeterminate
+        if (state === "") {
+          state = "true";
+          cb.indeterminate = false;
+          cb.checked = true;
+        } else if (state === "true") {
+          state = "false";
+          cb.indeterminate = false;
+          cb.checked = false;
+        } else {
+          state = "";
+          cb.indeterminate = true;
+          cb.checked = false;
+        }
+
+        const attr = checkbox.dataset.attr;
+        const posJson = checkbox.dataset.pos;
+        if (!attr || !posJson) return;
+
+        try {
+          const attributePosition = JSON.parse(posJson);
+          vscode.postMessage({
+            type: "edit",
+            attribute: attr,
+            value: state,
+            attributePosition,
+          });
+          checkbox.classList.add("applied");
+        } catch {
+          // ignore parse errors
+        }
+      });
+    });
 
   document
     .querySelectorAll<HTMLSelectElement>(".edit-select")

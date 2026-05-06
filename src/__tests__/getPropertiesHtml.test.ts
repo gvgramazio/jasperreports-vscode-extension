@@ -73,26 +73,24 @@ describe("getPropertiesHtml", () => {
         label: "Attributes",
         entries: [
           {
-            name: "bold",
-            value: "true",
+            name: "width",
+            value: "100",
             editable: true,
             attributePosition: {
               nameStart: 0,
-              nameEnd: 4,
-              valueStart: 6,
+              nameEnd: 5,
+              valueStart: 7,
               valueEnd: 10,
             },
             typeInfo: {
-              type: "boolean",
-              enumValues: ["true", "false"],
+              type: "integer",
             },
           },
         ],
       },
     ];
     const html = getPropertiesHtml(makeWebview(), extensionUri, groups, "Node");
-    expect(html).toContain('data-type="boolean"');
-    expect(html).toContain("data-enum=");
+    expect(html).toContain('data-type="integer"');
   });
 
   it("renders enum attributes as <select> dropdowns", () => {
@@ -220,5 +218,95 @@ describe("getPropertiesHtml", () => {
     expect(html).toContain(
       'class="edit-input" type="text"\n                  value="red"',
     );
+  });
+
+  it("renders boolean true as a checked checkbox", () => {
+    const groups: PropertyGroup[] = [
+      {
+        label: "Attributes",
+        entries: [
+          {
+            name: "bold",
+            value: "true",
+            editable: true,
+            attributePosition: {
+              nameStart: 0,
+              nameEnd: 4,
+              valueStart: 6,
+              valueEnd: 10,
+            },
+            typeInfo: {
+              type: "boolean",
+              enumValues: ["true", "false"],
+            },
+          },
+        ],
+      },
+    ];
+    const html = getPropertiesHtml(makeWebview(), extensionUri, groups, "Node");
+    expect(html).toContain("edit-checkbox");
+    expect(html).toContain("<vscode-checkbox");
+    expect(html).toContain('data-attr="bold"');
+    expect(html).toContain(" checked");
+    expect(html).not.toContain("indeterminate");
+    expect(html).not.toContain('<input class="edit-input"');
+  });
+
+  it("renders boolean false as an unchecked checkbox", () => {
+    const groups: PropertyGroup[] = [
+      {
+        label: "Attributes",
+        entries: [
+          {
+            name: "italic",
+            value: "false",
+            editable: true,
+            attributePosition: {
+              nameStart: 0,
+              nameEnd: 6,
+              valueStart: 8,
+              valueEnd: 13,
+            },
+            typeInfo: {
+              type: "boolean",
+              enumValues: ["true", "false"],
+            },
+          },
+        ],
+      },
+    ];
+    const html = getPropertiesHtml(makeWebview(), extensionUri, groups, "Node");
+    expect(html).toContain("edit-checkbox");
+    expect(html).not.toContain(" checked");
+    expect(html).not.toContain("indeterminate");
+  });
+
+  it("renders non-true/false boolean value as indeterminate checkbox", () => {
+    const groups: PropertyGroup[] = [
+      {
+        label: "Attributes",
+        entries: [
+          {
+            name: "bold",
+            value: "",
+            editable: true,
+            attributePosition: {
+              nameStart: 0,
+              nameEnd: 4,
+              valueStart: 6,
+              valueEnd: 6,
+            },
+            typeInfo: {
+              type: "boolean",
+              enumValues: ["true", "false"],
+            },
+          },
+        ],
+      },
+    ];
+    const html = getPropertiesHtml(makeWebview(), extensionUri, groups, "Node");
+    expect(html).toContain("edit-checkbox");
+    expect(html).toContain("indeterminate");
+    expect(html).not.toContain(" checked");
   });
 });
