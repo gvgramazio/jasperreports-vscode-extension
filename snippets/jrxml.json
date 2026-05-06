@@ -314,6 +314,13 @@
       "</element>"
     ]
   },
+  "Break": {
+    "prefix": "break",
+    "description": "<element kind=\"break\">",
+    "body": [
+      "<element kind=\"break\" x=\"0\" y=\"${1:0}\" width=\"${2:100}\" height=\"1\"/>"
+    ]
+  },
 
   "Expression": {
     "prefix": "expression",

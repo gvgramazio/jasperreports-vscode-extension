@@ -34,7 +34,7 @@ The extension automatically activates the XML extension when needed and prompts 
 - **Data model** — `field`, `fieldDesc`, `parameter`, `parameterDefault`, `variable`, `sortField`, `query`, `property`
 - **Styles** — `style`, `styleDefault`, `conditionalStyle`
 - **Sections** — `title`, `pageHeader`, `columnHeader`, `detail`, `columnFooter`, `pageFooter`, `lastPageFooter`, `summary`, `noData`, `background`, `band`, `group`
-- **Report elements** (JR 7.0.6 `<element kind="...">` format) — `textField`, `staticText`, `image`, `line`, `rectangle`, `ellipse`, `frame`, `subreport`, `chart`, `crosstab`, `component`, `elementGroup`, `generic`
+- **Report elements** (JR 7.0.6 `<element kind="...">` format) — `textField`, `staticText`, `image`, `line`, `rectangle`, `ellipse`, `frame`, `subreport`, `chart`, `crosstab`, `component`, `elementGroup`, `generic`, `break`
 - **Common children** — `expression`, `text`, `box`
 - **Expression references** — `$F{}`, `$P{}`, `$V{}`, `$R{}`
 

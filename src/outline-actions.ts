@@ -34,6 +34,9 @@ const ELEMENT_KIND_TEMPLATES: Record<string, (name: string) => string> = {
     `      <element kind="ellipse" x="0" y="0" width="100" height="20"/>\n`,
   frame: () =>
     `      <element kind="frame" x="0" y="0" width="100" height="20"/>\n`,
+  break: () =>
+    `      <element kind="break" x="0" y="0" width="100" height="1"/>\n`,
+  elementGroup: () => `      <element kind="elementGroup">\n      </element>\n`,
 };
 
 interface AddableChild {
@@ -62,6 +65,8 @@ const ADD_CHILDREN_MAP: Record<string, AddableChild[]> = {
     { label: "Rectangle", kind: "element:rectangle", needsName: false },
     { label: "Ellipse", kind: "element:ellipse", needsName: false },
     { label: "Frame", kind: "element:frame", needsName: false },
+    { label: "Break", kind: "element:break", needsName: false },
+    { label: "Element Group", kind: "element:elementGroup", needsName: false },
   ],
   group: [
     { label: "Group Header", kind: "groupHeader", needsName: false },
