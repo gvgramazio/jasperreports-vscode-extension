@@ -104,7 +104,7 @@ A dedicated activity bar panel showing the structure of the active `.jrxml` file
 
 A webview panel below the Report Outline showing detailed properties for the selected tree item.
 
-- **Attributes** — all element attributes in a tabular view, **editable inline** (blur or Enter commits, Escape reverts); `uuid` is read-only
+- **Attributes** — all element attributes in a tabular view, **editable inline** (blur or Enter commits, Escape reverts); enum attributes use dropdown selectors; `uuid` is read-only
 - **Expressions** — expression content (e.g. `textFieldExpression`, `imageExpression`) displayed with CDATA text
 - **Style** — referenced style name
 - **Box & Pen** — border and line properties including per-side pen attributes
@@ -126,7 +126,7 @@ Context menu actions available on tree items:
 
 - **Dirty indicator** — a left border accent appears while you are typing an uncommitted change
 - **Applied indicator** — a subtle background tint marks values that have been applied but not yet saved to disk
-- **Input validation** — attributes with known types (integer, decimal, boolean, color, enum) are validated as you type; invalid values are highlighted with an error border
+- **Input validation** — attributes with known types (integer, decimal, boolean, color) are validated as you type; invalid values are highlighted with an error border
 
 ## Installation
 

@@ -1,6 +1,6 @@
 import * as crypto from "crypto";
 import * as vscode from "vscode";
-import { PropertyGroup } from "./formatNode";
+import { PropertyEntry, PropertyGroup } from "./formatNode";
 
 export function getPropertiesHtml(
   webview: vscode.Webview,
@@ -73,6 +73,22 @@ export function getPropertiesHtml(
     .edit-input.invalid {
       border-color: var(--vscode-inputValidation-errorBorder);
     }
+    .edit-select {
+      width: 100%;
+      box-sizing: border-box;
+      background: var(--vscode-input-background);
+      color: var(--vscode-input-foreground);
+      border: 1px solid var(--vscode-input-border, transparent);
+      padding: 2px 4px;
+      font-family: var(--vscode-editor-font-family, monospace);
+      font-size: var(--vscode-font-size);
+    }
+    .edit-select:focus {
+      outline: 1px solid var(--vscode-focusBorder);
+    }
+    .edit-select.applied {
+      background-color: var(--vscode-diffEditor-insertedTextBackground);
+    }
     .stale-overlay {
       display: none;
       position: fixed;
@@ -115,15 +131,16 @@ export function getPropertiesHtml(
 function renderGroup(group: PropertyGroup): string {
   const rows = group.entries
     .map((e) => {
-      const valueCell =
-        e.editable && e.attributePosition
-          ? `<vscode-table-cell class="value-cell">
-              <input class="edit-input" type="text"
-                value="${escapeHtml(e.value)}"
-                data-attr="${escapeHtml(e.name)}"
-                data-pos="${escapeHtml(JSON.stringify(e.attributePosition))}"${e.typeInfo ? ` data-type="${escapeHtml(e.typeInfo.type)}"` : ""}${e.typeInfo?.enumValues ? ` data-enum="${escapeHtml(JSON.stringify(e.typeInfo.enumValues))}"` : ""} />
-            </vscode-table-cell>`
-          : `<vscode-table-cell class="value-cell">${escapeHtml(e.value)}</vscode-table-cell>`;
+      let valueCell: string;
+      if (e.editable && e.attributePosition) {
+        if (e.typeInfo?.type === "enum" && e.typeInfo.enumValues) {
+          valueCell = renderEnumCell(e);
+        } else {
+          valueCell = renderInputCell(e);
+        }
+      } else {
+        valueCell = `<vscode-table-cell class="value-cell">${escapeHtml(e.value)}</vscode-table-cell>`;
+      }
 
       return `<vscode-table-row>
           <vscode-table-cell>${escapeHtml(e.name)}</vscode-table-cell>
@@ -143,6 +160,34 @@ function renderGroup(group: PropertyGroup): string {
     </vscode-table-body>
   </vscode-table>
 </vscode-collapsible>`;
+}
+
+function renderInputCell(e: PropertyEntry): string {
+  return `<vscode-table-cell class="value-cell">
+              <input class="edit-input" type="text"
+                value="${escapeHtml(e.value)}"
+                data-attr="${escapeHtml(e.name)}"
+                data-pos="${escapeHtml(JSON.stringify(e.attributePosition))}"${e.typeInfo ? ` data-type="${escapeHtml(e.typeInfo.type)}"` : ""}${e.typeInfo?.enumValues ? ` data-enum="${escapeHtml(JSON.stringify(e.typeInfo.enumValues))}"` : ""} />
+            </vscode-table-cell>`;
+}
+
+function renderEnumCell(e: PropertyEntry): string {
+  const values = e.typeInfo!.enumValues!;
+  const options = values
+    .map(
+      (v) =>
+        `<option value="${escapeHtml(v)}"${v === e.value ? " selected" : ""}>${escapeHtml(v)}</option>`,
+    )
+    .join("");
+  const blankSelected = !values.includes(e.value) ? " selected" : "";
+  return `<vscode-table-cell class="value-cell">
+              <select class="edit-select"
+                data-attr="${escapeHtml(e.name)}"
+                data-pos="${escapeHtml(JSON.stringify(e.attributePosition))}">
+                <option value=""${blankSelected}>\u2014</option>
+                ${options}
+              </select>
+            </vscode-table-cell>`;
 }
 
 function escapeHtml(text: string): string {
