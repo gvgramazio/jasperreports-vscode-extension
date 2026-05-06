@@ -72,15 +72,59 @@ function setupEditListeners(): void {
     });
 
   document
+    .querySelectorAll<HTMLInputElement>(".edit-color")
+    .forEach((picker) => {
+      const textInput = picker
+        .closest(".color-wrapper")
+        ?.querySelector<HTMLInputElement>(".edit-input");
+      if (!textInput) return;
+
+      const originalValue = textInput.value;
+
+      picker.addEventListener("input", () => {
+        textInput.value = picker.value;
+        textInput.classList.toggle("dirty", textInput.value !== originalValue);
+        textInput.classList.remove("applied", "invalid");
+      });
+
+      picker.addEventListener("change", () => {
+        const attr = picker.dataset.attr;
+        const posJson = picker.dataset.pos;
+        if (!attr || !posJson) return;
+
+        try {
+          const attributePosition = JSON.parse(posJson);
+          vscode.postMessage({
+            type: "edit",
+            attribute: attr,
+            value: picker.value,
+            attributePosition,
+          });
+          textInput.classList.remove("dirty");
+          textInput.classList.add("applied");
+          picker.classList.add("applied");
+        } catch {
+          // ignore parse errors
+        }
+      });
+    });
+
+  document
     .querySelectorAll<HTMLInputElement>(".edit-input")
     .forEach((input) => {
       const originalValue = input.value;
+      const colorPicker = input
+        .closest(".color-wrapper")
+        ?.querySelector<HTMLInputElement>(".edit-color");
 
       input.addEventListener("input", () => {
         const isDirty = input.value !== originalValue;
         input.classList.toggle("dirty", isDirty);
         input.classList.remove("applied");
         input.classList.toggle("invalid", !validateValue(input));
+        if (colorPicker && /^#[0-9a-fA-F]{6}$/.test(input.value)) {
+          colorPicker.value = input.value;
+        }
       });
 
       const commit = () => {
@@ -106,6 +150,10 @@ function setupEditListeners(): void {
           });
           input.classList.remove("dirty");
           input.classList.add("applied");
+          if (colorPicker && /^#[0-9a-fA-F]{6}$/.test(newValue)) {
+            colorPicker.value = newValue;
+            colorPicker.classList.add("applied");
+          }
         } catch {
           // ignore parse errors
         }
