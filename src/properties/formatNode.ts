@@ -11,6 +11,8 @@ export interface PropertyEntry {
   typeInfo?: AttributeTypeInfo;
   /** True when the attribute exists in the file. */
   present?: boolean;
+  /** True for expression entries (edited via expressionEdit messages). */
+  isExpression?: boolean;
 }
 
 export interface PropertyGroup {
@@ -81,6 +83,8 @@ function formatWithModel(node: JrxmlNode, def: ElementDef): PropertyGroup[] {
         name: expr.tag,
         value: text,
         present: !!child,
+        editable: true,
+        isExpression: true,
       });
     }
     groups.push({ label: "Expressions", entries: exprEntries });

@@ -158,7 +158,7 @@ function setupEditListeners(): void {
     });
 
   document
-    .querySelectorAll<HTMLInputElement>(".edit-input")
+    .querySelectorAll<HTMLInputElement>(".edit-input:not(.edit-expression)")
     .forEach((input) => {
       const originalValue = input.value;
       const colorPicker = input
@@ -215,6 +215,49 @@ function setupEditListeners(): void {
         } else if (e.key === "Escape") {
           input.value = originalValue;
           input.classList.remove("dirty", "applied", "invalid");
+          input.blur();
+        }
+      });
+    });
+
+  // Expression inputs: inline editing for expression child elements
+  document
+    .querySelectorAll<HTMLInputElement>(".edit-expression")
+    .forEach((input) => {
+      const originalValue = input.value;
+
+      input.addEventListener("input", () => {
+        input.classList.toggle("dirty", input.value !== originalValue);
+        input.classList.remove("applied");
+      });
+
+      const commit = () => {
+        const newValue = input.value;
+        if (newValue === originalValue) {
+          input.classList.remove("dirty");
+          return;
+        }
+
+        const exprTag = input.dataset.exprTag;
+        if (!exprTag) return;
+
+        vscode.postMessage({
+          type: "expressionEdit",
+          expressionTag: exprTag,
+          value: newValue,
+        });
+        input.classList.remove("dirty");
+        input.classList.add("applied");
+      };
+
+      input.addEventListener("blur", commit);
+      input.addEventListener("keydown", (e: KeyboardEvent) => {
+        if (e.key === "Enter") {
+          e.preventDefault();
+          commit();
+        } else if (e.key === "Escape") {
+          input.value = originalValue;
+          input.classList.remove("dirty", "applied");
           input.blur();
         }
       });

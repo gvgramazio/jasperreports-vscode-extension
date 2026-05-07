@@ -2,7 +2,12 @@ import * as vscode from "vscode";
 import { JrxmlNode, parseJrxml } from "../jrxml-parser";
 import { formatNodeProperties } from "./formatNode";
 import { getPropertiesHtml } from "./getPropertiesHtml";
-import { handleEditMessage, EditMessage } from "./editHandler";
+import {
+  handleEditMessage,
+  EditMessage,
+  handleExpressionEdit,
+  ExpressionEditMessage,
+} from "./editHandler";
 
 interface NodeIdentity {
   tag: string;
@@ -36,13 +41,32 @@ export class PropertiesViewProvider implements vscode.WebviewViewProvider {
     };
 
     webviewView.webview.onDidReceiveMessage(
-      async (message: EditMessage | { type: "refresh" }) => {
+      async (
+        message: EditMessage | ExpressionEditMessage | { type: "refresh" },
+      ) => {
         if (message.type === "edit") {
           this._editInProgress = true;
           try {
             const success = await handleEditMessage(message);
             if (success) {
               this.reParseAndRefresh();
+            }
+          } finally {
+            this._editInProgress = false;
+          }
+        } else if (message.type === "expressionEdit") {
+          this._editInProgress = true;
+          try {
+            const node = this.findCurrentNode();
+            if (node) {
+              const success = await handleExpressionEdit(
+                node,
+                message.expressionTag,
+                message.value,
+              );
+              if (success) {
+                this.reParseAndRefresh();
+              }
             }
           } finally {
             this._editInProgress = false;
@@ -105,6 +129,15 @@ export class PropertiesViewProvider implements vscode.WebviewViewProvider {
         this._currentNodeId.label,
       );
     }
+  }
+
+  private findCurrentNode(): JrxmlNode | null {
+    if (!this._currentNodeId) return null;
+    const editor = vscode.window.activeTextEditor;
+    if (!editor) return null;
+    const doc = parseJrxml(editor.document.getText());
+    if (!doc.root) return null;
+    return findNodeByIdentity(doc.root, this._currentNodeId);
   }
 
   private showEmpty(): void {

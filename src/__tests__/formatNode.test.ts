@@ -264,6 +264,36 @@ describe("formatNodeProperties — model-driven", () => {
     expect(absentExpr!.present).toBe(false);
   });
 
+  it("marks expressions as editable with isExpression flag", () => {
+    const node = makeNode({
+      tag: "element",
+      attributes: { kind: "textField" },
+      children: [makeNode({ tag: "expression", text: "$F{name}" })],
+    });
+    const groups = formatNodeProperties(node);
+    const exprGroup = groups.find((g) => g.label === "Expressions")!;
+
+    for (const entry of exprGroup.entries) {
+      expect(entry.editable).toBe(true);
+      expect(entry.isExpression).toBe(true);
+    }
+  });
+
+  it("marks absent expressions as editable with isExpression flag", () => {
+    const node = makeNode({
+      tag: "element",
+      attributes: { kind: "textField" },
+    });
+    const groups = formatNodeProperties(node);
+    const exprGroup = groups.find((g) => g.label === "Expressions")!;
+    const absentExpr = exprGroup.entries.find(
+      (e) => e.name === "patternExpression",
+    );
+    expect(absentExpr!.editable).toBe(true);
+    expect(absentExpr!.isExpression).toBe(true);
+    expect(absentExpr!.present).toBe(false);
+  });
+
   it("marks uuid as read-only in model-driven mode", () => {
     const node = makeNode({
       tag: "element",
