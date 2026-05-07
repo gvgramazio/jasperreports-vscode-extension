@@ -16,3 +16,6 @@ export {
   getRegistrySize,
   clearRegistry,
 } from "./registry";
+
+// Importing elements triggers self-registration of all element definitions.
+export * from "./elements";
