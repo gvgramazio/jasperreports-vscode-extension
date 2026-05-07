@@ -1,6 +1,10 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import * as vscode from "vscode";
-import { addElement, deleteElement } from "../outline-actions";
+import {
+  addElement,
+  deleteElement,
+  duplicateElement,
+} from "../outline-actions";
 import { OutlineItem } from "../outline";
 import { JrxmlNode } from "../jrxml-parser";
 
@@ -727,5 +731,101 @@ describe("addElement — template and edge coverage", () => {
 
     // Falls through to last-resort insert at line 1
     expect(vscode.workspace.applyEdit).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe("duplicateElement", () => {
+  it("does nothing when item has no node", async () => {
+    const item = new OutlineItem("Fields", "group-fields" as never, null, []);
+    setupEditor("<jasperReport/>");
+
+    await duplicateElement(item);
+
+    expect(vscode.workspace.applyEdit).not.toHaveBeenCalled();
+  });
+
+  it("does nothing when no active editor", async () => {
+    const node = makeNode({
+      tag: "field",
+      attributes: { name: "f1" },
+      position: { startLine: 2, startColumn: 1, endLine: 2, endColumn: 40 },
+    });
+    const item = new OutlineItem("f1", "field", node, []);
+
+    await duplicateElement(item);
+
+    expect(vscode.workspace.applyEdit).not.toHaveBeenCalled();
+  });
+
+  it("duplicates a named field with _copy suffix", async () => {
+    const node = makeNode({
+      tag: "field",
+      attributes: { name: "myField", class: "java.lang.String" },
+      position: { startLine: 2, startColumn: 1, endLine: 2, endColumn: 50 },
+    });
+    const item = new OutlineItem("myField", "field", node, [], "String");
+    setupEditor(
+      '<jasperReport>\n  <field name="myField" class="java.lang.String"/>\n</jasperReport>',
+    );
+
+    await duplicateElement(item);
+
+    expect(vscode.workspace.applyEdit).toHaveBeenCalledTimes(1);
+    const editArg = (vscode.workspace.applyEdit as ReturnType<typeof vi.fn>)
+      .mock.calls[0][0];
+    const entries = editArg.entries();
+    const [, edits] = entries[0];
+    expect(edits[0].newText).toContain('name="myField_copy"');
+    expect(edits[0].position).toBeDefined();
+    expect(edits[0].position!.line).toBe(2);
+  });
+
+  it("replaces uuid with a new value", async () => {
+    const node = makeNode({
+      tag: "element",
+      attributes: {
+        kind: "textField",
+        uuid: "aaaa-bbbb-cccc",
+        x: "0",
+        y: "0",
+      },
+      position: { startLine: 4, startColumn: 1, endLine: 4, endColumn: 80 },
+    });
+    const item = new OutlineItem("textField", "element", node, []);
+    setupEditor(
+      '<jasperReport>\n  <detail>\n    <band>\n      <element kind="textField" uuid="aaaa-bbbb-cccc" x="0" y="0"/>\n    </band>\n  </detail>\n</jasperReport>',
+    );
+
+    await duplicateElement(item);
+
+    expect(vscode.workspace.applyEdit).toHaveBeenCalledTimes(1);
+    const editArg = (vscode.workspace.applyEdit as ReturnType<typeof vi.fn>)
+      .mock.calls[0][0];
+    const entries = editArg.entries();
+    const [, edits] = entries[0];
+    // UUID should be replaced (not the original)
+    expect(edits[0].newText).not.toContain('uuid="aaaa-bbbb-cccc"');
+    expect(edits[0].newText).toMatch(/uuid="[0-9a-f-]+"/);
+  });
+
+  it("does not add _copy suffix for non-named kinds", async () => {
+    const node = makeNode({
+      tag: "element",
+      attributes: { kind: "line", x: "0", y: "0" },
+      position: { startLine: 4, startColumn: 1, endLine: 4, endColumn: 60 },
+    });
+    const item = new OutlineItem("line", "element", node, []);
+    setupEditor(
+      '<jasperReport>\n  <detail>\n    <band>\n      <element kind="line" x="0" y="0"/>\n    </band>\n  </detail>\n</jasperReport>',
+    );
+
+    await duplicateElement(item);
+
+    expect(vscode.workspace.applyEdit).toHaveBeenCalledTimes(1);
+    const editArg = (vscode.workspace.applyEdit as ReturnType<typeof vi.fn>)
+      .mock.calls[0][0];
+    const entries = editArg.entries();
+    const [, edits] = entries[0];
+    expect(edits[0].newText).not.toContain("_copy");
   });
 });

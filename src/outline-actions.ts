@@ -1,3 +1,4 @@
+import * as crypto from "crypto";
 import * as vscode from "vscode";
 import { OutlineItem, nodeToFullLineRange } from "./outline";
 import { NodePosition, parseJrxml } from "./jrxml-parser";
@@ -184,6 +185,37 @@ export async function deleteElement(item: OutlineItem): Promise<void> {
   const range = nodeToFullLineRange(editor.document, item.node.position);
   const edit = new vscode.WorkspaceEdit();
   edit.delete(editor.document.uri, range);
+  await vscode.workspace.applyEdit(edit);
+}
+
+export async function duplicateElement(item: OutlineItem): Promise<void> {
+  if (!item.node?.position) return;
+
+  const editor = vscode.window.activeTextEditor;
+  if (!editor) return;
+
+  const range = nodeToFullLineRange(editor.document, item.node.position);
+  let text = editor.document.getText(range);
+
+  // Replace all uuid attributes with new UUIDs
+  text = text.replace(/uuid="[^"]*"/g, () => `uuid="${crypto.randomUUID()}"`);
+
+  // Append _copy to name attribute (first occurrence only) for named items
+  const namedKinds = new Set([
+    "style",
+    "parameter",
+    "field",
+    "variable",
+    "sortField",
+    "group",
+  ]);
+  if (namedKinds.has(item.kind)) {
+    text = text.replace(/name="([^"]*)"/, (_, name) => `name="${name}_copy"`);
+  }
+
+  const insertPos = new vscode.Position(item.node.position.endLine, 0);
+  const edit = new vscode.WorkspaceEdit();
+  edit.insert(editor.document.uri, insertPos, text);
   await vscode.workspace.applyEdit(edit);
 }
 

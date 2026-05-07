@@ -147,6 +147,12 @@
         "title": "Delete Element",
         "category": "JasperReports",
         "icon": "$(trash)"
+      },
+      {
+        "command": "jasperreports.outline.duplicate",
+        "title": "Duplicate Element",
+        "category": "JasperReports",
+        "icon": "$(copy)"
       }
     ],
     "menus": {
@@ -178,6 +184,10 @@
         {
           "command": "jasperreports.outline.delete",
           "when": "false"
+        },
+        {
+          "command": "jasperreports.outline.duplicate",
+          "when": "false"
         }
       ],
       "view/item/context": [
@@ -189,6 +199,11 @@
         {
           "command": "jasperreports.outline.delete",
           "when": "view == jasperreports-outline && viewItem =~ /^(style|parameter|field|variable|sortField|group|groupHeader|groupFooter|section|band|element)$/",
+          "group": "inline"
+        },
+        {
+          "command": "jasperreports.outline.duplicate",
+          "when": "view == jasperreports-outline && viewItem =~ /^(style|parameter|field|variable|sortField|group|band|element)$/",
           "group": "inline"
         }
       ]
