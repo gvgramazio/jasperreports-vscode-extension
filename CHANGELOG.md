@@ -1,3 +1,12 @@
+# [1.12.0](https://github.com/gvgramazio/jasperreports-vscode-extension/compare/v1.11.0...v1.12.0) (2026-05-07)
+
+
+### Features
+
+* **outline:** add "Add Section..." action node ([#37](https://github.com/gvgramazio/jasperreports-vscode-extension/issues/37)) ([d31617b](https://github.com/gvgramazio/jasperreports-vscode-extension/commit/d31617b49331bebceb3e17924262e1b907fbe1fd))
+* **outline:** add duplicate element action ([#38](https://github.com/gvgramazio/jasperreports-vscode-extension/issues/38)) ([fe6a482](https://github.com/gvgramazio/jasperreports-vscode-extension/commit/fe6a482014718044c4f15927a37c9ebb9f3790b0))
+* replace panel icon with JasperReports mountain logo ([50c9884](https://github.com/gvgramazio/jasperreports-vscode-extension/commit/50c9884d1be803f0d38cf6dfcf6d236a694d8780))
+
 # [1.11.0](https://github.com/gvgramazio/jasperreports-vscode-extension/compare/v1.10.0...v1.11.0) (2026-05-06)
 
 
