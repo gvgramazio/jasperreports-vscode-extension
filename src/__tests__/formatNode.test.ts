@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { formatNodeProperties, PropertyGroup } from "../properties/formatNode";
+import { formatNodeProperties } from "../properties/formatNode";
 import { JrxmlNode } from "../jrxml-parser";
 // Ensure model elements are registered
 import "../model/elements";
