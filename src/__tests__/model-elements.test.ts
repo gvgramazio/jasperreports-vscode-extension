@@ -2,6 +2,7 @@ import { describe, it, expect, beforeEach } from "vitest";
 import {
   getElementDef,
   getRegistrySize,
+  registerElement,
 } from "../model/registry";
 import {
   parameterDef,
@@ -46,8 +47,6 @@ import {
 function ensureRegistered() {
   // Elements self-register on import. If cleared, re-register:
   if (getRegistrySize() === 0) {
-    // Force re-import by re-registering all defs
-    const { registerElement } = require("../model/registry");
     [
       parameterDef,
       fieldDef,
