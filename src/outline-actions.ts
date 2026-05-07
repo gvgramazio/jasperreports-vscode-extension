@@ -1,32 +1,16 @@
 import * as crypto from "crypto";
 import * as vscode from "vscode";
 import { OutlineItem, nodeToFullLineRange } from "./outline";
-import { SECTION_LABELS, SECTION_TAGS } from "./outline-types";
+import { SECTION_LABELS, SECTION_TAGS, tagToLabel } from "./outline-types";
 import { NodePosition, parseJrxml } from "./jrxml-parser";
+import { getElementDef, getAllElementDefs, jasperReportDef } from "./model";
 
 /**
  * Canonical ordering of child elements under <jasperReport>,
- * matching the XSD xs:sequence.
+ * derived from the jasperReport model definition.
  */
-export const JRXML_ELEMENT_ORDER = [
-  "style",
-  "parameter",
-  "query",
-  "field",
-  "sortField",
-  "variable",
-  "group",
-  "background",
-  "title",
-  "pageHeader",
-  "columnHeader",
-  "detail",
-  "columnFooter",
-  "pageFooter",
-  "lastPageFooter",
-  "summary",
-  "noData",
-] as const;
+export const JRXML_ELEMENT_ORDER: readonly string[] =
+  jasperReportDef.children.map((c) => c.tag);
 
 /** Map outline group kinds to their JRXML tag name. */
 const GROUP_KIND_TO_TAG: Record<string, string> = {
@@ -38,55 +22,75 @@ const GROUP_KIND_TO_TAG: Record<string, string> = {
   "group-groups": "group",
 };
 
-const ELEMENT_TEMPLATES: Record<string, (name: string) => string> = {
-  field: (name) => `  <field name="${name}" class="java.lang.String"/>\n`,
-  parameter: (name) =>
-    `  <parameter name="${name}" class="java.lang.String"/>\n`,
-  variable: (name) =>
-    `  <variable name="${name}" class="java.lang.Integer" calculation="Nothing">\n    <initialValueExpression><![CDATA[0]]></initialValueExpression>\n  </variable>\n`,
-  sortField: (name) => `  <sortField name="${name}"/>\n`,
-  group: (name) =>
-    `  <group name="${name}">\n    <groupHeader>\n      <band height="20"/>\n    </groupHeader>\n    <groupFooter>\n      <band height="20"/>\n    </groupFooter>\n  </group>\n`,
-  style: (name) => `  <style name="${name}"/>\n`,
-  band: () => `    <band height="20"/>\n`,
-  groupHeader: () =>
-    `    <groupHeader>\n      <band height="20"/>\n    </groupHeader>\n`,
-  groupFooter: () =>
-    `    <groupFooter>\n      <band height="20"/>\n    </groupFooter>\n`,
+/** Default band heights for section templates. */
+const SECTION_BAND_HEIGHTS: Record<string, number> = {
+  title: 50,
+  summary: 50,
+  noData: 50,
+  background: 50,
 };
+const DEFAULT_BAND_HEIGHT = 30;
 
-const SECTION_TEMPLATES: Record<string, string> = {
-  title: `  <title>\n    <band height="50"/>\n  </title>\n`,
-  pageHeader: `  <pageHeader>\n    <band height="30"/>\n  </pageHeader>\n`,
-  columnHeader: `  <columnHeader>\n    <band height="30"/>\n  </columnHeader>\n`,
-  detail: `  <detail>\n    <band height="30"/>\n  </detail>\n`,
-  columnFooter: `  <columnFooter>\n    <band height="30"/>\n  </columnFooter>\n`,
-  pageFooter: `  <pageFooter>\n    <band height="30"/>\n  </pageFooter>\n`,
-  lastPageFooter: `  <lastPageFooter>\n    <band height="30"/>\n  </lastPageFooter>\n`,
-  summary: `  <summary>\n    <band height="50"/>\n  </summary>\n`,
-  noData: `  <noData>\n    <band height="50"/>\n  </noData>\n`,
-  background: `  <background>\n    <band height="50"/>\n  </background>\n`,
-};
+/**
+ * Generate XML for a new element based on its model definition.
+ * Includes required attributes with defaults and commonly needed attributes.
+ */
+export function generateElementXml(
+  tag: string,
+  kind?: string,
+  name?: string,
+): string {
+  // Section wrapper elements (title, pageHeader, etc.)
+  if (SECTION_TAGS.includes(tag)) {
+    const h = SECTION_BAND_HEIGHTS[tag] ?? DEFAULT_BAND_HEIGHT;
+    return `  <${tag}>\n    <band height="${h}"/>\n  </${tag}>\n`;
+  }
 
-const ELEMENT_KIND_TEMPLATES: Record<string, (name: string) => string> = {
-  textField: () =>
-    `      <element kind="textField" x="0" y="0" width="100" height="20"/>\n`,
-  staticText: () =>
-    `      <element kind="staticText" x="0" y="0" width="100" height="20"/>\n`,
-  image: () =>
-    `      <element kind="image" x="0" y="0" width="100" height="20"/>\n`,
-  line: () =>
-    `      <element kind="line" x="0" y="0" width="100" height="1"/>\n`,
-  rectangle: () =>
-    `      <element kind="rectangle" x="0" y="0" width="100" height="20"/>\n`,
-  ellipse: () =>
-    `      <element kind="ellipse" x="0" y="0" width="100" height="20"/>\n`,
-  frame: () =>
-    `      <element kind="frame" x="0" y="0" width="100" height="20"/>\n`,
-  break: () =>
-    `      <element kind="break" x="0" y="0" width="100" height="1"/>\n`,
-  elementGroup: () => `      <element kind="elementGroup">\n      </element>\n`,
-};
+  // Group structure wrapper elements (not in registry)
+  if (tag === "groupHeader" || tag === "groupFooter") {
+    return `    <${tag}>\n      <band height="20"/>\n    </${tag}>\n`;
+  }
+
+  const def = getElementDef(tag, kind);
+  if (!def) return "";
+
+  // Build attribute string
+  const attrs: string[] = [];
+  if (kind) attrs.push(`kind="${kind}"`);
+  for (const group of def.attributeGroups) {
+    for (const attr of group.attributes) {
+      if (attr.name === "name") {
+        if (name) attrs.push(`name="${name}"`);
+        continue;
+      }
+      // Skip uuid — auto-generated at runtime
+      if (attr.name === "uuid") continue;
+      // Include required attrs that have defaults, plus width/height always
+      if (attr.defaultValue !== undefined && attr.required) {
+        attrs.push(`${attr.name}="${attr.defaultValue}"`);
+      }
+    }
+  }
+  const attrStr = attrs.length > 0 ? " " + attrs.join(" ") : "";
+  const indent = kind ? "      " : "  ";
+
+  // Container elements that need content (elementGroup)
+  if (kind === "elementGroup") {
+    return `${indent}<${tag}${attrStr}>\n${indent}</${tag}>\n`;
+  }
+
+  // Group element gets default header/footer structure
+  if (tag === "group" && !kind) {
+    return `${indent}<${tag}${attrStr}>\n    <groupHeader>\n      <band height="20"/>\n    </groupHeader>\n    <groupFooter>\n      <band height="20"/>\n    </groupFooter>\n  </${tag}>\n`;
+  }
+
+  // Band element uses a practical default height
+  if (tag === "band") {
+    return `${indent}  <band height="20"/>\n`;
+  }
+
+  return `${indent}<${tag}${attrStr}/>\n`;
+}
 
 interface AddableChild {
   label: string;
@@ -94,37 +98,53 @@ interface AddableChild {
   needsName: boolean;
 }
 
-const ADD_CHILDREN_MAP: Record<string, AddableChild[]> = {
-  "group-fields": [{ label: "Field", kind: "field", needsName: true }],
-  "group-parameters": [
-    { label: "Parameter", kind: "parameter", needsName: true },
-  ],
-  "group-variables": [{ label: "Variable", kind: "variable", needsName: true }],
-  "group-sortFields": [
-    { label: "Sort Field", kind: "sortField", needsName: true },
-  ],
-  "group-groups": [{ label: "Group", kind: "group", needsName: true }],
-  "group-styles": [{ label: "Style", kind: "style", needsName: true }],
-  section: [{ label: "Band", kind: "band", needsName: false }],
-  band: [
-    { label: "Text Field", kind: "element:textField", needsName: false },
-    { label: "Static Text", kind: "element:staticText", needsName: false },
-    { label: "Image", kind: "element:image", needsName: false },
-    { label: "Line", kind: "element:line", needsName: false },
-    { label: "Rectangle", kind: "element:rectangle", needsName: false },
-    { label: "Ellipse", kind: "element:ellipse", needsName: false },
-    { label: "Frame", kind: "element:frame", needsName: false },
-    { label: "Break", kind: "element:break", needsName: false },
-    { label: "Element Group", kind: "element:elementGroup", needsName: false },
-  ],
-  group: [
-    { label: "Group Header", kind: "groupHeader", needsName: false },
-    { label: "Group Footer", kind: "groupFooter", needsName: false },
-  ],
-};
+/**
+ * Determine addable children for an outline item based on the element model.
+ */
+function getAddableChildren(itemKind: string): AddableChild[] {
+  // Group containers (Fields, Parameters, etc.) → single child type
+  const groupTag = GROUP_KIND_TO_TAG[itemKind];
+  if (groupTag) {
+    const def = getElementDef(groupTag);
+    if (!def) return [];
+    const needsName = def.attributeGroups.some((g) =>
+      g.attributes.some((a) => a.name === "name" && a.required),
+    );
+    return [{ label: def.label, kind: groupTag, needsName }];
+  }
+
+  // Section → add band
+  if (itemKind === "section") {
+    return [{ label: "Band", kind: "band", needsName: false }];
+  }
+
+  // Band → add visual elements
+  if (itemKind === "band") {
+    return getAllElementDefs()
+      .filter((d) => d.tag === "element" && d.kind !== undefined)
+      .map((d) => ({
+        label: d.label,
+        kind: `element:${d.kind}`,
+        needsName: false,
+      }));
+  }
+
+  // Group → add groupHeader / groupFooter
+  if (itemKind === "group") {
+    const def = getElementDef("group");
+    if (!def) return [];
+    return def.children.map((c) => ({
+      label: tagToLabel(c.tag),
+      kind: c.tag,
+      needsName: false,
+    }));
+  }
+
+  return [];
+}
 
 export async function addElement(item: OutlineItem): Promise<void> {
-  const children = ADD_CHILDREN_MAP[item.kind];
+  const children = getAddableChildren(item.kind);
   if (!children || children.length === 0) return;
 
   let selected: AddableChild;
@@ -157,14 +177,11 @@ export async function addElement(item: OutlineItem): Promise<void> {
   let xml: string;
   if (selected.kind.startsWith("element:")) {
     const elementKind = selected.kind.split(":")[1];
-    const tpl = ELEMENT_KIND_TEMPLATES[elementKind];
-    if (!tpl) return;
-    xml = tpl(name);
+    xml = generateElementXml("element", elementKind, name || undefined);
   } else {
-    const tpl = ELEMENT_TEMPLATES[selected.kind];
-    if (!tpl) return;
-    xml = tpl(name);
+    xml = generateElementXml(selected.kind, undefined, name || undefined);
   }
+  if (!xml) return;
 
   const edit = new vscode.WorkspaceEdit();
 
@@ -253,7 +270,7 @@ export async function addSection(): Promise<void> {
   );
   if (!picked) return;
 
-  const xml = SECTION_TEMPLATES[picked.tag];
+  const xml = generateElementXml(picked.tag);
   if (!xml) return;
 
   const insertPos = getOrderedInsertPosition(editor.document, picked.tag);
@@ -347,9 +364,7 @@ function getOrderedInsertPosition(
   const doc = parseJrxml(document.getText());
   if (!doc.root) return undefined;
 
-  const orderIndex = JRXML_ELEMENT_ORDER.indexOf(
-    tag as (typeof JRXML_ELEMENT_ORDER)[number],
-  );
+  const orderIndex = JRXML_ELEMENT_ORDER.indexOf(tag);
   if (orderIndex === -1) return undefined;
 
   const rootChildren = doc.root.children;

@@ -1,31 +1,31 @@
 import * as vscode from "vscode";
 import { JrxmlNode } from "./jrxml-parser";
+import { jasperReportDef } from "./model/elements/jasperReport";
 
-export const SECTION_TAGS = [
-  "title",
-  "pageHeader",
-  "columnHeader",
-  "detail",
-  "columnFooter",
-  "pageFooter",
-  "lastPageFooter",
-  "summary",
-  "noData",
-  "background",
-] as const;
+/**
+ * Convert a camelCase tag name to a human-readable label.
+ * e.g. "pageHeader" → "Page Header", "noData" → "No Data"
+ */
+export function tagToLabel(tag: string): string {
+  return tag
+    .replace(/([A-Z])/g, " $1")
+    .replace(/^./, (c) => c.toUpperCase())
+    .trim();
+}
 
-export const SECTION_LABELS: Record<string, string> = {
-  title: "Title",
-  pageHeader: "Page Header",
-  columnHeader: "Column Header",
-  detail: "Detail",
-  columnFooter: "Column Footer",
-  pageFooter: "Page Footer",
-  lastPageFooter: "Last Page Footer",
-  summary: "Summary",
-  noData: "No Data",
-  background: "Background",
-};
+/**
+ * Section tags derived from jasperReport model children.
+ * Sections are the single-occurrence band-container children.
+ */
+const NON_SECTION_SINGULAR_TAGS = new Set(["query"]);
+
+export const SECTION_TAGS: readonly string[] = jasperReportDef.children
+  .filter((c) => c.maxOccurs === 1 && !NON_SECTION_SINGULAR_TAGS.has(c.tag))
+  .map((c) => c.tag);
+
+export const SECTION_LABELS: Record<string, string> = Object.fromEntries(
+  SECTION_TAGS.map((tag) => [tag, tagToLabel(tag)]),
+);
 
 export type OutlineItemKind =
   | "root"
