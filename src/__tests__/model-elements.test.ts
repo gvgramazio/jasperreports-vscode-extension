@@ -28,6 +28,18 @@ import {
   componentDef,
   genericElementDef,
   jasperReportDef,
+  chartDatasetDef,
+  chartPlotDef,
+  chartTitleDef,
+  chartSubtitleDef,
+  chartLegendDef,
+  crosstabRowGroupDef,
+  crosstabColumnGroupDef,
+  crosstabMeasureDef,
+  crosstabCellDef,
+  whenNoDataCellDef,
+  headerCellDef,
+  bucketDef,
 } from "../model/elements";
 
 // Re-register after clearing (importing elements already registered them,
@@ -61,6 +73,18 @@ function ensureRegistered() {
       componentDef,
       genericElementDef,
       jasperReportDef,
+      chartDatasetDef,
+      chartPlotDef,
+      chartTitleDef,
+      chartSubtitleDef,
+      chartLegendDef,
+      crosstabRowGroupDef,
+      crosstabColumnGroupDef,
+      crosstabMeasureDef,
+      crosstabCellDef,
+      whenNoDataCellDef,
+      headerCellDef,
+      bucketDef,
     ].forEach((def) => registerElement(def));
   }
 }
@@ -494,12 +518,14 @@ describe("element definitions", () => {
       expect(names).toContain("horizontalPosition");
     });
 
-    it("allows rowGroup, columnGroup, measure, cell children", () => {
+    it("allows rowGroup, columnGroup, measure, cell, headerCell, whenNoDataCell children", () => {
       const tags = crosstabDef.children.map((c) => c.tag);
       expect(tags).toContain("rowGroup");
       expect(tags).toContain("columnGroup");
       expect(tags).toContain("measure");
       expect(tags).toContain("cell");
+      expect(tags).toContain("headerCell");
+      expect(tags).toContain("whenNoDataCell");
     });
   });
 
@@ -521,6 +547,274 @@ describe("element definitions", () => {
       const tags = genericElementDef.children.map((c) => c.tag);
       expect(tags).toContain("genericType");
       expect(tags).toContain("parameter");
+    });
+  });
+
+  // =============================================
+  // Step 12e: Chart & crosstab sub-elements
+  // =============================================
+
+  describe("chartDataset", () => {
+    it("has correct tag, kind, and label", () => {
+      expect(chartDatasetDef.tag).toBe("dataset");
+      expect(chartDatasetDef.kind).toBe("chart");
+      expect(chartDatasetDef.label).toBe("Chart Dataset");
+    });
+
+    it("has resetType and incrementType enum attributes", () => {
+      const attrs = chartDatasetDef.attributeGroups[0].attributes;
+      const resetType = attrs.find((a) => a.name === "resetType");
+      expect(resetType?.type).toBe("enum");
+      const incrementType = attrs.find((a) => a.name === "incrementType");
+      expect(incrementType?.type).toBe("enum");
+    });
+
+    it("has incrementWhenExpression", () => {
+      expect(chartDatasetDef.expressions).toHaveLength(1);
+      expect(chartDatasetDef.expressions[0].tag).toBe(
+        "incrementWhenExpression",
+      );
+    });
+
+    it("allows datasetRun and series children", () => {
+      const tags = chartDatasetDef.children.map((c) => c.tag);
+      expect(tags).toContain("datasetRun");
+      expect(tags).toContain("series");
+    });
+
+    it("is registered with kind 'chart'", () => {
+      const def = getElementDef("dataset", "chart");
+      expect(def).toBe(chartDatasetDef);
+    });
+  });
+
+  describe("chartPlot", () => {
+    it("has correct tag and label", () => {
+      expect(chartPlotDef.tag).toBe("plot");
+      expect(chartPlotDef.label).toBe("Chart Plot");
+      expect(chartPlotDef.kind).toBeUndefined();
+    });
+
+    it("has orientation enum and alpha attributes", () => {
+      const attrs = chartPlotDef.attributeGroups[0].attributes;
+      const orientation = attrs.find((a) => a.name === "orientation");
+      expect(orientation?.type).toBe("enum");
+      expect(attrs.find((a) => a.name === "backgroundAlpha")?.type).toBe(
+        "decimal",
+      );
+      expect(attrs.find((a) => a.name === "foregroundAlpha")?.type).toBe(
+        "decimal",
+      );
+    });
+
+    it("has axis label expressions", () => {
+      expect(chartPlotDef.expressions.length).toBeGreaterThanOrEqual(9);
+      const tags = chartPlotDef.expressions.map((e) => e.tag);
+      expect(tags).toContain("categoryAxisLabelExpression");
+      expect(tags).toContain("valueAxisLabelExpression");
+    });
+
+    it("has children for labels and colors", () => {
+      const tags = chartPlotDef.children.map((c) => c.tag);
+      expect(tags).toContain("itemLabel");
+      expect(tags).toContain("seriesColor");
+    });
+  });
+
+  describe("chartTitle", () => {
+    it("has correct tag and label", () => {
+      expect(chartTitleDef.tag).toBe("chartTitle");
+      expect(chartTitleDef.label).toBe("Chart Title");
+    });
+
+    it("has position enum and color attributes", () => {
+      const attrs = chartTitleDef.attributeGroups[0].attributes;
+      const position = attrs.find((a) => a.name === "position");
+      expect(position?.type).toBe("enum");
+      expect(attrs.find((a) => a.name === "color")?.type).toBe("color");
+    });
+
+    it("has expression and font child", () => {
+      expect(chartTitleDef.expressions).toHaveLength(1);
+      expect(chartTitleDef.children.map((c) => c.tag)).toContain("font");
+    });
+  });
+
+  describe("chartSubtitle", () => {
+    it("has correct tag and label", () => {
+      expect(chartSubtitleDef.tag).toBe("chartSubtitle");
+      expect(chartSubtitleDef.label).toBe("Chart Subtitle");
+    });
+
+    it("has same structure as chartTitle", () => {
+      expect(chartSubtitleDef.attributeGroups).toHaveLength(1);
+      expect(chartSubtitleDef.expressions).toHaveLength(1);
+      expect(chartSubtitleDef.children).toHaveLength(1);
+    });
+  });
+
+  describe("chartLegend", () => {
+    it("has correct tag and label", () => {
+      expect(chartLegendDef.tag).toBe("chartLegend");
+      expect(chartLegendDef.label).toBe("Chart Legend");
+    });
+
+    it("has same structure as chartTitle", () => {
+      expect(chartLegendDef.attributeGroups).toHaveLength(1);
+      expect(chartLegendDef.expressions).toHaveLength(1);
+      expect(chartLegendDef.children).toHaveLength(1);
+    });
+  });
+
+  describe("crosstabRowGroup", () => {
+    it("has correct tag and label", () => {
+      expect(crosstabRowGroupDef.tag).toBe("rowGroup");
+      expect(crosstabRowGroupDef.label).toBe("Row Group");
+    });
+
+    it("has name as required", () => {
+      const attrs = crosstabRowGroupDef.attributeGroups[0].attributes;
+      const name = attrs.find((a) => a.name === "name");
+      expect(name?.required).toBe(true);
+    });
+
+    it("has totalPosition and headerPosition enums", () => {
+      const attrs = crosstabRowGroupDef.attributeGroups[0].attributes;
+      expect(attrs.find((a) => a.name === "totalPosition")?.type).toBe("enum");
+      expect(attrs.find((a) => a.name === "headerPosition")?.type).toBe("enum");
+    });
+
+    it("allows bucket, header, totalHeader children", () => {
+      const tags = crosstabRowGroupDef.children.map((c) => c.tag);
+      expect(tags).toContain("bucket");
+      expect(tags).toContain("header");
+      expect(tags).toContain("totalHeader");
+    });
+  });
+
+  describe("crosstabColumnGroup", () => {
+    it("has correct tag and label", () => {
+      expect(crosstabColumnGroupDef.tag).toBe("columnGroup");
+      expect(crosstabColumnGroupDef.label).toBe("Column Group");
+    });
+
+    it("has name as required", () => {
+      const attrs = crosstabColumnGroupDef.attributeGroups[0].attributes;
+      const name = attrs.find((a) => a.name === "name");
+      expect(name?.required).toBe(true);
+    });
+
+    it("has height attribute", () => {
+      const attrs = crosstabColumnGroupDef.attributeGroups[0].attributes;
+      expect(attrs.find((a) => a.name === "height")?.type).toBe("integer");
+    });
+
+    it("allows bucket, header, totalHeader children", () => {
+      const tags = crosstabColumnGroupDef.children.map((c) => c.tag);
+      expect(tags).toContain("bucket");
+      expect(tags).toContain("header");
+      expect(tags).toContain("totalHeader");
+    });
+  });
+
+  describe("crosstabMeasure", () => {
+    it("has correct tag and label", () => {
+      expect(crosstabMeasureDef.tag).toBe("measure");
+      expect(crosstabMeasureDef.label).toBe("Measure");
+    });
+
+    it("has name as required", () => {
+      const attrs = crosstabMeasureDef.attributeGroups[0].attributes;
+      const name = attrs.find((a) => a.name === "name");
+      expect(name?.required).toBe(true);
+    });
+
+    it("has calculation and percentageOf enums", () => {
+      const attrs = crosstabMeasureDef.attributeGroups[0].attributes;
+      expect(attrs.find((a) => a.name === "calculation")?.type).toBe("enum");
+      expect(attrs.find((a) => a.name === "percentageOf")?.type).toBe("enum");
+    });
+
+    it("has expression", () => {
+      expect(crosstabMeasureDef.expressions).toHaveLength(1);
+      expect(crosstabMeasureDef.expressions[0].tag).toBe("expression");
+    });
+  });
+
+  describe("crosstabCell", () => {
+    it("has correct tag and label", () => {
+      expect(crosstabCellDef.tag).toBe("cell");
+      expect(crosstabCellDef.label).toBe("Cell");
+    });
+
+    it("has dimension and group attributes", () => {
+      const attrs = crosstabCellDef.attributeGroups[0].attributes;
+      expect(attrs.find((a) => a.name === "width")?.type).toBe("integer");
+      expect(attrs.find((a) => a.name === "height")?.type).toBe("integer");
+      expect(attrs.find((a) => a.name === "rowTotalGroup")?.type).toBe(
+        "string",
+      );
+      expect(attrs.find((a) => a.name === "columnTotalGroup")?.type).toBe(
+        "string",
+      );
+    });
+
+    it("allows contents, element, box children", () => {
+      const tags = crosstabCellDef.children.map((c) => c.tag);
+      expect(tags).toContain("contents");
+      expect(tags).toContain("element");
+      expect(tags).toContain("box");
+    });
+  });
+
+  describe("whenNoDataCell", () => {
+    it("has correct tag and label", () => {
+      expect(whenNoDataCellDef.tag).toBe("whenNoDataCell");
+      expect(whenNoDataCellDef.label).toBe("When No Data Cell");
+    });
+
+    it("has width and height", () => {
+      const attrs = whenNoDataCellDef.attributeGroups[0].attributes;
+      expect(attrs).toHaveLength(2);
+    });
+  });
+
+  describe("headerCell", () => {
+    it("has correct tag and label", () => {
+      expect(headerCellDef.tag).toBe("headerCell");
+      expect(headerCellDef.label).toBe("Header Cell");
+    });
+
+    it("allows contents, element, box children", () => {
+      const tags = headerCellDef.children.map((c) => c.tag);
+      expect(tags).toContain("contents");
+      expect(tags).toContain("element");
+      expect(tags).toContain("box");
+    });
+  });
+
+  describe("bucket", () => {
+    it("has correct tag and label", () => {
+      expect(bucketDef.tag).toBe("bucket");
+      expect(bucketDef.label).toBe("Bucket");
+    });
+
+    it("has order enum attribute", () => {
+      const attrs = bucketDef.attributeGroups[0].attributes;
+      const order = attrs.find((a) => a.name === "order");
+      expect(order?.type).toBe("enum");
+    });
+
+    it("has 3 expressions", () => {
+      expect(bucketDef.expressions).toHaveLength(3);
+      const tags = bucketDef.expressions.map((e) => e.tag);
+      expect(tags).toContain("expression");
+      expect(tags).toContain("orderByExpression");
+      expect(tags).toContain("comparatorExpression");
+    });
+
+    it("has no children", () => {
+      expect(bucketDef.children).toHaveLength(0);
     });
   });
 
@@ -657,6 +951,18 @@ describe("element definitions", () => {
         componentDef,
         genericElementDef,
         jasperReportDef,
+        chartDatasetDef,
+        chartPlotDef,
+        chartTitleDef,
+        chartSubtitleDef,
+        chartLegendDef,
+        crosstabRowGroupDef,
+        crosstabColumnGroupDef,
+        crosstabMeasureDef,
+        crosstabCellDef,
+        whenNoDataCellDef,
+        headerCellDef,
+        bucketDef,
       ];
       for (const def of allDefs) {
         expect(
@@ -691,6 +997,18 @@ describe("element definitions", () => {
         componentDef,
         genericElementDef,
         jasperReportDef,
+        chartDatasetDef,
+        chartPlotDef,
+        chartTitleDef,
+        chartSubtitleDef,
+        chartLegendDef,
+        crosstabRowGroupDef,
+        crosstabColumnGroupDef,
+        crosstabMeasureDef,
+        crosstabCellDef,
+        whenNoDataCellDef,
+        headerCellDef,
+        bucketDef,
       ];
       for (const def of allDefs) {
         for (const group of def.attributeGroups) {

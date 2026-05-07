@@ -37,5 +37,19 @@ export { crosstabDef } from "./crosstab";
 export { componentDef } from "./component";
 export { genericElementDef } from "./genericElement";
 
+// Step 12e: Chart & crosstab sub-elements
+export { chartDatasetDef } from "./chartDataset";
+export { chartPlotDef } from "./chartPlot";
+export { chartTitleDef, chartSubtitleDef, chartLegendDef } from "./chartTitle";
+export { crosstabRowGroupDef } from "./crosstabRowGroup";
+export { crosstabColumnGroupDef } from "./crosstabColumnGroup";
+export { crosstabMeasureDef } from "./crosstabMeasure";
+export {
+  crosstabCellDef,
+  whenNoDataCellDef,
+  headerCellDef,
+} from "./crosstabCell";
+export { bucketDef } from "./bucket";
+
 // Step 10: Root element
 export { jasperReportDef } from "./jasperReport";
