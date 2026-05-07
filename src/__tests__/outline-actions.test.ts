@@ -4,6 +4,7 @@ import {
   addElement,
   deleteElement,
   duplicateElement,
+  addSection,
 } from "../outline-actions";
 import { OutlineItem } from "../outline";
 import { JrxmlNode } from "../jrxml-parser";
@@ -827,5 +828,85 @@ describe("duplicateElement", () => {
     const entries = editArg.entries();
     const [, edits] = entries[0];
     expect(edits[0].newText).not.toContain("_copy");
+  });
+});
+
+describe("addSection", () => {
+  it("does nothing when no active editor", async () => {
+    await addSection();
+    expect(vscode.workspace.applyEdit).not.toHaveBeenCalled();
+  });
+
+  it("does nothing when all sections present", async () => {
+    setupEditor(
+      `<jasperReport>
+  <title><band height="50"/></title>
+  <pageHeader><band height="30"/></pageHeader>
+  <columnHeader><band height="30"/></columnHeader>
+  <detail><band height="30"/></detail>
+  <columnFooter><band height="30"/></columnFooter>
+  <pageFooter><band height="30"/></pageFooter>
+  <lastPageFooter><band height="30"/></lastPageFooter>
+  <summary><band height="50"/></summary>
+  <noData><band height="50"/></noData>
+  <background><band height="50"/></background>
+</jasperReport>`,
+    );
+
+    await addSection();
+    expect(vscode.window.showQuickPick).not.toHaveBeenCalled();
+  });
+
+  it("shows quick pick with missing sections only", async () => {
+    setupEditor(
+      '<jasperReport>\n  <title><band height="50"/></title>\n  <detail><band height="30"/></detail>\n</jasperReport>',
+    );
+    (vscode.window.showQuickPick as ReturnType<typeof vi.fn>).mockResolvedValue(
+      undefined,
+    );
+
+    await addSection();
+
+    expect(vscode.window.showQuickPick).toHaveBeenCalledTimes(1);
+    const items = (vscode.window.showQuickPick as ReturnType<typeof vi.fn>).mock
+      .calls[0][0];
+    const labels = items.map((i: { label: string }) => i.label);
+    expect(labels).not.toContain("Title");
+    expect(labels).not.toContain("Detail");
+    expect(labels).toContain("Page Header");
+    expect(labels).toContain("Summary");
+    expect(labels).toContain("Background");
+  });
+
+  it("inserts section at correct position", async () => {
+    setupEditor(
+      '<jasperReport>\n  <title><band height="50"/></title>\n  <detail><band height="30"/></detail>\n</jasperReport>',
+    );
+    (vscode.window.showQuickPick as ReturnType<typeof vi.fn>).mockResolvedValue(
+      { label: "Page Header", tag: "pageHeader" },
+    );
+
+    await addSection();
+
+    expect(vscode.workspace.applyEdit).toHaveBeenCalledTimes(1);
+    const editArg = (vscode.workspace.applyEdit as ReturnType<typeof vi.fn>)
+      .mock.calls[0][0];
+    const entries = editArg.entries();
+    const [, edits] = entries[0];
+    expect(edits[0].newText).toContain("<pageHeader>");
+    expect(edits[0].newText).toContain("<band height=");
+  });
+
+  it("does nothing when user cancels quick pick", async () => {
+    setupEditor(
+      '<jasperReport>\n  <title><band height="50"/></title>\n</jasperReport>',
+    );
+    (vscode.window.showQuickPick as ReturnType<typeof vi.fn>).mockResolvedValue(
+      undefined,
+    );
+
+    await addSection();
+
+    expect(vscode.workspace.applyEdit).not.toHaveBeenCalled();
   });
 });

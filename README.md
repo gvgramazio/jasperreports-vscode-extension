@@ -120,6 +120,7 @@ A webview panel below the Report Outline showing detailed properties for the sel
 Context menu actions available on tree items:
 
 - **Add** — right-click a group (Fields, Parameters, Variables, Sort Fields, Groups, Styles), a section, a band, or a group to add child elements; shows a QuickPick when multiple child types are available (e.g. element types for bands, groupHeader/groupFooter for groups)
+- **Add Section** — an "Add Section..." node appears at the bottom of the outline when not all sections are present; click it to pick from missing sections (Title, Page Header, Detail, etc.) and insert at the correct position
 - **Delete** — right-click any field, parameter, variable, sortField, group, groupHeader, groupFooter, section, band, element, or style to delete it (with confirmation)
 - **Duplicate** — right-click any style, parameter, field, variable, sortField, group, band, or element to duplicate it; named items get a `_copy` suffix, and `uuid` attributes are regenerated
 - **Drag & Drop Reorder** — drag sibling items within the same parent to reorder them; drop on a sibling to insert before it, or drop on the parent to move to the end

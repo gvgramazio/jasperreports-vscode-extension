@@ -1,6 +1,7 @@
 import * as crypto from "crypto";
 import * as vscode from "vscode";
 import { OutlineItem, nodeToFullLineRange } from "./outline";
+import { SECTION_LABELS, SECTION_TAGS } from "./outline-types";
 import { NodePosition, parseJrxml } from "./jrxml-parser";
 
 /**
@@ -52,6 +53,19 @@ const ELEMENT_TEMPLATES: Record<string, (name: string) => string> = {
     `    <groupHeader>\n      <band height="20"/>\n    </groupHeader>\n`,
   groupFooter: () =>
     `    <groupFooter>\n      <band height="20"/>\n    </groupFooter>\n`,
+};
+
+const SECTION_TEMPLATES: Record<string, string> = {
+  title: `  <title>\n    <band height="50"/>\n  </title>\n`,
+  pageHeader: `  <pageHeader>\n    <band height="30"/>\n  </pageHeader>\n`,
+  columnHeader: `  <columnHeader>\n    <band height="30"/>\n  </columnHeader>\n`,
+  detail: `  <detail>\n    <band height="30"/>\n  </detail>\n`,
+  columnFooter: `  <columnFooter>\n    <band height="30"/>\n  </columnFooter>\n`,
+  pageFooter: `  <pageFooter>\n    <band height="30"/>\n  </pageFooter>\n`,
+  lastPageFooter: `  <lastPageFooter>\n    <band height="30"/>\n  </lastPageFooter>\n`,
+  summary: `  <summary>\n    <band height="50"/>\n  </summary>\n`,
+  noData: `  <noData>\n    <band height="50"/>\n  </noData>\n`,
+  background: `  <background>\n    <band height="50"/>\n  </background>\n`,
 };
 
 const ELEMENT_KIND_TEMPLATES: Record<string, (name: string) => string> = {
@@ -216,6 +230,37 @@ export async function duplicateElement(item: OutlineItem): Promise<void> {
   const insertPos = new vscode.Position(item.node.position.endLine, 0);
   const edit = new vscode.WorkspaceEdit();
   edit.insert(editor.document.uri, insertPos, text);
+  await vscode.workspace.applyEdit(edit);
+}
+
+export async function addSection(): Promise<void> {
+  const editor = vscode.window.activeTextEditor;
+  if (!editor) return;
+
+  const doc = parseJrxml(editor.document.getText());
+  if (!doc.root) return;
+
+  const existingTags = new Set(doc.root.children.map((c) => c.tag));
+  const missingSections = SECTION_TAGS.filter((tag) => !existingTags.has(tag));
+  if (missingSections.length === 0) return;
+
+  const picked = await vscode.window.showQuickPick(
+    missingSections.map((tag) => ({
+      label: SECTION_LABELS[tag] || tag,
+      tag,
+    })),
+    { placeHolder: "Select section to add" },
+  );
+  if (!picked) return;
+
+  const xml = SECTION_TEMPLATES[picked.tag];
+  if (!xml) return;
+
+  const insertPos = getOrderedInsertPosition(editor.document, picked.tag);
+  if (!insertPos) return;
+
+  const edit = new vscode.WorkspaceEdit();
+  edit.insert(editor.document.uri, insertPos, xml);
   await vscode.workspace.applyEdit(edit);
 }
 
