@@ -105,11 +105,12 @@ A dedicated activity bar panel showing the structure of the active `.jrxml` file
 
 A webview panel below the Report Outline showing detailed properties for the selected tree item.
 
+- **Model-driven groups** — for elements with a registered model definition, properties are organized into semantic groups (Report Element, Font, Text Alignment, Hyperlink, etc.) derived from the element schema rather than a flat attribute list
+- **Full schema view** — all attributes defined in the model are shown, including those not yet present in the file; absent attributes appear dimmed (0.5 opacity) with empty values
 - **Attributes** — all element attributes in a tabular view, **editable inline** (blur or Enter commits, Escape reverts); enum attributes use dropdown selectors; color attributes include a visual color picker; boolean attributes use three-state checkboxes (checked/unchecked/indeterminate); `uuid` is read-only
-- **Expressions** — expression content (e.g. `textFieldExpression`, `imageExpression`) displayed with CDATA text
-- **Style** — referenced style name
+- **Expressions** — expression content (e.g. `expression`, `imageExpression`) displayed with CDATA text
 - **Box & Pen** — border and line properties including per-side pen attributes
-- **Report Element** — common element properties (position, size, key, etc.)
+- **Legacy fallback** — elements not yet in the model registry display the original flat layout (Attributes, Expressions, Style, Report Element groups)
 - Automatically updates when selecting a different node in the outline tree
 - After an inline edit, the panel re-parses the document and refreshes with fresh positions
 - When the document changes externally, a stale banner prompts you to refresh
