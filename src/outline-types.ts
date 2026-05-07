@@ -47,7 +47,8 @@ export type OutlineItemKind =
   | "groupHeader"
   | "groupFooter"
   | "band"
-  | "element";
+  | "element"
+  | "add-section";
 
 export class OutlineItem extends vscode.TreeItem {
   public parent: OutlineItem | null = null;
@@ -123,5 +124,7 @@ export function getIcon(kind: OutlineItemKind): vscode.ThemeIcon {
       return new vscode.ThemeIcon("layout");
     case "element":
       return new vscode.ThemeIcon("symbol-misc");
+    case "add-section":
+      return new vscode.ThemeIcon("add");
   }
 }

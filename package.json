@@ -153,6 +153,11 @@
         "title": "Duplicate Element",
         "category": "JasperReports",
         "icon": "$(copy)"
+      },
+      {
+        "command": "jasperreports.outline.addSection",
+        "title": "Add Section",
+        "category": "JasperReports"
       }
     ],
     "menus": {
@@ -187,6 +192,10 @@
         },
         {
           "command": "jasperreports.outline.duplicate",
+          "when": "false"
+        },
+        {
+          "command": "jasperreports.outline.addSection",
           "when": "false"
         }
       ],

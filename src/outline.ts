@@ -132,6 +132,25 @@ export class JrxmlOutlineProvider implements vscode.TreeDataProvider<OutlineItem
       }
     }
 
+    // "Add Section..." action node
+    const existingTags = new Set(root.children.map((c) => c.tag));
+    const hasMissingSections = SECTION_TAGS.some(
+      (tag) => !existingTags.has(tag),
+    );
+    if (hasMissingSections) {
+      const addSectionItem = new OutlineItem(
+        "Add Section...",
+        "add-section",
+        null,
+        [],
+      );
+      addSectionItem.command = {
+        command: "jasperreports.outline.addSection",
+        title: "Add Section",
+      };
+      items.push(addSectionItem);
+    }
+
     return items;
   }
 

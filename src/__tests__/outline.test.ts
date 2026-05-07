@@ -371,4 +371,37 @@ describe("additional outline scenarios", () => {
     const children = provider.getChildren(title);
     expect(children).toHaveLength(0);
   });
+
+  it("shows 'Add Section...' when some sections are missing", () => {
+    const xml = `<jasperReport name="Test">
+  <title><band height="50"/></title>
+</jasperReport>`;
+    provider.refresh(xml);
+    const roots = provider.getChildren();
+    const addSection = roots.find((r) => r.label === "Add Section...");
+    expect(addSection).toBeDefined();
+    expect(addSection!.kind).toBe("add-section");
+    expect(addSection!.command?.command).toBe(
+      "jasperreports.outline.addSection",
+    );
+  });
+
+  it("hides 'Add Section...' when all sections are present", () => {
+    const xml = `<jasperReport name="Test">
+  <title><band height="50"/></title>
+  <pageHeader><band height="30"/></pageHeader>
+  <columnHeader><band height="30"/></columnHeader>
+  <detail><band height="30"/></detail>
+  <columnFooter><band height="30"/></columnFooter>
+  <pageFooter><band height="30"/></pageFooter>
+  <lastPageFooter><band height="30"/></lastPageFooter>
+  <summary><band height="50"/></summary>
+  <noData><band height="50"/></noData>
+  <background><band height="50"/></background>
+</jasperReport>`;
+    provider.refresh(xml);
+    const roots = provider.getChildren();
+    const addSection = roots.find((r) => r.label === "Add Section...");
+    expect(addSection).toBeUndefined();
+  });
 });
