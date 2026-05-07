@@ -1,6 +1,5 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import {
-  clearRegistry,
   getElementDef,
   getRegistrySize,
 } from "../model/registry";
