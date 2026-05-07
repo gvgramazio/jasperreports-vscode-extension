@@ -113,6 +113,9 @@ export function getPropertiesHtml(
     .edit-select.applied {
       background-color: var(--vscode-diffEditor-insertedTextBackground);
     }
+    .absent {
+      opacity: 0.5;
+    }
     .stale-overlay {
       display: none;
       position: fixed;
@@ -170,7 +173,8 @@ function renderGroup(group: PropertyGroup): string {
         valueCell = `<vscode-table-cell class="value-cell">${escapeHtml(e.value)}</vscode-table-cell>`;
       }
 
-      return `<vscode-table-row>
+      const rowClass = e.present === false ? ' class="absent"' : "";
+      return `<vscode-table-row${rowClass}>
           <vscode-table-cell>${escapeHtml(e.name)}</vscode-table-cell>
           ${valueCell}
         </vscode-table-row>`;

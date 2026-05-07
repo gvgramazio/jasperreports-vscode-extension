@@ -339,4 +339,45 @@ describe("getPropertiesHtml", () => {
     expect(html).toContain("edit-input");
     expect(html).not.toContain("<select");
   });
+
+  it("renders absent attributes with absent class on row", () => {
+    const groups: PropertyGroup[] = [
+      {
+        label: "Attributes",
+        entries: [
+          {
+            name: "width",
+            value: "",
+            present: false,
+          },
+        ],
+      },
+    ];
+    const html = getPropertiesHtml(makeWebview(), extensionUri, groups, "Node");
+    expect(html).toContain('class="absent"');
+    expect(html).toContain("width");
+  });
+
+  it("does not add absent class for present attributes", () => {
+    const groups: PropertyGroup[] = [
+      {
+        label: "Attributes",
+        entries: [
+          {
+            name: "x",
+            value: "10",
+            present: true,
+          },
+        ],
+      },
+    ];
+    const html = getPropertiesHtml(makeWebview(), extensionUri, groups, "Node");
+    expect(html).not.toContain('class="absent"');
+  });
+
+  it("includes absent CSS rule in style block", () => {
+    const html = getPropertiesHtml(makeWebview(), extensionUri, [], "");
+    expect(html).toContain(".absent");
+    expect(html).toContain("opacity");
+  });
 });
