@@ -1,3 +1,27 @@
+# [2.0.0](https://github.com/gvgramazio/jasperreports-vscode-extension/compare/v1.12.0...v2.0.0) (2026-05-07)
+
+
+### Bug Fixes
+
+* replace `require("../model/registry")` with a static `registerElement` ([e6e1319](https://github.com/gvgramazio/jasperreports-vscode-extension/commit/e6e13195418221bb88503856561945a4f1f75c0c))
+* unused variable, import, function or class ([61c24a1](https://github.com/gvgramazio/jasperreports-vscode-extension/commit/61c24a1f2bcbdf189e68afd474aef7d86899536b))
+* unused variable, import, function or class ([102816b](https://github.com/gvgramazio/jasperreports-vscode-extension/commit/102816ba2ccd90e8e60f2119d4473987a25550d7))
+
+
+### Features
+
+* **model:** add chart and crosstab deep sub-element definitions ([#47](https://github.com/gvgramazio/jasperreports-vscode-extension/issues/47)) ([b488e97](https://github.com/gvgramazio/jasperreports-vscode-extension/commit/b488e9784f16380af635c671c9b005a2324d0f8e))
+* **model:** add element definitions for all JRXML element types ([#47](https://github.com/gvgramazio/jasperreports-vscode-extension/issues/47)) ([8d5acfe](https://github.com/gvgramazio/jasperreports-vscode-extension/commit/8d5acfea3fc5e49749fa4f7a947124599c2375c5))
+* **model:** add JRXML element model infrastructure ([#47](https://github.com/gvgramazio/jasperreports-vscode-extension/issues/47)) ([221e526](https://github.com/gvgramazio/jasperreports-vscode-extension/commit/221e526758c57f243e1227c179afd312efafa040))
+* **properties:** inline expression editing with add/remove support ([#47](https://github.com/gvgramazio/jasperreports-vscode-extension/issues/47)) ([ac6b8dd](https://github.com/gvgramazio/jasperreports-vscode-extension/commit/ac6b8dd3a15f1814dfb31d7e74a17af0aca2d853))
+* **properties:** model-driven property groups with full schema view ([#47](https://github.com/gvgramazio/jasperreports-vscode-extension/issues/47)) ([9d18adb](https://github.com/gvgramazio/jasperreports-vscode-extension/commit/9d18adb6c21612e6381e6a4d121923c3fdc35787))
+
+
+### BREAKING CHANGES
+
+* **properties:** getAttributeType() signature changed from
+(name) to (tag, name, kind?).
+
 # [1.12.0](https://github.com/gvgramazio/jasperreports-vscode-extension/compare/v1.11.0...v1.12.0) (2026-05-07)
 
 
