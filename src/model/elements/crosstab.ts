@@ -45,10 +45,12 @@ const crosstabDef: ElementDef = {
     { tag: "property", maxOccurs: undefined },
     { tag: "propertyExpression", maxOccurs: undefined },
     { tag: "parameter", maxOccurs: undefined },
+    { tag: "headerCell", maxOccurs: 1 },
     { tag: "rowGroup", maxOccurs: undefined },
     { tag: "columnGroup", maxOccurs: undefined },
     { tag: "measure", maxOccurs: undefined },
     { tag: "cell", maxOccurs: undefined },
+    { tag: "whenNoDataCell", maxOccurs: 1 },
   ],
 };
 

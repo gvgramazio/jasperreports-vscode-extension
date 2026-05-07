@@ -197,6 +197,26 @@ export const PartEvaluationTimeType = ["Now", "Group", "Report"] as const;
 
 export const ExpressionTypeEnum = ["default", "simpleText"] as const;
 
+export const EdgeEnum = ["Top", "Bottom", "Left", "Right"] as const;
+
+export const CrosstabTotalPositionEnum = ["None", "Start", "End"] as const;
+
+export const CrosstabRowPositionEnum = [
+  "Top",
+  "Middle",
+  "Bottom",
+  "Stretch",
+] as const;
+
+export const CrosstabColumnPositionEnum = [
+  "Left",
+  "Center",
+  "Right",
+  "Stretch",
+] as const;
+
+export const CrosstabPercentageEnum = ["None", "GrandTotal"] as const;
+
 export const ElementKindEnum = [
   "textField",
   "staticText",
