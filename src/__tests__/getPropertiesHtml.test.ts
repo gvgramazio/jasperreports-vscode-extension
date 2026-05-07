@@ -380,4 +380,80 @@ describe("getPropertiesHtml", () => {
     expect(html).toContain(".absent");
     expect(html).toContain("opacity");
   });
+
+  it("renders expression entries as editable inputs with edit-expression class", () => {
+    const groups: PropertyGroup[] = [
+      {
+        label: "Expressions",
+        entries: [
+          {
+            name: "expression",
+            value: "$F{name}",
+            editable: true,
+            isExpression: true,
+            present: true,
+          },
+        ],
+      },
+    ];
+    const html = getPropertiesHtml(
+      makeWebview(),
+      extensionUri,
+      groups,
+      "TextField",
+    );
+    expect(html).toContain("edit-expression");
+    expect(html).toContain("edit-input");
+    expect(html).toContain('data-expr-tag="expression"');
+    expect(html).toContain("$F{name}");
+    // Should NOT have data-attr or data-pos (attribute-style edits)
+    expect(html).not.toContain('data-attr="expression"');
+    expect(html).not.toContain("data-pos=");
+  });
+
+  it("renders absent expression entries as editable inputs", () => {
+    const groups: PropertyGroup[] = [
+      {
+        label: "Expressions",
+        entries: [
+          {
+            name: "printWhenExpression",
+            value: "",
+            editable: true,
+            isExpression: true,
+            present: false,
+          },
+        ],
+      },
+    ];
+    const html = getPropertiesHtml(
+      makeWebview(),
+      extensionUri,
+      groups,
+      "TextField",
+    );
+    expect(html).toContain("edit-expression");
+    expect(html).toContain('data-expr-tag="printWhenExpression"');
+    expect(html).toContain('class="absent"');
+  });
+
+  it("does not render expression entries as select or checkbox", () => {
+    const groups: PropertyGroup[] = [
+      {
+        label: "Expressions",
+        entries: [
+          {
+            name: "expression",
+            value: "$F{x}",
+            editable: true,
+            isExpression: true,
+            present: true,
+          },
+        ],
+      },
+    ];
+    const html = getPropertiesHtml(makeWebview(), extensionUri, groups, "Node");
+    expect(html).not.toContain("<select");
+    expect(html).not.toContain("vscode-checkbox");
+  });
 });

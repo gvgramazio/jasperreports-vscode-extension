@@ -159,7 +159,9 @@ function renderGroup(group: PropertyGroup): string {
   const rows = group.entries
     .map((e) => {
       let valueCell: string;
-      if (e.editable && e.attributePosition) {
+      if (e.isExpression && e.editable) {
+        valueCell = renderExpressionCell(e);
+      } else if (e.editable && e.attributePosition) {
         if (e.typeInfo?.type === "enum" && e.typeInfo.enumValues) {
           valueCell = renderEnumCell(e);
         } else if (e.typeInfo?.type === "color") {
@@ -200,6 +202,14 @@ function renderInputCell(e: PropertyEntry): string {
                 value="${escapeHtml(e.value)}"
                 data-attr="${escapeHtml(e.name)}"
                 data-pos="${escapeHtml(JSON.stringify(e.attributePosition))}"${e.typeInfo ? ` data-type="${escapeHtml(e.typeInfo.type)}"` : ""}${e.typeInfo?.enumValues ? ` data-enum="${escapeHtml(JSON.stringify(e.typeInfo.enumValues))}"` : ""} />
+            </vscode-table-cell>`;
+}
+
+function renderExpressionCell(e: PropertyEntry): string {
+  return `<vscode-table-cell class="value-cell">
+              <input class="edit-input edit-expression" type="text"
+                value="${escapeHtml(e.value)}"
+                data-expr-tag="${escapeHtml(e.name)}" />
             </vscode-table-cell>`;
 }
 
