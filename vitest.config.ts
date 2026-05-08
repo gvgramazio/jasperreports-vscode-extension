@@ -11,6 +11,10 @@ export default defineConfig({
     globals: true,
     environment: "node",
     include: ["src/**/*.test.ts"],
+    reporters: ["default", "github-actions", "junit"],
+    outputFile: {
+      junit: "./test-results/junit.xml",
+    },
     coverage: {
       provider: "v8",
       reporter: ["text", "lcov"],
