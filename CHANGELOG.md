@@ -1,3 +1,11 @@
+# [2.1.0](https://github.com/gvgramazio/jasperreports-vscode-extension/compare/v2.0.0...v2.1.0) (2026-05-08)
+
+
+### Features
+
+* add absent attributes from properties panel ([#41](https://github.com/gvgramazio/jasperreports-vscode-extension/issues/41)) ([032b00e](https://github.com/gvgramazio/jasperreports-vscode-extension/commit/032b00e5c6ae765f7da2767d16cfaa64f2c8b0ec))
+* **properties:** remove attribute from XML when value is cleared ([#39](https://github.com/gvgramazio/jasperreports-vscode-extension/issues/39)) ([9eb768d](https://github.com/gvgramazio/jasperreports-vscode-extension/commit/9eb768d7c8411bccb0e4f3d8424f9e69d333e0b9))
+
 # [2.0.0](https://github.com/gvgramazio/jasperreports-vscode-extension/compare/v1.12.0...v2.0.0) (2026-05-07)
 
 
