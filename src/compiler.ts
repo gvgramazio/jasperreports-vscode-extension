@@ -4,6 +4,7 @@ import { resolveJavaExecutable, validateJava } from "./java";
 import { compileJavaSources, cleanupTempDir } from "./java-sources";
 import { getOutputChannel } from "./logger";
 import { runJava } from "./java-runner";
+import { getClasspath, getSourcePaths } from "./config";
 
 /**
  * Resolves the active .jrxml file path from an explicit argument or the active editor.
@@ -64,8 +65,7 @@ export async function resolveJavaEnv(
     return undefined;
   }
 
-  const config = vscode.workspace.getConfiguration("jasperreports");
-  const sourcePaths = config.get<string[]>("java.sourcePaths", []);
+  const sourcePaths = getSourcePaths();
 
   if (sourcePaths.length > 0) {
     const tempClassDir = await compileJavaSources(classpath, sourcePaths);
@@ -89,8 +89,7 @@ export async function resolveJavaEnv(
  * Includes the bundled jr-compiler.jar and all user-configured classpath entries.
  */
 export function buildClasspath(extensionPath: string): string | undefined {
-  const config = vscode.workspace.getConfiguration("jasperreports");
-  const userClasspath = config.get<string[]>("classpath", []);
+  const userClasspath = getClasspath();
 
   if (userClasspath.length === 0) {
     return undefined;

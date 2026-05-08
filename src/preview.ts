@@ -6,6 +6,7 @@ import { resolveActiveJrxmlPath, resolveJavaEnv } from "./compiler";
 import { cleanupTempDir } from "./java-sources";
 import { getOutputChannel } from "./logger";
 import { runJava } from "./java-runner";
+import { isLiveReloadEnabled } from "./config";
 import {
   type PreviewFormat,
   getPreviewConfig,
@@ -145,8 +146,7 @@ export class PreviewManager implements vscode.Disposable {
   ): void {
     this.disposeLiveReload();
 
-    const config = vscode.workspace.getConfiguration("jasperreports");
-    if (!config.get<boolean>("preview.liveReload", false)) {
+    if (!isLiveReloadEnabled()) {
       return;
     }
 

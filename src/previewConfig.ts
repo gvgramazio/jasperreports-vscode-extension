@@ -1,5 +1,6 @@
 import * as vscode from "vscode";
 import * as path from "path";
+import { getPreviewFormat } from "./config";
 
 export type PreviewFormat = "html" | "pdf";
 
@@ -44,8 +45,7 @@ export async function setPreviewConfig(
 }
 
 function getDefaultFormat(): PreviewFormat {
-  const config = vscode.workspace.getConfiguration("jasperreports");
-  return config.get<PreviewFormat>("preview.format", "html");
+  return getPreviewFormat();
 }
 
 export function resolveFormat(
