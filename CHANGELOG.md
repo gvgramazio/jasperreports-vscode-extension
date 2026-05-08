@@ -1,3 +1,10 @@
+# [2.2.0](https://github.com/gvgramazio/jasperreports-vscode-extension/compare/v2.1.0...v2.2.0) (2026-05-08)
+
+
+### Features
+
+* add support for publishing to Open VSX registry ([f4738e4](https://github.com/gvgramazio/jasperreports-vscode-extension/commit/f4738e49a7cdc9d3e427c6225cb582b95723e9d3))
+
 # [2.1.0](https://github.com/gvgramazio/jasperreports-vscode-extension/compare/v2.0.0...v2.1.0) (2026-05-08)
 
 
