@@ -51,10 +51,15 @@ vi.mock("../outline", () => {
     JrxmlOutlineProvider: MockJrxmlOutlineProvider,
     OutlineItem: class {},
     revealPosition: vi.fn(),
+    OutlineDragAndDropController: vi.fn(),
+    addElement: vi.fn(),
+    deleteElement: vi.fn(),
+    duplicateElement: vi.fn(),
+    addSection: vi.fn(),
   };
 });
 
-vi.mock("../properties/PropertiesViewProvider", () => ({
+vi.mock("../properties", () => ({
   PropertiesViewProvider: MockPropertiesViewProvider,
 }));
 
@@ -66,13 +71,6 @@ vi.mock("../preview", () => ({
   disposePreviewPanel: vi.fn(),
 }));
 vi.mock("../previewConfigUI", () => ({ configurePreview: vi.fn() }));
-vi.mock("../outline-dnd", () => ({
-  OutlineDragAndDropController: vi.fn(),
-}));
-vi.mock("../outline-actions", () => ({
-  addElement: vi.fn(),
-  deleteElement: vi.fn(),
-}));
 vi.mock("../logger", () => ({
   getOutputChannel: vi.fn().mockReturnValue({
     appendLine: vi.fn(),
@@ -254,7 +252,7 @@ describe("extension", () => {
     const context = createContext();
     await extension.activate(context);
 
-    const { addElement, deleteElement } = await import("../outline-actions");
+    const { addElement, deleteElement } = await import("../outline");
 
     const calls = vi.mocked(vscode.commands.registerCommand).mock.calls;
     const findCallback = (name: string) =>

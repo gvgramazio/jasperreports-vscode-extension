@@ -5,8 +5,8 @@ import {
   deleteElement,
   duplicateElement,
   addSection,
-} from "../outline-actions";
-import { OutlineItem } from "../outline";
+  OutlineItem,
+} from "../outline";
 import { JrxmlNode } from "../jrxml-parser";
 
 function makeNode(overrides: Partial<JrxmlNode> = {}): JrxmlNode {

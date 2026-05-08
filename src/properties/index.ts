@@ -1,0 +1,1 @@
+export { PropertiesViewProvider } from "./PropertiesViewProvider";

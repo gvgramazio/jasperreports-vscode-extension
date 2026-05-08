@@ -1,6 +1,6 @@
 import * as vscode from "vscode";
-import { JrxmlNode } from "./jrxml-parser";
-import { jasperReportDef } from "./model/elements/jasperReport";
+import { JrxmlNode } from "../jrxml-parser";
+import { jasperReportDef } from "../model/elements/jasperReport";
 
 /**
  * Convert a camelCase tag name to a human-readable label.
