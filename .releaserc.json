@@ -27,13 +27,13 @@
     [
       "@semantic-release/exec",
       {
-        "publishCmd": "pnpm run vsce:publish"
+        "publishCmd": "pnpm run ovsx:publish"
       }
     ],
     [
       "@semantic-release/exec",
       {
-        "publishCmd": "pnpm run ovsx:publish"
+        "publishCmd": "pnpm run vsce:publish"
       }
     ]
   ]
