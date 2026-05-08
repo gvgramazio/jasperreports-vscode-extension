@@ -66,10 +66,22 @@ vi.mock("../properties", () => ({
 // Mock other imported modules to avoid side effects
 vi.mock("../compiler", () => ({ compileReport: vi.fn() }));
 vi.mock("../dependencies", () => ({ downloadDependencies: vi.fn() }));
-vi.mock("../preview", () => ({
-  previewReport: vi.fn(),
-  disposePreviewPanel: vi.fn(),
-}));
+let mockPreviewInstance: {
+  preview: ReturnType<typeof vi.fn>;
+  dispose: ReturnType<typeof vi.fn>;
+};
+
+vi.mock("../preview", () => {
+  class MockPreviewManager {
+    preview = vi.fn();
+    dispose = vi.fn();
+    constructor() {
+      // eslint-disable-next-line @typescript-eslint/no-this-alias
+      mockPreviewInstance = this;
+    }
+  }
+  return { PreviewManager: MockPreviewManager };
+});
 vi.mock("../previewConfigUI", () => ({ configurePreview: vi.fn() }));
 vi.mock("../logger", () => ({
   getOutputChannel: vi.fn().mockReturnValue({
@@ -221,7 +233,6 @@ describe("extension", () => {
     await extension.activate(context);
 
     const { compileReport } = await import("../compiler");
-    const { previewReport } = await import("../preview");
     const { downloadDependencies } = await import("../dependencies");
     const { configurePreview } = await import("../previewConfigUI");
 
@@ -233,11 +244,10 @@ describe("extension", () => {
     expect(compileReport).toHaveBeenCalledWith(context.extensionPath);
 
     findCallback("jasperreports.preview")();
-    expect(previewReport).toHaveBeenCalledWith(context);
+    expect(mockPreviewInstance.preview).toHaveBeenCalledWith();
 
     findCallback("jasperreports.previewToSide")();
-    expect(previewReport).toHaveBeenCalledWith(
-      context,
+    expect(mockPreviewInstance.preview).toHaveBeenCalledWith(
       vscode.ViewColumn.Beside,
     );
 
@@ -525,7 +535,6 @@ describe("extension", () => {
     const context = createContext();
     await extension.activate(context);
 
-    const { disposePreviewPanel } = await import("../preview");
     const { disposeOutputChannel } = await import("../logger");
 
     // Dispose all subscriptions
@@ -533,7 +542,7 @@ describe("extension", () => {
       sub.dispose();
     }
 
-    expect(disposePreviewPanel).toHaveBeenCalled();
+    expect(mockPreviewInstance.dispose).toHaveBeenCalled();
     expect(disposeOutputChannel).toHaveBeenCalled();
   });
 });
