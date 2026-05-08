@@ -40,7 +40,14 @@ jobs:
         run: pnpm run format:check
 
       - name: Test
-        run: pnpm run test
+        run: pnpm run test:coverage
+
+      - name: Upload coverage to Codecov
+        if: always()
+        uses: codecov/codecov-action@v5
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: ./coverage/lcov.info
 
       - name: Release
         run: pnpm exec semantic-release
