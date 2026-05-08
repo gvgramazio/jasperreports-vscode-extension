@@ -1,3 +1,10 @@
+## [2.2.1](https://github.com/gvgramazio/jasperreports-vscode-extension/compare/v2.2.0...v2.2.1) (2026-05-08)
+
+
+### Bug Fixes
+
+* swap publish commands for Open VSX and VSCE in release configuration ([d1ba714](https://github.com/gvgramazio/jasperreports-vscode-extension/commit/d1ba71411332f002c1f858fca1219988e30d0a7b))
+
 # [2.2.0](https://github.com/gvgramazio/jasperreports-vscode-extension/compare/v2.1.0...v2.2.0) (2026-05-08)
 
 
