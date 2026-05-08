@@ -1,5 +1,5 @@
-import * as vscode from "vscode";
 import { execFile } from "child_process";
+import { getJavaHome } from "./config";
 
 /**
  * Resolves the path to the `java` executable.
@@ -12,8 +12,7 @@ import { execFile } from "child_process";
  * Returns `undefined` if Java cannot be found.
  */
 export function resolveJavaExecutable(): string | undefined {
-  const config = vscode.workspace.getConfiguration("jasperreports");
-  const configuredHome = config.get<string>("java.home", "").trim();
+  const configuredHome = getJavaHome();
 
   if (configuredHome) {
     return `${configuredHome}/bin/java`;
@@ -36,8 +35,7 @@ export function resolveJavaExecutable(): string | undefined {
  * Falls back to `"javac"` on PATH as a last resort.
  */
 export function resolveJavacExecutable(): string {
-  const config = vscode.workspace.getConfiguration("jasperreports");
-  const configuredHome = config.get<string>("java.home", "").trim();
+  const configuredHome = getJavaHome();
 
   if (configuredHome) {
     return `${configuredHome}/bin/javac`;

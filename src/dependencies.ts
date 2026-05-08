@@ -3,6 +3,7 @@ import * as path from "path";
 import * as fs from "fs";
 import * as os from "os";
 import { execFile } from "child_process";
+import { getSchemaVersion, getClasspath } from "./config";
 
 const LIB_DIR_NAME = ".jasperreports";
 const GROUP_ID = "net.sf.jasperreports";
@@ -108,8 +109,7 @@ export async function downloadDependencies(): Promise<void> {
     return;
   }
 
-  const config = vscode.workspace.getConfiguration("jasperreports");
-  const version = config.get<string>("schema.version", "7.0.6");
+  const version = getSchemaVersion();
 
   const mvnPath = resolveMvnExecutable();
 
@@ -126,14 +126,16 @@ export async function downloadDependencies(): Promise<void> {
 
   // Update workspace classpath setting
   const globPattern = path.join(libDir, "*");
-  const currentClasspath = config.get<string[]>("classpath", []);
+  const currentClasspath = getClasspath();
   if (!currentClasspath.includes(globPattern)) {
     const updatedClasspath = [...currentClasspath, globPattern];
-    await config.update(
-      "classpath",
-      updatedClasspath,
-      vscode.ConfigurationTarget.Workspace,
-    );
+    await vscode.workspace
+      .getConfiguration("jasperreports")
+      .update(
+        "classpath",
+        updatedClasspath,
+        vscode.ConfigurationTarget.Workspace,
+      );
   }
 
   vscode.window.showInformationMessage(

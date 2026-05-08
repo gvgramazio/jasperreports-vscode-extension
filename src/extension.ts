@@ -1,6 +1,11 @@
 import * as vscode from "vscode";
 import * as path from "path";
 import { compileReport } from "./compiler";
+import {
+  getSchemaVersion,
+  getCustomJrxmlSchemaPath,
+  getCustomJrtxSchemaPath,
+} from "./config";
 import { downloadDependencies } from "./dependencies";
 import { disposeOutputChannel, getOutputChannel } from "./logger";
 import {
@@ -179,10 +184,9 @@ function isJrxmlDocument(document: vscode.TextDocument): boolean {
 async function registerXmlFileAssociations(
   context: vscode.ExtensionContext,
 ): Promise<void> {
-  const config = vscode.workspace.getConfiguration("jasperreports");
-  const version = config.get<string>("schema.version", "7.0.6");
-  const customJrxmlPath = config.get<string>("schema.jrxmlPath", "");
-  const customJrtxPath = config.get<string>("schema.jrtxPath", "");
+  const version = getSchemaVersion();
+  const customJrxmlPath = getCustomJrxmlSchemaPath();
+  const customJrtxPath = getCustomJrtxSchemaPath();
 
   const jrxmlXsd =
     customJrxmlPath ||
