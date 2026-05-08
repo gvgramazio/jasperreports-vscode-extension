@@ -3,18 +3,20 @@ import * as path from "path";
 import { compileReport } from "./compiler";
 import { downloadDependencies } from "./dependencies";
 import { disposeOutputChannel, getOutputChannel } from "./logger";
-import { JrxmlOutlineProvider, OutlineItem, revealPosition } from "./outline";
-import { OutlineDragAndDropController } from "./outline-dnd";
-import { previewReport, disposePreviewPanel } from "./preview";
-import { configurePreview } from "./previewConfigUI";
-import { NodePosition } from "./jrxml-parser";
-import { PropertiesViewProvider } from "./properties/PropertiesViewProvider";
 import {
+  JrxmlOutlineProvider,
+  OutlineItem,
+  revealPosition,
+  OutlineDragAndDropController,
   addElement,
   deleteElement,
   duplicateElement,
   addSection,
-} from "./outline-actions";
+} from "./outline";
+import { previewReport, disposePreviewPanel } from "./preview";
+import { configurePreview } from "./previewConfigUI";
+import { NodePosition } from "./jrxml-parser";
+import { PropertiesViewProvider } from "./properties";
 
 const XML_EXTENSION_ID = "redhat.vscode-xml";
 

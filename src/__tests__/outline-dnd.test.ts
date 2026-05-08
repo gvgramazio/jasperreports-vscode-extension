@@ -1,7 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import * as vscode from "vscode";
-import { OutlineDragAndDropController } from "../outline-dnd";
-import { OutlineItem } from "../outline";
+import { OutlineDragAndDropController, OutlineItem } from "../outline";
 import { JrxmlNode } from "../jrxml-parser";
 
 function makeNode(overrides: Partial<JrxmlNode> = {}): JrxmlNode {

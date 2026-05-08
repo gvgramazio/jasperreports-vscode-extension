@@ -4,11 +4,11 @@ import {
   JrxmlNode,
   JrxmlDocument,
   NodePosition,
-} from "./jrxml-parser";
-import { SECTION_TAGS, SECTION_LABELS, OutlineItem } from "./outline-types";
+} from "../jrxml-parser";
+import { SECTION_TAGS, SECTION_LABELS, OutlineItem } from "./types";
 
-export { OutlineItem } from "./outline-types";
-export type { OutlineItemKind } from "./outline-types";
+export { OutlineItem } from "./types";
+export type { OutlineItemKind } from "./types";
 
 export class JrxmlOutlineProvider implements vscode.TreeDataProvider<OutlineItem> {
   private _onDidChangeTreeData = new vscode.EventEmitter<

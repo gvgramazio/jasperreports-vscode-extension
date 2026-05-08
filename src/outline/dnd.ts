@@ -1,5 +1,5 @@
 import * as vscode from "vscode";
-import { OutlineItem, nodeToFullLineRange } from "./outline";
+import { OutlineItem, nodeToFullLineRange } from "./provider";
 
 const MIME_TYPE = "application/vnd.code.tree.jasperreports-outline";
 

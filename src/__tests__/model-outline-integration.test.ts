@@ -1,6 +1,11 @@
 import { describe, it, expect } from "vitest";
-import { SECTION_TAGS, SECTION_LABELS, tagToLabel } from "../outline-types";
-import { JRXML_ELEMENT_ORDER, generateElementXml } from "../outline-actions";
+import {
+  SECTION_TAGS,
+  SECTION_LABELS,
+  tagToLabel,
+  JRXML_ELEMENT_ORDER,
+  generateElementXml,
+} from "../outline";
 import { jasperReportDef } from "../model/elements/jasperReport";
 
 describe("tagToLabel", () => {
