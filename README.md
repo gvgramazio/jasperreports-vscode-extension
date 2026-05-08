@@ -1,5 +1,12 @@
 # JasperReports
 
+[![CI](https://github.com/gvgramazio/jasperreports-vscode-extension/actions/workflows/ci.yml/badge.svg)](https://github.com/gvgramazio/jasperreports-vscode-extension/actions/workflows/ci.yml)
+[![codecov](https://codecov.io/gh/gvgramazio/jasperreports-vscode-extension/graph/badge.svg?token=48KV6Z4VCL)](https://codecov.io/gh/gvgramazio/jasperreports-vscode-extension)
+[![Visual Studio Marketplace Version](https://img.shields.io/visual-studio-marketplace/v/gvgramazio.jasperreports)](https://marketplace.visualstudio.com/items?itemName=gvgramazio.jasperreports)
+[![Visual Studio Marketplace Installs](https://img.shields.io/visual-studio-marketplace/i/gvgramazio.jasperreports)](https://marketplace.visualstudio.com/items?itemName=gvgramazio.jasperreports)
+[![Open VSX Version](https://img.shields.io/open-vsx/v/gvgramazio/jasperreports)](https://open-vsx.org/extension/gvgramazio/jasperreports)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
 VS Code extension for JasperReports `.jrxml` and `.jrtx` files.
 
 ## Features
