@@ -9,6 +9,8 @@ import {
   ExpressionEditMessage,
   handleRemoveAttribute,
   RemoveAttributeMessage,
+  handleAddAttribute,
+  AddAttributeMessage,
 } from "./editHandler";
 
 interface NodeIdentity {
@@ -48,6 +50,7 @@ export class PropertiesViewProvider implements vscode.WebviewViewProvider {
           | EditMessage
           | ExpressionEditMessage
           | RemoveAttributeMessage
+          | AddAttributeMessage
           | { type: "refresh" },
       ) => {
         if (message.type === "edit") {
@@ -66,6 +69,23 @@ export class PropertiesViewProvider implements vscode.WebviewViewProvider {
             const success = await handleRemoveAttribute(message);
             if (success) {
               this.reParseAndRefresh();
+            }
+          } finally {
+            this._editInProgress = false;
+          }
+        } else if (message.type === "addAttribute") {
+          this._editInProgress = true;
+          try {
+            const node = this.findCurrentNode();
+            if (node) {
+              const success = await handleAddAttribute(
+                node,
+                message.attribute,
+                message.value,
+              );
+              if (success) {
+                this.reParseAndRefresh();
+              }
             }
           } finally {
             this._editInProgress = false;

@@ -4,6 +4,7 @@ import {
   handleEditMessage,
   handleExpressionEdit,
   handleRemoveAttribute,
+  handleAddAttribute,
 } from "../properties/editHandler";
 import { parseJrxml, JrxmlNode } from "../jrxml-parser";
 
@@ -481,5 +482,114 @@ describe("handleRemoveAttribute", () => {
       },
     });
     expect(result).toBe(false);
+  });
+});
+
+describe("handleAddAttribute", () => {
+  function setupEditor(text: string) {
+    const mockDocument = {
+      getText: () => text,
+      positionAt: (offset: number) => new vscode.Position(0, offset),
+      uri: { fsPath: "/test.jrxml", toString: () => "file:///test.jrxml" },
+    };
+    (vscode.window as { activeTextEditor: unknown }).activeTextEditor = {
+      document: mockDocument,
+    };
+  }
+
+  function parseNode(text: string): JrxmlNode {
+    const doc = parseJrxml(text);
+    return doc.root!;
+  }
+
+  it("returns false when no active editor", async () => {
+    (vscode.window as { activeTextEditor: undefined }).activeTextEditor =
+      undefined;
+    const node = parseNode('<element x="10"/>');
+    const result = await handleAddAttribute(node, "y", "20");
+    expect(result).toBe(false);
+  });
+
+  it("adds attribute to a self-closing tag", async () => {
+    const text = '<element x="10"/>';
+    setupEditor(text);
+    const node = parseNode(text);
+
+    const result = await handleAddAttribute(node, "y", "20");
+    expect(result).toBe(true);
+    expect(vscode.workspace.applyEdit).toHaveBeenCalledTimes(1);
+
+    const editArg = (vscode.workspace.applyEdit as ReturnType<typeof vi.fn>)
+      .mock.calls[0][0] as vscode.WorkspaceEdit;
+    const entries = editArg.entries();
+    const edits = entries[0][1];
+    // Insert position should be just before '/>'
+    expect(edits[0].position!.character).toBe(15); // position of '/'
+    expect(edits[0].newText).toBe(' y="20"');
+  });
+
+  it("adds attribute to a tag with children", async () => {
+    const text = '<element x="10">\n  <child/>\n</element>';
+    setupEditor(text);
+    const node = parseNode(text);
+
+    const result = await handleAddAttribute(node, "width", "100");
+    expect(result).toBe(true);
+
+    const editArg = (vscode.workspace.applyEdit as ReturnType<typeof vi.fn>)
+      .mock.calls[0][0] as vscode.WorkspaceEdit;
+    const entries = editArg.entries();
+    const edits = entries[0][1];
+    // Insert position should be just before '>'
+    expect(edits[0].position!.character).toBe(15); // position of '>'
+    expect(edits[0].newText).toBe(' width="100"');
+  });
+
+  it("adds attribute to a tag with no existing attributes", async () => {
+    const text = "<element/>";
+    setupEditor(text);
+    const node = parseNode(text);
+
+    const result = await handleAddAttribute(node, "x", "5");
+    expect(result).toBe(true);
+
+    const editArg = (vscode.workspace.applyEdit as ReturnType<typeof vi.fn>)
+      .mock.calls[0][0] as vscode.WorkspaceEdit;
+    const entries = editArg.entries();
+    const edits = entries[0][1];
+    // Insert before '/'
+    expect(edits[0].position!.character).toBe(8); // position of '/'
+    expect(edits[0].newText).toBe(' x="5"');
+  });
+
+  it("adds attribute to a multiline opening tag", async () => {
+    const text = '<element\n  x="10"\n  y="20"/>';
+    setupEditor(text);
+    const node = parseNode(text);
+
+    const result = await handleAddAttribute(node, "width", "100");
+    expect(result).toBe(true);
+
+    const editArg = (vscode.workspace.applyEdit as ReturnType<typeof vi.fn>)
+      .mock.calls[0][0] as vscode.WorkspaceEdit;
+    const entries = editArg.entries();
+    const edits = entries[0][1];
+    expect(edits[0].newText).toBe(' width="100"');
+  });
+
+  it("returns false when tag is not found in document", async () => {
+    const text = '<element x="10"/>';
+    setupEditor(text);
+    // Create a node that points to a tag not in the document
+    const node: JrxmlNode = {
+      tag: "nonexistent",
+      attributes: {},
+      children: [],
+      position: { startLine: 0, startColumn: 0, endLine: 0, endColumn: 0 },
+    };
+
+    const result = await handleAddAttribute(node, "y", "20");
+    expect(result).toBe(false);
+    expect(vscode.workspace.applyEdit).not.toHaveBeenCalled();
   });
 });

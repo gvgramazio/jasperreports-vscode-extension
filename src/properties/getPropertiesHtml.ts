@@ -171,6 +171,16 @@ function renderGroup(group: PropertyGroup): string {
         } else {
           valueCell = renderInputCell(e);
         }
+      } else if (e.editable && e.present === false) {
+        if (e.typeInfo?.type === "enum" && e.typeInfo.enumValues) {
+          valueCell = renderAbsentEnumCell(e);
+        } else if (e.typeInfo?.type === "color") {
+          valueCell = renderAbsentColorCell(e);
+        } else if (e.typeInfo?.type === "boolean") {
+          valueCell = renderAbsentBooleanCell(e);
+        } else {
+          valueCell = renderAbsentInputCell(e);
+        }
       } else {
         valueCell = `<vscode-table-cell class="value-cell">${escapeHtml(e.value)}</vscode-table-cell>`;
       }
@@ -256,6 +266,54 @@ function renderColorCell(e: PropertyEntry): string {
                   value="${escapeHtml(e.value)}"
                   data-attr="${escapeHtml(e.name)}"
                   data-pos="${escapeHtml(JSON.stringify(e.attributePosition))}"
+                  data-type="color" />
+              </div>
+            </vscode-table-cell>`;
+}
+
+function renderAbsentInputCell(e: PropertyEntry): string {
+  return `<vscode-table-cell class="value-cell">
+              <input class="edit-input" type="text"
+                value=""
+                data-attr="${escapeHtml(e.name)}"
+                data-absent="true"${e.typeInfo ? ` data-type="${escapeHtml(e.typeInfo.type)}"` : ""}${e.typeInfo?.enumValues ? ` data-enum="${escapeHtml(JSON.stringify(e.typeInfo.enumValues))}"` : ""} />
+            </vscode-table-cell>`;
+}
+
+function renderAbsentEnumCell(e: PropertyEntry): string {
+  const values = e.typeInfo!.enumValues!;
+  const options = values
+    .map((v) => `<option value="${escapeHtml(v)}">${escapeHtml(v)}</option>`)
+    .join("");
+  return `<vscode-table-cell class="value-cell">
+              <select class="edit-select"
+                data-attr="${escapeHtml(e.name)}"
+                data-absent="true">
+                <option value="" selected>\u2014</option>
+                ${options}
+              </select>
+            </vscode-table-cell>`;
+}
+
+function renderAbsentBooleanCell(e: PropertyEntry): string {
+  return `<vscode-table-cell class="value-cell">
+              <vscode-checkbox class="edit-checkbox"
+                data-attr="${escapeHtml(e.name)}"
+                data-absent="true" indeterminate></vscode-checkbox>
+            </vscode-table-cell>`;
+}
+
+function renderAbsentColorCell(e: PropertyEntry): string {
+  return `<vscode-table-cell class="value-cell">
+              <div class="color-wrapper">
+                <input class="edit-color" type="color"
+                  value="#000000"
+                  data-attr="${escapeHtml(e.name)}"
+                  data-absent="true" />
+                <input class="edit-input" type="text"
+                  value=""
+                  data-attr="${escapeHtml(e.name)}"
+                  data-absent="true"
                   data-type="color" />
               </div>
             </vscode-table-cell>`;
