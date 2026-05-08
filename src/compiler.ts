@@ -1,9 +1,9 @@
 import * as vscode from "vscode";
 import * as path from "path";
-import { execFile } from "child_process";
 import { resolveJavaExecutable, validateJava } from "./java";
 import { compileJavaSources, cleanupTempDir } from "./java-sources";
 import { getOutputChannel } from "./logger";
+import { runJava } from "./java-runner";
 
 /**
  * Resolves the active .jrxml file path from an explicit argument or the active editor.
@@ -128,53 +128,28 @@ export async function compileReport(
         title: `Compiling ${fileName}`,
         cancellable: false,
       },
-      () => runCompiler(env.javaPath, env.classpath, filePath, channel),
+      async () => {
+        const result = await runJava({
+          javaPath: env.javaPath,
+          classpath: env.classpath,
+          args: ["JrCompiler", "compile", filePath],
+          cwd: path.dirname(filePath),
+        });
+
+        if (result.ok) {
+          const jasperFile = filePath.replace(/\.jrxml$/, ".jasper");
+          channel.appendLine(`OK → ${path.basename(jasperFile)}`);
+          vscode.window.showInformationMessage(
+            `Compiled successfully: ${path.basename(jasperFile)}`,
+          );
+        } else {
+          vscode.window.showErrorMessage(`Compilation failed: ${result.error}`);
+        }
+      },
     );
   } finally {
     if (env.tempClassDir) {
       cleanupTempDir(env.tempClassDir);
     }
   }
-}
-
-function runCompiler(
-  javaPath: string,
-  classpath: string,
-  jrxmlPath: string,
-  channel: vscode.OutputChannel,
-): Promise<void> {
-  return new Promise((resolve) => {
-    const args = ["-cp", classpath, "JrCompiler", "compile", jrxmlPath];
-    const cwd = path.dirname(jrxmlPath);
-
-    execFile(
-      javaPath,
-      args,
-      { cwd, timeout: 60_000 },
-      (err, stdout, stderr) => {
-        if (stdout) {
-          channel.appendLine(stdout);
-        }
-        if (stderr) {
-          channel.appendLine(stderr);
-        }
-
-        if (err) {
-          const jasperError = stderr || err.message;
-          channel.appendLine(`FAILED: ${jasperError}`);
-          channel.show(true);
-          vscode.window.showErrorMessage(
-            `Compilation failed: ${jasperError.split("\n")[0]}`,
-          );
-        } else {
-          const jasperFile = jrxmlPath.replace(/\.jrxml$/, ".jasper");
-          channel.appendLine(`OK → ${path.basename(jasperFile)}`);
-          vscode.window.showInformationMessage(
-            `Compiled successfully: ${path.basename(jasperFile)}`,
-          );
-        }
-        resolve();
-      },
-    );
-  });
 }

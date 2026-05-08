@@ -2,10 +2,10 @@ import * as vscode from "vscode";
 import * as path from "path";
 import * as fs from "fs";
 import * as os from "os";
-import { execFile } from "child_process";
 import { resolveActiveJrxmlPath, resolveJavaEnv } from "./compiler";
 import { cleanupTempDir } from "./java-sources";
 import { getOutputChannel } from "./logger";
+import { runJava } from "./java-runner";
 import {
   type PreviewFormat,
   getPreviewConfig,
@@ -98,140 +98,87 @@ export async function previewReport(
   setupLiveReload(context, filePath, viewColumn);
 }
 
-function runPreview(
+async function runPreview(
   javaPath: string,
   classpath: string,
   jrxmlPath: string,
   format: PreviewFormat,
   dataSourcePath?: string,
 ): Promise<string | undefined> {
-  return new Promise((resolve) => {
-    const tmpDir = os.tmpdir();
-    const outputFile = path.join(tmpDir, `jr-preview-${Date.now()}.html`);
+  const tmpDir = os.tmpdir();
+  const outputFile = path.join(tmpDir, `jr-preview-${Date.now()}.html`);
 
-    const args = [
-      "-cp",
-      classpath,
-      "JrCompiler",
-      "preview",
-      jrxmlPath,
-      outputFile,
-      format,
-    ];
-    if (dataSourcePath) {
-      args.push(dataSourcePath);
-    }
+  const args = ["JrCompiler", "preview", jrxmlPath, outputFile, format];
+  if (dataSourcePath) {
+    args.push(dataSourcePath);
+  }
 
-    const cwd = path.dirname(jrxmlPath);
-
-    execFile(
-      javaPath,
-      args,
-      { cwd, timeout: 60_000 },
-      (err, stdout, stderr) => {
-        const channel = getOutputChannel();
-        if (stdout) {
-          channel.appendLine(stdout);
-        }
-        if (stderr) {
-          channel.appendLine(stderr);
-        }
-
-        if (err) {
-          const errorMsg = stderr || err.message;
-          channel.appendLine(`FAILED: ${errorMsg}`);
-          channel.show(true);
-          cleanupTempFile(outputFile);
-          vscode.window.showErrorMessage(
-            `Preview failed: ${errorMsg.split("\n")[0]}`,
-          );
-          resolve(undefined);
-          return;
-        }
-
-        try {
-          const html = fs.readFileSync(outputFile, "utf-8");
-          fs.unlinkSync(outputFile);
-          channel.appendLine(`OK → preview rendered (${format})`);
-          resolve(html);
-        } catch (readErr) {
-          channel.appendLine(
-            `FAILED: Failed to read preview output: ${readErr}`,
-          );
-          channel.show(true);
-          vscode.window.showErrorMessage(
-            `Failed to read preview output: ${readErr}`,
-          );
-          resolve(undefined);
-        }
-      },
-    );
+  const result = await runJava({
+    javaPath,
+    classpath,
+    args,
+    cwd: path.dirname(jrxmlPath),
   });
+
+  if (!result.ok) {
+    cleanupTempFile(outputFile);
+    vscode.window.showErrorMessage(`Preview failed: ${result.error}`);
+    return undefined;
+  }
+
+  try {
+    const html = fs.readFileSync(outputFile, "utf-8");
+    fs.unlinkSync(outputFile);
+    const channel = getOutputChannel();
+    channel.appendLine(`OK → preview rendered (${format})`);
+    return html;
+  } catch (readErr) {
+    const channel = getOutputChannel();
+    channel.appendLine(`FAILED: Failed to read preview output: ${readErr}`);
+    channel.show(true);
+    vscode.window.showErrorMessage(`Failed to read preview output: ${readErr}`);
+    return undefined;
+  }
 }
 
-function runPdfPreview(
+async function runPdfPreview(
   javaPath: string,
   classpath: string,
   jrxmlPath: string,
   dataSourcePath?: string,
 ): Promise<string | undefined> {
-  return new Promise((resolve) => {
-    const tmpDir = os.tmpdir();
-    const outputFile = path.join(tmpDir, `jr-preview-${Date.now()}.pdf`);
+  const tmpDir = os.tmpdir();
+  const outputFile = path.join(tmpDir, `jr-preview-${Date.now()}.pdf`);
 
-    const args = [
-      "-cp",
-      classpath,
-      "JrCompiler",
-      "preview",
-      jrxmlPath,
-      outputFile,
-      "pdf",
-    ];
-    if (dataSourcePath) {
-      args.push(dataSourcePath);
-    }
+  const args = ["JrCompiler", "preview", jrxmlPath, outputFile, "pdf"];
+  if (dataSourcePath) {
+    args.push(dataSourcePath);
+  }
 
-    const cwd = path.dirname(jrxmlPath);
-
-    execFile(
-      javaPath,
-      args,
-      { cwd, timeout: 60_000 },
-      (err, stdout, stderr) => {
-        const channel = getOutputChannel();
-        if (stdout) {
-          channel.appendLine(stdout);
-        }
-        if (stderr) {
-          channel.appendLine(stderr);
-        }
-
-        if (err) {
-          const errorMsg = stderr || err.message;
-          channel.appendLine(`FAILED: ${errorMsg}`);
-          channel.show(true);
-          cleanupTempFile(outputFile);
-          vscode.window.showErrorMessage(
-            `Preview failed: ${errorMsg.split("\n")[0]}`,
-          );
-          resolve(undefined);
-          return;
-        }
-
-        if (!fs.existsSync(outputFile)) {
-          channel.appendLine("FAILED: PDF output file was not created");
-          channel.show(true);
-          vscode.window.showErrorMessage("PDF output file was not created");
-          resolve(undefined);
-          return;
-        }
-
-        channel.appendLine("OK → preview rendered (pdf)");
-        resolve(outputFile);
-      },
-    );
+  const result = await runJava({
+    javaPath,
+    classpath,
+    args,
+    cwd: path.dirname(jrxmlPath),
   });
+
+  if (!result.ok) {
+    cleanupTempFile(outputFile);
+    vscode.window.showErrorMessage(`Preview failed: ${result.error}`);
+    return undefined;
+  }
+
+  if (!fs.existsSync(outputFile)) {
+    const channel = getOutputChannel();
+    channel.appendLine("FAILED: PDF output file was not created");
+    channel.show(true);
+    vscode.window.showErrorMessage("PDF output file was not created");
+    return undefined;
+  }
+
+  const channel = getOutputChannel();
+  channel.appendLine("OK → preview rendered (pdf)");
+  return outputFile;
 }
 
 function showPreviewPanel(
