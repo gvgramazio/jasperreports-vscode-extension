@@ -134,9 +134,13 @@ Context menu actions available on tree items:
 
 ## Installation
 
-### From Marketplace
+### From Visual Studio Marketplace
 
 Search for **JasperReports** in the VS Code Extensions view (`Ctrl+Shift+X` / `Cmd+Shift+X`).
+
+### From Open VSX Registry
+
+Install from [Open VSX](https://open-vsx.org/extension/gvgramazio/jasperreports) — available for VS Codium, Theia, code-server, and other compatible editors.
 
 ### From VSIX
 
