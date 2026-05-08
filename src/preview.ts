@@ -16,86 +16,154 @@ import { promptDataSource } from "./previewConfigUI";
 
 const PREVIEW_PANEL_TYPE = "jasperreportsPreview";
 
-let currentPanel: vscode.WebviewPanel | undefined;
-let liveReloadDisposable: vscode.Disposable | undefined;
+export class PreviewManager implements vscode.Disposable {
+  private currentPanel: vscode.WebviewPanel | undefined;
+  private liveReloadDisposable: vscode.Disposable | undefined;
 
-export async function previewReport(
-  context: vscode.ExtensionContext,
-  viewColumn: vscode.ViewColumn = vscode.ViewColumn.Active,
-  jrxmlPath?: string,
-): Promise<void> {
-  const filePath = resolveActiveJrxmlPath(jrxmlPath);
-  if (!filePath) return;
+  constructor(private readonly context: vscode.ExtensionContext) {}
 
-  const env = await resolveJavaEnv(context.extensionPath);
-  if (!env) return;
+  async preview(
+    viewColumn: vscode.ViewColumn = vscode.ViewColumn.Active,
+    jrxmlPath?: string,
+  ): Promise<void> {
+    const filePath = resolveActiveJrxmlPath(jrxmlPath);
+    if (!filePath) return;
 
-  // Resolve per-file config
-  let fileConfig = getPreviewConfig(context, filePath);
-  if (!fileConfig) {
-    const dataSource = await promptDataSource();
-    if (dataSource === "cancelled") {
+    const env = await resolveJavaEnv(this.context.extensionPath);
+    if (!env) return;
+
+    // Resolve per-file config
+    let fileConfig = getPreviewConfig(this.context, filePath);
+    if (!fileConfig) {
+      const dataSource = await promptDataSource();
+      if (dataSource === "cancelled") {
+        return;
+      }
+      fileConfig = { dataSourcePath: dataSource };
+      await setPreviewConfig(this.context, filePath, fileConfig);
+    }
+
+    const format = resolveFormat(fileConfig);
+    const dataSourcePath = fileConfig.dataSourcePath;
+    const fileName = path.basename(filePath);
+
+    const channel = getOutputChannel();
+    channel.appendLine(`Previewing ${fileName} (${format})...`);
+    channel.appendLine(`  Java: ${env.javaPath} (${env.javaVersion})`);
+    channel.appendLine(`  File: ${filePath}`);
+    if (dataSourcePath) {
+      channel.appendLine(`  Data source: ${dataSourcePath}`);
+    }
+
+    try {
+      await vscode.window.withProgress(
+        {
+          location: vscode.ProgressLocation.Notification,
+          title: `Previewing ${fileName}`,
+          cancellable: false,
+        },
+        async () => {
+          if (format === "pdf") {
+            const pdfPath = await runPdfPreview(
+              env.javaPath,
+              env.classpath,
+              filePath,
+              dataSourcePath,
+            );
+            if (pdfPath) {
+              const uri = vscode.Uri.file(pdfPath);
+              await vscode.commands.executeCommand("vscode.open", uri, {
+                viewColumn,
+                preview: true,
+              });
+            }
+          } else {
+            const output = await runPreview(
+              env.javaPath,
+              env.classpath,
+              filePath,
+              format,
+              dataSourcePath,
+            );
+            if (output !== undefined) {
+              this.showPanel(fileName, output, viewColumn);
+            }
+          }
+        },
+      );
+    } finally {
+      if (env.tempClassDir) {
+        cleanupTempDir(env.tempClassDir);
+      }
+    }
+
+    this.setupLiveReload(filePath, viewColumn);
+  }
+
+  dispose(): void {
+    this.currentPanel?.dispose();
+    this.currentPanel = undefined;
+    this.disposeLiveReload();
+  }
+
+  private showPanel(
+    fileName: string,
+    content: string,
+    column: vscode.ViewColumn,
+  ): void {
+    const html = wrapHtml(content);
+
+    if (this.currentPanel) {
+      this.currentPanel.title = `Preview: ${fileName}`;
+      this.currentPanel.webview.html = html;
+      this.currentPanel.reveal(column);
       return;
     }
-    fileConfig = { dataSourcePath: dataSource };
-    await setPreviewConfig(context, filePath, fileConfig);
-  }
 
-  const format = resolveFormat(fileConfig);
-  const dataSourcePath = fileConfig.dataSourcePath;
-  const fileName = path.basename(filePath);
-
-  const channel = getOutputChannel();
-  channel.appendLine(`Previewing ${fileName} (${format})...`);
-  channel.appendLine(`  Java: ${env.javaPath} (${env.javaVersion})`);
-  channel.appendLine(`  File: ${filePath}`);
-  if (dataSourcePath) {
-    channel.appendLine(`  Data source: ${dataSourcePath}`);
-  }
-
-  try {
-    await vscode.window.withProgress(
+    this.currentPanel = vscode.window.createWebviewPanel(
+      PREVIEW_PANEL_TYPE,
+      `Preview: ${fileName}`,
+      column,
       {
-        location: vscode.ProgressLocation.Notification,
-        title: `Previewing ${fileName}`,
-        cancellable: false,
+        enableScripts: true,
+        retainContextWhenHidden: true,
+        localResourceRoots: [],
       },
-      async () => {
-        if (format === "pdf") {
-          const pdfPath = await runPdfPreview(
-            env.javaPath,
-            env.classpath,
-            filePath,
-            dataSourcePath,
-          );
-          if (pdfPath) {
-            const uri = vscode.Uri.file(pdfPath);
-            await vscode.commands.executeCommand("vscode.open", uri, {
-              viewColumn,
-              preview: true,
-            });
-          }
-        } else {
-          const output = await runPreview(
-            env.javaPath,
-            env.classpath,
-            filePath,
-            format,
-            dataSourcePath,
-          );
-          if (output !== undefined) {
-            showPreviewPanel(fileName, output, format, viewColumn);
-          }
+    );
+
+    this.currentPanel.webview.html = html;
+
+    this.currentPanel.onDidDispose(() => {
+      this.currentPanel = undefined;
+      this.disposeLiveReload();
+    });
+  }
+
+  private setupLiveReload(
+    filePath: string,
+    viewColumn: vscode.ViewColumn,
+  ): void {
+    this.disposeLiveReload();
+
+    const config = vscode.workspace.getConfiguration("jasperreports");
+    if (!config.get<boolean>("preview.liveReload", false)) {
+      return;
+    }
+
+    this.liveReloadDisposable = vscode.workspace.onDidSaveTextDocument(
+      (doc) => {
+        if (doc.fileName === filePath && this.currentPanel) {
+          this.preview(viewColumn, filePath);
         }
       },
     );
-  } finally {
-    if (env.tempClassDir) {
-      cleanupTempDir(env.tempClassDir);
-    }
+    this.context.subscriptions.push(this.liveReloadDisposable);
   }
 
-  setupLiveReload(context, filePath, viewColumn);
+  private disposeLiveReload(): void {
+    this.liveReloadDisposable?.dispose();
+    this.liveReloadDisposable = undefined;
+  }
 }
 
 async function runPreview(
@@ -181,40 +249,6 @@ async function runPdfPreview(
   return outputFile;
 }
 
-function showPreviewPanel(
-  fileName: string,
-  content: string,
-  format: PreviewFormat,
-  column: vscode.ViewColumn,
-): void {
-  const html = wrapHtml(content);
-
-  if (currentPanel) {
-    currentPanel.title = `Preview: ${fileName}`;
-    currentPanel.webview.html = html;
-    currentPanel.reveal(column);
-    return;
-  }
-
-  currentPanel = vscode.window.createWebviewPanel(
-    PREVIEW_PANEL_TYPE,
-    `Preview: ${fileName}`,
-    column,
-    {
-      enableScripts: true,
-      retainContextWhenHidden: true,
-      localResourceRoots: [],
-    },
-  );
-
-  currentPanel.webview.html = html;
-
-  currentPanel.onDidDispose(() => {
-    currentPanel = undefined;
-    disposeLiveReload();
-  });
-}
-
 function wrapHtml(jasperHtml: string): string {
   const style = `<style>
       body { margin: 0; padding: 16px; background: white; }
@@ -226,41 +260,10 @@ function wrapHtml(jasperHtml: string): string {
   return `${style}\n${jasperHtml}`;
 }
 
-function setupLiveReload(
-  context: vscode.ExtensionContext,
-  filePath: string,
-  viewColumn: vscode.ViewColumn,
-): void {
-  disposeLiveReload();
-
-  const config = vscode.workspace.getConfiguration("jasperreports");
-  if (!config.get<boolean>("preview.liveReload", false)) {
-    return;
-  }
-
-  liveReloadDisposable = vscode.workspace.onDidSaveTextDocument((doc) => {
-    if (doc.fileName === filePath && currentPanel) {
-      previewReport(context, viewColumn, filePath);
-    }
-  });
-  context.subscriptions.push(liveReloadDisposable);
-}
-
 function cleanupTempFile(filePath: string): void {
   try {
     fs.unlinkSync(filePath);
   } catch {
     // File may not exist if the process failed before writing
   }
-}
-
-function disposeLiveReload(): void {
-  liveReloadDisposable?.dispose();
-  liveReloadDisposable = undefined;
-}
-
-export function disposePreviewPanel(): void {
-  currentPanel?.dispose();
-  currentPanel = undefined;
-  disposeLiveReload();
 }

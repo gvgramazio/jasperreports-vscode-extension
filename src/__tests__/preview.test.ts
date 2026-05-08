@@ -26,19 +26,23 @@ import * as fs from "fs";
 import { resolveActiveJrxmlPath, resolveJavaEnv } from "../compiler";
 
 let mockContext: ReturnType<typeof createMockContext>;
+let previewManager: InstanceType<typeof import("../preview").PreviewManager>;
 
-beforeEach(() => {
+beforeEach(async () => {
   vi.clearAllMocks();
   vscode.window.activeTextEditor = undefined;
   mockContext = createMockContext();
+  const { PreviewManager } = await import("../preview");
+  previewManager = new PreviewManager(
+    mockContext as unknown as vscode.ExtensionContext,
+  );
 });
 
-describe("previewReport", () => {
+describe("PreviewManager", () => {
   it("returns early when no jrxml file is resolved", async () => {
     vi.mocked(resolveActiveJrxmlPath).mockReturnValue(undefined);
 
-    const { previewReport } = await import("../preview");
-    await previewReport(mockContext as unknown as vscode.ExtensionContext);
+    await previewManager.preview();
 
     expect(resolveJavaEnv).not.toHaveBeenCalled();
     expect(execFile).not.toHaveBeenCalled();
@@ -48,8 +52,7 @@ describe("previewReport", () => {
     vi.mocked(resolveActiveJrxmlPath).mockReturnValue("/test/report.jrxml");
     vi.mocked(resolveJavaEnv).mockResolvedValue(undefined);
 
-    const { previewReport } = await import("../preview");
-    await previewReport(mockContext as unknown as vscode.ExtensionContext);
+    await previewManager.preview();
 
     expect(execFile).not.toHaveBeenCalled();
   });
@@ -64,8 +67,7 @@ describe("previewReport", () => {
     // promptDataSource returns 'cancelled' when quick pick is dismissed
     vi.mocked(vscode.window.showQuickPick).mockResolvedValue(undefined);
 
-    const { previewReport } = await import("../preview");
-    await previewReport(mockContext as unknown as vscode.ExtensionContext);
+    await previewManager.preview();
 
     // Should not have proceeded to runPreview
     expect(execFile).not.toHaveBeenCalled();
@@ -100,8 +102,7 @@ describe("previewReport", () => {
       "<html><head></head><body>Report</body></html>",
     );
 
-    const { previewReport } = await import("../preview");
-    await previewReport(mockContext as unknown as vscode.ExtensionContext);
+    await previewManager.preview();
 
     expect(fs.readFileSync).toHaveBeenCalled();
     expect(fs.unlinkSync).toHaveBeenCalled();
@@ -137,8 +138,7 @@ describe("previewReport", () => {
 
     vi.mocked(fs.existsSync).mockReturnValue(true);
 
-    const { previewReport } = await import("../preview");
-    await previewReport(ctx);
+    await previewManager.preview();
 
     // PDF should be opened via vscode.open command, not in a webview
     expect(vscode.commands.executeCommand).toHaveBeenCalledWith(
@@ -174,9 +174,8 @@ describe("previewReport", () => {
       },
     );
 
-    const { previewReport, disposePreviewPanel } = await import("../preview");
-    disposePreviewPanel();
-    await previewReport(ctx);
+    previewManager.dispose();
+    await previewManager.preview();
 
     expect(vscode.window.showErrorMessage).toHaveBeenCalledWith(
       expect.stringContaining("Preview failed"),
@@ -210,9 +209,8 @@ describe("previewReport", () => {
       },
     );
 
-    const { previewReport, disposePreviewPanel } = await import("../preview");
-    disposePreviewPanel();
-    await previewReport(ctx);
+    previewManager.dispose();
+    await previewManager.preview();
 
     expect(vscode.window.showErrorMessage).toHaveBeenCalledWith(
       expect.stringContaining("timeout"),
@@ -247,9 +245,8 @@ describe("previewReport", () => {
 
     vi.mocked(fs.existsSync).mockReturnValue(false);
 
-    const { previewReport, disposePreviewPanel } = await import("../preview");
-    disposePreviewPanel();
-    await previewReport(ctx);
+    previewManager.dispose();
+    await previewManager.preview();
 
     expect(vscode.window.showErrorMessage).toHaveBeenCalledWith(
       "PDF output file was not created",
@@ -284,9 +281,8 @@ describe("previewReport", () => {
 
     vi.mocked(fs.existsSync).mockReturnValue(true);
 
-    const { previewReport, disposePreviewPanel } = await import("../preview");
-    disposePreviewPanel();
-    await previewReport(ctx);
+    previewManager.dispose();
+    await previewManager.preview();
 
     expect(vscode.commands.executeCommand).toHaveBeenCalledWith(
       "vscode.open",
@@ -326,9 +322,8 @@ describe("previewReport", () => {
 
     vi.mocked(fs.existsSync).mockReturnValue(true);
 
-    const { previewReport, disposePreviewPanel } = await import("../preview");
-    disposePreviewPanel();
-    await previewReport(ctx);
+    previewManager.dispose();
+    await previewManager.preview();
 
     const execCalls = vi.mocked(execFile).mock.calls;
     const lastArgs = execCalls[execCalls.length - 1][1] as string[];
@@ -336,10 +331,9 @@ describe("previewReport", () => {
   });
 });
 
-describe("disposePreviewPanel", () => {
+describe("dispose", () => {
   it("can be called without error when no panel exists", async () => {
-    const { disposePreviewPanel } = await import("../preview");
-    expect(() => disposePreviewPanel()).not.toThrow();
+    expect(() => previewManager.dispose()).not.toThrow();
   });
 });
 
@@ -368,9 +362,8 @@ describe("runPreview error handling", () => {
       },
     );
 
-    const { previewReport, disposePreviewPanel } = await import("../preview");
-    disposePreviewPanel(); // reset module state
-    await previewReport(mockContext as unknown as vscode.ExtensionContext);
+    previewManager.dispose();
+    await previewManager.preview();
 
     expect(vscode.window.showErrorMessage).toHaveBeenCalledWith(
       expect.stringContaining("Preview failed"),
@@ -403,9 +396,8 @@ describe("runPreview error handling", () => {
       },
     );
 
-    const { previewReport, disposePreviewPanel } = await import("../preview");
-    disposePreviewPanel();
-    await previewReport(mockContext as unknown as vscode.ExtensionContext);
+    previewManager.dispose();
+    await previewManager.preview();
 
     expect(vscode.window.showErrorMessage).toHaveBeenCalledWith(
       expect.stringContaining("timeout"),
@@ -440,9 +432,8 @@ describe("runPreview error handling", () => {
       throw new Error("ENOENT: file not found");
     });
 
-    const { previewReport, disposePreviewPanel } = await import("../preview");
-    disposePreviewPanel();
-    await previewReport(mockContext as unknown as vscode.ExtensionContext);
+    previewManager.dispose();
+    await previewManager.preview();
 
     expect(vscode.window.showErrorMessage).toHaveBeenCalledWith(
       expect.stringContaining("Failed to read preview output"),
@@ -480,17 +471,15 @@ describe("showPreviewPanel", () => {
       "<html><head></head><body>Report</body></html>",
     );
 
-    const { previewReport, disposePreviewPanel } = await import("../preview");
-    disposePreviewPanel();
-    const ctx = mockContext as unknown as vscode.ExtensionContext;
+    previewManager.dispose();
 
     // First preview creates a panel
-    await previewReport(ctx);
+    await previewManager.preview();
     const createCalls1 = vi.mocked(vscode.window.createWebviewPanel).mock.calls
       .length;
 
     // Second preview should reuse
-    await previewReport(ctx);
+    await previewManager.preview();
     const createCalls2 = vi.mocked(vscode.window.createWebviewPanel).mock.calls
       .length;
 
@@ -532,9 +521,8 @@ describe("wrapHtml", () => {
       "<body><p>No head tag</p></body>",
     );
 
-    const { previewReport, disposePreviewPanel } = await import("../preview");
-    disposePreviewPanel();
-    await previewReport(mockContext as unknown as vscode.ExtensionContext);
+    previewManager.dispose();
+    await previewManager.preview();
 
     const panel = vi.mocked(vscode.window.createWebviewPanel).mock.results[
       vi.mocked(vscode.window.createWebviewPanel).mock.results.length - 1
@@ -582,9 +570,8 @@ describe("setupLiveReload", () => {
       update: vi.fn(),
     } as never);
 
-    const { previewReport, disposePreviewPanel } = await import("../preview");
-    disposePreviewPanel();
-    await previewReport(mockContext as unknown as vscode.ExtensionContext);
+    previewManager.dispose();
+    await previewManager.preview();
 
     expect(vscode.workspace.onDidSaveTextDocument).toHaveBeenCalled();
   });
@@ -623,9 +610,8 @@ describe("data source logging", () => {
       "<html><head></head><body>Report</body></html>",
     );
 
-    const { previewReport, disposePreviewPanel } = await import("../preview");
-    disposePreviewPanel();
-    await previewReport(mockContext as unknown as vscode.ExtensionContext);
+    previewManager.dispose();
+    await previewManager.preview();
 
     // The data source path should have been passed to execFile
     const execCalls = vi.mocked(execFile).mock.calls;
@@ -663,9 +649,8 @@ describe("onDidDispose", () => {
       "<html><head></head><body>Report</body></html>",
     );
 
-    const { previewReport, disposePreviewPanel } = await import("../preview");
-    disposePreviewPanel();
-    await previewReport(mockContext as unknown as vscode.ExtensionContext);
+    previewManager.dispose();
+    await previewManager.preview();
 
     // Trigger onDidDispose callback
     const panel = vi.mocked(vscode.window.createWebviewPanel).mock.results[
@@ -675,7 +660,7 @@ describe("onDidDispose", () => {
     disposeHandler();
 
     // After dispose, next preview should create a new panel
-    await previewReport(mockContext as unknown as vscode.ExtensionContext);
+    await previewManager.preview();
     expect(vscode.window.createWebviewPanel).toHaveBeenCalledTimes(
       vi.mocked(vscode.window.createWebviewPanel).mock.calls.length,
     );

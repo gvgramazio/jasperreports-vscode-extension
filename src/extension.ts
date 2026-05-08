@@ -13,7 +13,7 @@ import {
   duplicateElement,
   addSection,
 } from "./outline";
-import { previewReport, disposePreviewPanel } from "./preview";
+import { PreviewManager } from "./preview";
 import { configurePreview } from "./previewConfigUI";
 import { NodePosition } from "./jrxml-parser";
 import { PropertiesViewProvider } from "./properties";
@@ -26,13 +26,14 @@ export async function activate(
   const channel = getOutputChannel();
   channel.appendLine("JasperReports extension is now active.");
 
+  const previewManager = new PreviewManager(context);
+
   await registerXmlFileAssociations(context);
-  registerCommands(context);
+  registerCommands(context, previewManager);
   registerOutlineView(context);
-  context.subscriptions.push(
-    { dispose: () => disposePreviewPanel() },
-    { dispose: () => disposeOutputChannel() },
-  );
+  context.subscriptions.push(previewManager, {
+    dispose: () => disposeOutputChannel(),
+  });
   await activateXmlExtension();
 }
 
@@ -43,16 +44,19 @@ export function deactivate(): void {
 /**
  * Registers extension commands.
  */
-function registerCommands(context: vscode.ExtensionContext): void {
+function registerCommands(
+  context: vscode.ExtensionContext,
+  previewManager: PreviewManager,
+): void {
   context.subscriptions.push(
     vscode.commands.registerCommand("jasperreports.compile", () =>
       compileReport(context.extensionPath),
     ),
     vscode.commands.registerCommand("jasperreports.preview", () =>
-      previewReport(context),
+      previewManager.preview(),
     ),
     vscode.commands.registerCommand("jasperreports.previewToSide", () =>
-      previewReport(context, vscode.ViewColumn.Beside),
+      previewManager.preview(vscode.ViewColumn.Beside),
     ),
     vscode.commands.registerCommand("jasperreports.downloadDependencies", () =>
       downloadDependencies(),
