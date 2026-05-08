@@ -75,12 +75,20 @@ function setupEditListeners(): void {
 
         try {
           const attributePosition = JSON.parse(posJson);
-          vscode.postMessage({
-            type: "edit",
-            attribute: attr,
-            value: state,
-            attributePosition,
-          });
+          if (state === "") {
+            vscode.postMessage({
+              type: "removeAttribute",
+              attribute: attr,
+              attributePosition,
+            });
+          } else {
+            vscode.postMessage({
+              type: "edit",
+              attribute: attr,
+              value: state,
+              attributePosition,
+            });
+          }
           checkbox.classList.add("applied");
         } catch {
           // ignore parse errors
@@ -106,12 +114,20 @@ function setupEditListeners(): void {
 
         try {
           const attributePosition = JSON.parse(posJson);
-          vscode.postMessage({
-            type: "edit",
-            attribute: attr,
-            value: newValue,
-            attributePosition,
-          });
+          if (newValue === "") {
+            vscode.postMessage({
+              type: "removeAttribute",
+              attribute: attr,
+              attributePosition,
+            });
+          } else {
+            vscode.postMessage({
+              type: "edit",
+              attribute: attr,
+              value: newValue,
+              attributePosition,
+            });
+          }
           select.classList.add("applied");
         } catch {
           // ignore parse errors
@@ -190,12 +206,20 @@ function setupEditListeners(): void {
 
         try {
           const attributePosition = JSON.parse(posJson);
-          vscode.postMessage({
-            type: "edit",
-            attribute: attr,
-            value: newValue,
-            attributePosition,
-          });
+          if (newValue === "") {
+            vscode.postMessage({
+              type: "removeAttribute",
+              attribute: attr,
+              attributePosition,
+            });
+          } else {
+            vscode.postMessage({
+              type: "edit",
+              attribute: attr,
+              value: newValue,
+              attributePosition,
+            });
+          }
           input.classList.remove("dirty");
           input.classList.add("applied");
           if (colorPicker && /^#[0-9a-fA-F]{6}$/.test(newValue)) {
