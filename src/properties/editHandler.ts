@@ -20,6 +20,12 @@ export interface ExpressionEditMessage {
   value: string;
 }
 
+export interface AddAttributeMessage {
+  type: "addAttribute";
+  attribute: string;
+  value: string;
+}
+
 /**
  * Applies an attribute value edit to the active JRXML document using
  * the exact byte offsets from the parser's attributePositions.
@@ -123,6 +129,48 @@ export async function handleRemoveAttribute(
   const wsEdit = new vscode.WorkspaceEdit();
   wsEdit.delete(document.uri, new vscode.Range(startPos, endPos));
   return vscode.workspace.applyEdit(wsEdit);
+}
+
+/**
+ * Inserts a new attribute into the opening tag of the given node.
+ * Places ` attribute="value"` just before `>` or `/>`.
+ */
+export async function handleAddAttribute(
+  node: JrxmlNode,
+  attribute: string,
+  value: string,
+): Promise<boolean> {
+  const editor = vscode.window.activeTextEditor;
+  if (!editor) return false;
+
+  const document = editor.document;
+  const text = document.getText();
+
+  const lines = text.split("\n");
+  const approxOffset = lcOffset(
+    lines,
+    node.position.startLine,
+    node.position.startColumn,
+  );
+
+  // Find '<' of the node's opening tag
+  const openTag = `<${node.tag}`;
+  const tagStart = text.lastIndexOf(openTag, approxOffset);
+  if (tagStart === -1) return false;
+
+  // Find the end of the opening tag ('>' or '/>')
+  const openEnd = text.indexOf(">", tagStart);
+  if (openEnd === -1) return false;
+
+  // Insert point: just before '>' or '/>'
+  const insertOffset = text[openEnd - 1] === "/" ? openEnd - 1 : openEnd;
+
+  const insertion = ` ${attribute}="${value}"`;
+  const pos = document.positionAt(insertOffset);
+
+  const edit = new vscode.WorkspaceEdit();
+  edit.insert(document.uri, pos, insertion);
+  return vscode.workspace.applyEdit(edit);
 }
 
 /**

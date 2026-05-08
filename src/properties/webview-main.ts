@@ -71,27 +71,41 @@ function setupEditListeners(): void {
 
         const attr = checkbox.dataset.attr;
         const posJson = checkbox.dataset.pos;
-        if (!attr || !posJson) return;
+        const isAbsent = checkbox.dataset.absent === "true";
 
-        try {
-          const attributePosition = JSON.parse(posJson);
-          if (state === "") {
+        if (!attr) return;
+
+        if (isAbsent) {
+          if (state !== "") {
             vscode.postMessage({
-              type: "removeAttribute",
-              attribute: attr,
-              attributePosition,
-            });
-          } else {
-            vscode.postMessage({
-              type: "edit",
+              type: "addAttribute",
               attribute: attr,
               value: state,
-              attributePosition,
             });
+            checkbox.classList.add("applied");
           }
-          checkbox.classList.add("applied");
-        } catch {
-          // ignore parse errors
+        } else {
+          if (!posJson) return;
+          try {
+            const attributePosition = JSON.parse(posJson);
+            if (state === "") {
+              vscode.postMessage({
+                type: "removeAttribute",
+                attribute: attr,
+                attributePosition,
+              });
+            } else {
+              vscode.postMessage({
+                type: "edit",
+                attribute: attr,
+                value: state,
+                attributePosition,
+              });
+            }
+            checkbox.classList.add("applied");
+          } catch {
+            // ignore parse errors
+          }
         }
       });
     });
@@ -110,27 +124,41 @@ function setupEditListeners(): void {
 
         const attr = select.dataset.attr;
         const posJson = select.dataset.pos;
-        if (!attr || !posJson) return;
+        const isAbsent = select.dataset.absent === "true";
 
-        try {
-          const attributePosition = JSON.parse(posJson);
-          if (newValue === "") {
+        if (!attr) return;
+
+        if (isAbsent) {
+          if (newValue !== "") {
             vscode.postMessage({
-              type: "removeAttribute",
-              attribute: attr,
-              attributePosition,
-            });
-          } else {
-            vscode.postMessage({
-              type: "edit",
+              type: "addAttribute",
               attribute: attr,
               value: newValue,
-              attributePosition,
             });
+            select.classList.add("applied");
           }
-          select.classList.add("applied");
-        } catch {
-          // ignore parse errors
+        } else {
+          if (!posJson) return;
+          try {
+            const attributePosition = JSON.parse(posJson);
+            if (newValue === "") {
+              vscode.postMessage({
+                type: "removeAttribute",
+                attribute: attr,
+                attributePosition,
+              });
+            } else {
+              vscode.postMessage({
+                type: "edit",
+                attribute: attr,
+                value: newValue,
+                attributePosition,
+              });
+            }
+            select.classList.add("applied");
+          } catch {
+            // ignore parse errors
+          }
         }
       });
     });
@@ -154,21 +182,35 @@ function setupEditListeners(): void {
       picker.addEventListener("change", () => {
         const attr = picker.dataset.attr;
         const posJson = picker.dataset.pos;
-        if (!attr || !posJson) return;
+        const isAbsent = picker.dataset.absent === "true";
 
-        try {
-          const attributePosition = JSON.parse(posJson);
+        if (!attr) return;
+
+        if (isAbsent) {
           vscode.postMessage({
-            type: "edit",
+            type: "addAttribute",
             attribute: attr,
             value: picker.value,
-            attributePosition,
           });
           textInput.classList.remove("dirty");
           textInput.classList.add("applied");
           picker.classList.add("applied");
-        } catch {
-          // ignore parse errors
+        } else {
+          if (!posJson) return;
+          try {
+            const attributePosition = JSON.parse(posJson);
+            vscode.postMessage({
+              type: "edit",
+              attribute: attr,
+              value: picker.value,
+              attributePosition,
+            });
+            textInput.classList.remove("dirty");
+            textInput.classList.add("applied");
+            picker.classList.add("applied");
+          } catch {
+            // ignore parse errors
+          }
         }
       });
     });
@@ -202,32 +244,51 @@ function setupEditListeners(): void {
 
         const attr = input.dataset.attr;
         const posJson = input.dataset.pos;
-        if (!attr || !posJson) return;
+        const isAbsent = input.dataset.absent === "true";
 
-        try {
-          const attributePosition = JSON.parse(posJson);
-          if (newValue === "") {
+        if (!attr) return;
+
+        if (isAbsent) {
+          if (newValue !== "") {
             vscode.postMessage({
-              type: "removeAttribute",
-              attribute: attr,
-              attributePosition,
-            });
-          } else {
-            vscode.postMessage({
-              type: "edit",
+              type: "addAttribute",
               attribute: attr,
               value: newValue,
-              attributePosition,
             });
+            input.classList.remove("dirty");
+            input.classList.add("applied");
+            if (colorPicker && /^#[0-9a-fA-F]{6}$/.test(newValue)) {
+              colorPicker.value = newValue;
+              colorPicker.classList.add("applied");
+            }
           }
-          input.classList.remove("dirty");
-          input.classList.add("applied");
-          if (colorPicker && /^#[0-9a-fA-F]{6}$/.test(newValue)) {
-            colorPicker.value = newValue;
-            colorPicker.classList.add("applied");
+        } else {
+          if (!posJson) return;
+          try {
+            const attributePosition = JSON.parse(posJson);
+            if (newValue === "") {
+              vscode.postMessage({
+                type: "removeAttribute",
+                attribute: attr,
+                attributePosition,
+              });
+            } else {
+              vscode.postMessage({
+                type: "edit",
+                attribute: attr,
+                value: newValue,
+                attributePosition,
+              });
+            }
+            input.classList.remove("dirty");
+            input.classList.add("applied");
+            if (colorPicker && /^#[0-9a-fA-F]{6}$/.test(newValue)) {
+              colorPicker.value = newValue;
+              colorPicker.classList.add("applied");
+            }
+          } catch {
+            // ignore parse errors
           }
-        } catch {
-          // ignore parse errors
         }
       };
 
