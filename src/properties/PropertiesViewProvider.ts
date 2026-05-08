@@ -7,6 +7,8 @@ import {
   EditMessage,
   handleExpressionEdit,
   ExpressionEditMessage,
+  handleRemoveAttribute,
+  RemoveAttributeMessage,
 } from "./editHandler";
 
 interface NodeIdentity {
@@ -42,12 +44,26 @@ export class PropertiesViewProvider implements vscode.WebviewViewProvider {
 
     webviewView.webview.onDidReceiveMessage(
       async (
-        message: EditMessage | ExpressionEditMessage | { type: "refresh" },
+        message:
+          | EditMessage
+          | ExpressionEditMessage
+          | RemoveAttributeMessage
+          | { type: "refresh" },
       ) => {
         if (message.type === "edit") {
           this._editInProgress = true;
           try {
             const success = await handleEditMessage(message);
+            if (success) {
+              this.reParseAndRefresh();
+            }
+          } finally {
+            this._editInProgress = false;
+          }
+        } else if (message.type === "removeAttribute") {
+          this._editInProgress = true;
+          try {
+            const success = await handleRemoveAttribute(message);
             if (success) {
               this.reParseAndRefresh();
             }

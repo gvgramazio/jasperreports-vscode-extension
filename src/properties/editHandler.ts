@@ -8,6 +8,12 @@ export interface EditMessage {
   attributePosition: AttributePosition;
 }
 
+export interface RemoveAttributeMessage {
+  type: "removeAttribute";
+  attribute: string;
+  attributePosition: AttributePosition;
+}
+
 export interface ExpressionEditMessage {
   type: "expressionEdit";
   expressionTag: string;
@@ -53,6 +59,70 @@ export async function handleEditMessage(
   const edit = new vscode.WorkspaceEdit();
   edit.replace(document.uri, range, value);
   return vscode.workspace.applyEdit(edit);
+}
+
+/**
+ * Removes an attribute entirely from the active JRXML document.
+ * Deletes the attribute name, `=`, quotes, value, and surrounding whitespace.
+ */
+export async function handleRemoveAttribute(
+  message: RemoveAttributeMessage,
+): Promise<boolean> {
+  const editor = vscode.window.activeTextEditor;
+  if (!editor) return false;
+
+  const document = editor.document;
+  const text = document.getText();
+
+  const { attributePosition, attribute } = message;
+
+  // Validate offsets are within document bounds
+  if (
+    attributePosition.nameStart < 0 ||
+    attributePosition.valueEnd > text.length
+  ) {
+    return false;
+  }
+
+  // Verify the attribute name at the recorded position still matches
+  const nameAtPosition = text.substring(
+    attributePosition.nameStart,
+    attributePosition.nameEnd,
+  );
+  if (nameAtPosition !== attribute) {
+    return false;
+  }
+
+  // Compute deletion range: from before the attribute name to after the closing quote.
+  // attributePosition.valueEnd points to the end of the value content (inside quotes).
+  // We need to include the closing quote character.
+  let end = attributePosition.valueEnd;
+  if (end < text.length && (text[end] === '"' || text[end] === "'")) {
+    end++;
+  }
+
+  // Extend backward to consume leading whitespace before the attribute name
+  let start = attributePosition.nameStart;
+  while (start > 0 && (text[start - 1] === " " || text[start - 1] === "\t")) {
+    start--;
+  }
+
+  // If we've consumed all whitespace back to a newline, consume that too
+  // (attribute was on its own line)
+  if (start > 0 && text[start - 1] === "\n") {
+    start--;
+    // Also consume a preceding \r for \r\n line endings
+    if (start > 0 && text[start - 1] === "\r") {
+      start--;
+    }
+  }
+
+  const startPos = document.positionAt(start);
+  const endPos = document.positionAt(end);
+
+  const wsEdit = new vscode.WorkspaceEdit();
+  wsEdit.delete(document.uri, new vscode.Range(startPos, endPos));
+  return vscode.workspace.applyEdit(wsEdit);
 }
 
 /**
