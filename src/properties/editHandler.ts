@@ -107,21 +107,7 @@ export async function handleRemoveAttribute(
     end++;
   }
 
-  // Extend backward to consume leading whitespace before the attribute name
-  let start = attributePosition.nameStart;
-  while (start > 0 && (text[start - 1] === " " || text[start - 1] === "\t")) {
-    start--;
-  }
-
-  // If we've consumed all whitespace back to a newline, consume that too
-  // (attribute was on its own line)
-  if (start > 0 && text[start - 1] === "\n") {
-    start--;
-    // Also consume a preceding \r for \r\n line endings
-    if (start > 0 && text[start - 1] === "\r") {
-      start--;
-    }
-  }
+  const start = consumeLeadingWhitespace(text, attributePosition.nameStart);
 
   const startPos = document.positionAt(start);
   const endPos = document.positionAt(end);
@@ -228,13 +214,7 @@ async function removeExpression(
   if (!range) return false;
 
   // Extend backward to include leading whitespace and preceding newline
-  let start = range.start;
-  while (start > 0 && (text[start - 1] === " " || text[start - 1] === "\t")) {
-    start--;
-  }
-  if (start > 0 && text[start - 1] === "\n") {
-    start--;
-  }
+  const start = consumeLeadingWhitespace(text, range.start);
 
   const startPos = document.positionAt(start);
   const endPos = document.positionAt(range.end);
@@ -349,4 +329,22 @@ function lcOffset(lines: string[], line: number, col: number): number {
     offset += lines[i].length + 1;
   }
   return offset + col;
+}
+
+/**
+ * Consumes leading whitespace (and preceding newline) backward from
+ * the given offset. Used when removing attributes or expression elements.
+ */
+function consumeLeadingWhitespace(text: string, offset: number): number {
+  let pos = offset;
+  while (pos > 0 && (text[pos - 1] === " " || text[pos - 1] === "\t")) {
+    pos--;
+  }
+  if (pos > 0 && text[pos - 1] === "\n") {
+    pos--;
+    if (pos > 0 && text[pos - 1] === "\r") {
+      pos--;
+    }
+  }
+  return pos;
 }
