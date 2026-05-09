@@ -280,4 +280,72 @@ describe("jrxml-parser", () => {
     // Just ensure it doesn't crash; CDATA outside tags is ignored
     expect(doc.root).toBeDefined();
   });
+
+  it("handles XML with namespace declarations", () => {
+    const xml = `<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  name="NamespaceReport">
+  <field name="id" class="java.lang.Integer"/>
+</jasperReport>`;
+    const doc = parseJrxml(xml);
+    expect(doc.hasErrors).toBe(false);
+    expect(doc.root!.tag).toBe("jasperReport");
+    expect(doc.root!.attributes["name"]).toBe("NamespaceReport");
+    expect(doc.root!.children).toHaveLength(1);
+    expect(doc.root!.children[0].attributes["name"]).toBe("id");
+  });
+
+  it("captures CDATA with special XML characters", () => {
+    const xml = `<element><expression><![CDATA[$F{amount} > 100 && $F{name} != "test"]]></expression></element>`;
+    const doc = parseJrxml(xml);
+    const expr = doc.root!.children[0];
+    expect(expr.text).toBe('$F{amount} > 100 && $F{name} != "test"');
+  });
+
+  it("handles attributes with special characters", () => {
+    const xml = `<element name="a&amp;b" title="&lt;hello&gt;" desc="line1&#10;line2"/>`;
+    const doc = parseJrxml(xml);
+    expect(doc.root!.attributes["name"]).toBe("a&b");
+    expect(doc.root!.attributes["title"]).toBe("<hello>");
+    expect(doc.root!.attributes["desc"]).toBe("line1\nline2");
+  });
+
+  it("handles empty CDATA sections", () => {
+    const xml = `<element><expression><![CDATA[]]></expression></element>`;
+    const doc = parseJrxml(xml);
+    const expr = doc.root!.children[0];
+    // Empty CDATA produces no text event, so text remains undefined
+    expect(expr.text).toBeUndefined();
+  });
+
+  it("handles unicode in attributes and text", () => {
+    const xml = `<element name="日本語"><expression>€100 · ñ</expression></element>`;
+    const doc = parseJrxml(xml);
+    expect(doc.root!.attributes["name"]).toBe("日本語");
+    expect(doc.root!.children[0].text).toBe("€100 · ñ");
+  });
+
+  it("handles deeply nested structures", () => {
+    const xml = `<a><b><c><d><e name="deep"/></d></c></b></a>`;
+    const doc = parseJrxml(xml);
+    const e = doc.root!.children[0].children[0].children[0].children[0];
+    expect(e.tag).toBe("e");
+    expect(e.attributes["name"]).toBe("deep");
+  });
+
+  it("parses large documents within reasonable time", () => {
+    const fields = Array.from(
+      { length: 500 },
+      (_, i) => `  <field name="f${i}" class="java.lang.String"/>`,
+    ).join("\n");
+    const xml = `<jasperReport name="Large">\n${fields}\n</jasperReport>`;
+
+    const start = performance.now();
+    const doc = parseJrxml(xml);
+    const elapsed = performance.now() - start;
+
+    expect(doc.hasErrors).toBe(false);
+    expect(doc.root!.children).toHaveLength(500);
+    expect(elapsed).toBeLessThan(1000);
+  });
 });

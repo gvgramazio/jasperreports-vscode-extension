@@ -1,22 +1,14 @@
 import { describe, it, expect } from "vitest";
 import { formatNodeProperties } from "../properties/formatNode";
-import { JrxmlNode } from "../jrxml-parser";
 // Ensure model elements are registered
 import "../model/elements";
+import { makeNode } from "./helpers/makeNode";
 
-function makeNode(overrides: Partial<JrxmlNode> = {}): JrxmlNode {
-  return {
-    tag: "unknownTag",
-    attributes: {},
-    children: [],
-    position: { startLine: 1, startColumn: 1, endLine: 1, endColumn: 10 },
-    ...overrides,
-  };
-}
+const UNKNOWN_DEFAULTS = { tag: "unknownTag" } as const;
 
 describe("formatNodeProperties — legacy (no model)", () => {
   it("returns empty array for node with no attributes or children", () => {
-    const node = makeNode();
+    const node = makeNode(UNKNOWN_DEFAULTS);
     expect(formatNodeProperties(node)).toEqual([]);
   });
 

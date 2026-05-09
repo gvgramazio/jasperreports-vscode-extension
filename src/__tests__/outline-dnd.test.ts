@@ -2,16 +2,13 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import * as vscode from "vscode";
 import { OutlineDragAndDropController, OutlineItem } from "../outline";
 import { JrxmlNode } from "../jrxml-parser";
+import { makeNode } from "./helpers/makeNode";
 
-function makeNode(overrides: Partial<JrxmlNode> = {}): JrxmlNode {
-  return {
-    tag: "field",
-    attributes: { name: "testField" },
-    children: [],
-    position: { startLine: 3, startColumn: 1, endLine: 3, endColumn: 50 },
-    ...overrides,
-  };
-}
+const FIELD_DEFAULTS: Partial<JrxmlNode> = {
+  tag: "field",
+  attributes: { name: "testField" },
+  position: { startLine: 3, startColumn: 1, endLine: 3, endColumn: 50 },
+};
 
 function makeItem(
   label: string,
@@ -36,7 +33,7 @@ describe("OutlineDragAndDropController", () => {
 
   describe("handleDrag", () => {
     it("adds draggable item to data transfer", () => {
-      const node = makeNode();
+      const node = makeNode(FIELD_DEFAULTS);
       const item = makeItem("myField", "field", node);
       const transfer = new vscode.DataTransfer();
       const token = { isCancellationRequested: false } as never;
@@ -115,7 +112,7 @@ describe("OutlineDragAndDropController", () => {
     }
 
     it("rejects drop when target is undefined", async () => {
-      const source = makeItem("myField", "field", makeNode());
+      const source = makeItem("myField", "field", makeNode(FIELD_DEFAULTS));
       const transfer = new vscode.DataTransfer();
       transfer.set(MIME, new vscode.DataTransferItem(source));
       const token = { isCancellationRequested: false } as never;
@@ -139,7 +136,12 @@ describe("OutlineDragAndDropController", () => {
         }),
         parentA,
       );
-      const target = makeItem("p", "parameter", makeNode(), parentB);
+      const target = makeItem(
+        "p",
+        "parameter",
+        makeNode(FIELD_DEFAULTS),
+        parentB,
+      );
       target.parent = parentB;
 
       const transfer = new vscode.DataTransfer();

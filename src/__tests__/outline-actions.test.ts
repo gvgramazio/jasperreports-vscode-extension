@@ -8,16 +8,14 @@ import {
   OutlineItem,
 } from "../outline";
 import { JrxmlNode } from "../jrxml-parser";
+import { makeNode } from "./helpers/makeNode";
+import { setupMockEditor, clearMockEditor } from "./helpers/setupEditor";
 
-function makeNode(overrides: Partial<JrxmlNode> = {}): JrxmlNode {
-  return {
-    tag: "field",
-    attributes: { name: "testField" },
-    children: [],
-    position: { startLine: 3, startColumn: 1, endLine: 3, endColumn: 40 },
-    ...overrides,
-  };
-}
+const FIELD_DEFAULTS: Partial<JrxmlNode> = {
+  tag: "field",
+  attributes: { name: "testField" },
+  position: { startLine: 3, startColumn: 1, endLine: 3, endColumn: 40 },
+};
 
 function makeGroupItem(
   kind: string,
@@ -26,28 +24,9 @@ function makeGroupItem(
   return new OutlineItem("Fields", kind as never, null, children);
 }
 
-function setupEditor(text: string): void {
-  const lines = text.split("\n");
-  (
-    vscode.window as {
-      activeTextEditor: unknown;
-    }
-  ).activeTextEditor = {
-    document: {
-      getText: () => text,
-      uri: { fsPath: "/test.jrxml", toString: () => "file:///test.jrxml" },
-      lineCount: lines.length,
-      lineAt: (line: number) => ({ text: lines[line] || "" }),
-      positionAt: (offset: number) => new vscode.Position(0, offset),
-      languageId: "jrxml",
-    },
-  };
-}
-
 beforeEach(() => {
   vi.clearAllMocks();
-  (vscode.window as { activeTextEditor: undefined }).activeTextEditor =
-    undefined;
+  clearMockEditor();
 });
 
 describe("addElement", () => {
@@ -59,7 +38,7 @@ describe("addElement", () => {
   });
 
   it("prompts for name and inserts field (single-child kind)", async () => {
-    const childNode = makeNode();
+    const childNode = makeNode(FIELD_DEFAULTS);
     const childItem = new OutlineItem(
       "testField",
       "field",
@@ -72,7 +51,9 @@ describe("addElement", () => {
     (vscode.window.showInputBox as ReturnType<typeof vi.fn>).mockResolvedValue(
       "newField",
     );
-    setupEditor('<jasperReport>\n  <field name="testField"/>\n</jasperReport>');
+    setupMockEditor(
+      '<jasperReport>\n  <field name="testField"/>\n</jasperReport>',
+    );
 
     await addElement(item);
 
@@ -86,7 +67,7 @@ describe("addElement", () => {
     (vscode.window.showInputBox as ReturnType<typeof vi.fn>).mockResolvedValue(
       "myStyle",
     );
-    setupEditor("<jasperReport>\n</jasperReport>");
+    setupMockEditor("<jasperReport>\n</jasperReport>");
 
     await addElement(item);
 
@@ -101,7 +82,7 @@ describe("addElement", () => {
     });
     const item = new OutlineItem("Detail", "section", sectionNode, []);
 
-    setupEditor(
+    setupMockEditor(
       '<jasperReport>\n  <detail>\n    <band height="20"/>\n  </detail>\n</jasperReport>',
     );
 
@@ -129,7 +110,7 @@ describe("addElement", () => {
         },
       },
     );
-    setupEditor(
+    setupMockEditor(
       '<jasperReport>\n  <detail>\n    <band height="20">\n    </band>\n  </detail>\n</jasperReport>',
     );
 
@@ -157,7 +138,7 @@ describe("addElement", () => {
         },
       },
     );
-    setupEditor(
+    setupMockEditor(
       '<jasperReport>\n  <detail>\n    <band height="20"/>\n  </detail>\n</jasperReport>',
     );
 
@@ -188,7 +169,7 @@ describe("addElement", () => {
         child: { label: "Group Header", kind: "groupHeader", needsName: false },
       },
     );
-    setupEditor(
+    setupMockEditor(
       '<jasperReport>\n  <group name="myGroup">\n  </group>\n</jasperReport>',
     );
 
@@ -208,7 +189,7 @@ describe("addElement", () => {
     (vscode.window.showQuickPick as ReturnType<typeof vi.fn>).mockResolvedValue(
       undefined,
     );
-    setupEditor("<jasperReport>\n</jasperReport>");
+    setupMockEditor("<jasperReport>\n</jasperReport>");
 
     await addElement(item);
 
@@ -240,10 +221,12 @@ describe("addElement", () => {
 
 describe("deleteElement", () => {
   it("deletes after confirmation", async () => {
-    const node = makeNode();
+    const node = makeNode(FIELD_DEFAULTS);
     const item = new OutlineItem("testField", "field", node, [], "String");
 
-    setupEditor('<jasperReport>\n  <field name="testField"/>\n</jasperReport>');
+    setupMockEditor(
+      '<jasperReport>\n  <field name="testField"/>\n</jasperReport>',
+    );
     (
       vscode.window.showWarningMessage as ReturnType<typeof vi.fn>
     ).mockResolvedValue("Delete");
@@ -255,10 +238,12 @@ describe("deleteElement", () => {
   });
 
   it("does nothing when user cancels", async () => {
-    const node = makeNode();
+    const node = makeNode(FIELD_DEFAULTS);
     const item = new OutlineItem("testField", "field", node, [], "String");
 
-    setupEditor('<jasperReport>\n  <field name="testField"/>\n</jasperReport>');
+    setupMockEditor(
+      '<jasperReport>\n  <field name="testField"/>\n</jasperReport>',
+    );
     (
       vscode.window.showWarningMessage as ReturnType<typeof vi.fn>
     ).mockResolvedValue(undefined);
@@ -277,7 +262,7 @@ describe("deleteElement", () => {
   });
 
   it("does nothing when no active editor", async () => {
-    const node = makeNode();
+    const node = makeNode(FIELD_DEFAULTS);
     const item = new OutlineItem("testField", "field", node, [], "String");
 
     (vscode.window as { activeTextEditor: undefined }).activeTextEditor =
@@ -295,7 +280,7 @@ describe("addElement — additional scenarios", () => {
     (vscode.window.showInputBox as ReturnType<typeof vi.fn>).mockResolvedValue(
       "city",
     );
-    setupEditor("<jasperReport>\n</jasperReport>");
+    setupMockEditor("<jasperReport>\n</jasperReport>");
 
     await addElement(item);
 
@@ -308,7 +293,7 @@ describe("addElement — additional scenarios", () => {
     (vscode.window.showInputBox as ReturnType<typeof vi.fn>).mockResolvedValue(
       "myParam",
     );
-    setupEditor("<jasperReport>\n</jasperReport>");
+    setupMockEditor("<jasperReport>\n</jasperReport>");
 
     await addElement(item);
 
@@ -321,7 +306,7 @@ describe("addElement — additional scenarios", () => {
     (vscode.window.showInputBox as ReturnType<typeof vi.fn>).mockResolvedValue(
       "myVar",
     );
-    setupEditor("<jasperReport>\n</jasperReport>");
+    setupMockEditor("<jasperReport>\n</jasperReport>");
 
     await addElement(item);
 
@@ -334,7 +319,7 @@ describe("addElement — additional scenarios", () => {
     (vscode.window.showInputBox as ReturnType<typeof vi.fn>).mockResolvedValue(
       "CityGroup",
     );
-    setupEditor("<jasperReport>\n</jasperReport>");
+    setupMockEditor("<jasperReport>\n</jasperReport>");
 
     await addElement(item);
 
@@ -357,7 +342,7 @@ describe("addElement — template and edge coverage", () => {
         return "validName";
       },
     );
-    setupEditor("<jasperReport>\n</jasperReport>");
+    setupMockEditor("<jasperReport>\n</jasperReport>");
 
     await addElement(item);
 
@@ -377,7 +362,7 @@ describe("addElement — template and edge coverage", () => {
         child: { label: "Group Footer", kind: "groupFooter", needsName: false },
       },
     );
-    setupEditor(
+    setupMockEditor(
       '<jasperReport>\n  <group name="myGroup">\n  </group>\n</jasperReport>',
     );
 
@@ -407,7 +392,7 @@ describe("addElement — template and edge coverage", () => {
         },
       },
     );
-    setupEditor(
+    setupMockEditor(
       '<jasperReport>\n  <detail>\n    <band height="20">\n    </band>\n  </detail>\n</jasperReport>',
     );
 
@@ -429,7 +414,7 @@ describe("addElement — template and edge coverage", () => {
         child: { label: "Image", kind: "element:image", needsName: false },
       },
     );
-    setupEditor(
+    setupMockEditor(
       '<jasperReport>\n  <detail>\n    <band height="20">\n    </band>\n  </detail>\n</jasperReport>',
     );
 
@@ -451,7 +436,7 @@ describe("addElement — template and edge coverage", () => {
         child: { label: "Line", kind: "element:line", needsName: false },
       },
     );
-    setupEditor(
+    setupMockEditor(
       '<jasperReport>\n  <detail>\n    <band height="20">\n    </band>\n  </detail>\n</jasperReport>',
     );
 
@@ -477,7 +462,7 @@ describe("addElement — template and edge coverage", () => {
         },
       },
     );
-    setupEditor(
+    setupMockEditor(
       '<jasperReport>\n  <detail>\n    <band height="20">\n    </band>\n  </detail>\n</jasperReport>',
     );
 
@@ -503,7 +488,7 @@ describe("addElement — template and edge coverage", () => {
         },
       },
     );
-    setupEditor(
+    setupMockEditor(
       '<jasperReport>\n  <detail>\n    <band height="20">\n    </band>\n  </detail>\n</jasperReport>',
     );
 
@@ -525,7 +510,7 @@ describe("addElement — template and edge coverage", () => {
         child: { label: "Frame", kind: "element:frame", needsName: false },
       },
     );
-    setupEditor(
+    setupMockEditor(
       '<jasperReport>\n  <detail>\n    <band height="20">\n    </band>\n  </detail>\n</jasperReport>',
     );
 
@@ -539,7 +524,7 @@ describe("addElement — template and edge coverage", () => {
     (vscode.window.showInputBox as ReturnType<typeof vi.fn>).mockResolvedValue(
       "newField",
     );
-    setupEditor(
+    setupMockEditor(
       '<jasperReport>\n  <parameter name="p1" class="java.lang.String"/>\n</jasperReport>',
     );
 
@@ -560,7 +545,7 @@ describe("addElement — template and edge coverage", () => {
     (vscode.window.showInputBox as ReturnType<typeof vi.fn>).mockResolvedValue(
       "myStyle",
     );
-    setupEditor(
+    setupMockEditor(
       '<jasperReport>\n  <field name="f1" class="java.lang.String"/>\n</jasperReport>',
     );
 
@@ -581,7 +566,7 @@ describe("addElement — template and edge coverage", () => {
     (vscode.window.showInputBox as ReturnType<typeof vi.fn>).mockResolvedValue(
       "newField",
     );
-    setupEditor("<jasperReport>\n</jasperReport>");
+    setupMockEditor("<jasperReport>\n</jasperReport>");
 
     await addElement(item);
 
@@ -612,7 +597,7 @@ describe("addElement — template and edge coverage", () => {
         },
       },
     );
-    setupEditor("<jasperReport>\n</jasperReport>");
+    setupMockEditor("<jasperReport>\n</jasperReport>");
 
     await addElement(item);
 
@@ -631,7 +616,7 @@ describe("addElement — template and edge coverage", () => {
     (vscode.window.showInputBox as ReturnType<typeof vi.fn>).mockResolvedValue(
       "anotherField",
     );
-    setupEditor(
+    setupMockEditor(
       '<jasperReport>\n  <field name="existingField"/>\n</jasperReport>',
     );
 
@@ -645,7 +630,7 @@ describe("addElement — template and edge coverage", () => {
     (vscode.window.showInputBox as ReturnType<typeof vi.fn>).mockResolvedValue(
       "newField",
     );
-    setupEditor("<jasperReport/>");
+    setupMockEditor("<jasperReport/>");
 
     await addElement(item);
 
@@ -666,7 +651,7 @@ describe("addElement — template and edge coverage", () => {
         child: { label: "Break", kind: "element:break", needsName: false },
       },
     );
-    setupEditor(
+    setupMockEditor(
       '<jasperReport>\n  <detail>\n    <band height="20">\n    </band>\n  </detail>\n</jasperReport>',
     );
 
@@ -697,7 +682,7 @@ describe("addElement — template and edge coverage", () => {
         },
       },
     );
-    setupEditor(
+    setupMockEditor(
       '<jasperReport>\n  <detail>\n    <band height="20">\n    </band>\n  </detail>\n</jasperReport>',
     );
 
@@ -726,7 +711,9 @@ describe("addElement — template and edge coverage", () => {
     (vscode.window.showInputBox as ReturnType<typeof vi.fn>).mockResolvedValue(
       "newField",
     );
-    setupEditor('<jasperReport>\n  <field name="field1"/>\n</jasperReport>');
+    setupMockEditor(
+      '<jasperReport>\n  <field name="field1"/>\n</jasperReport>',
+    );
 
     await addElement(item);
 
@@ -738,7 +725,7 @@ describe("addElement — template and edge coverage", () => {
 describe("duplicateElement", () => {
   it("does nothing when item has no node", async () => {
     const item = new OutlineItem("Fields", "group-fields" as never, null, []);
-    setupEditor("<jasperReport/>");
+    setupMockEditor("<jasperReport/>");
 
     await duplicateElement(item);
 
@@ -765,7 +752,7 @@ describe("duplicateElement", () => {
       position: { startLine: 2, startColumn: 1, endLine: 2, endColumn: 50 },
     });
     const item = new OutlineItem("myField", "field", node, [], "String");
-    setupEditor(
+    setupMockEditor(
       '<jasperReport>\n  <field name="myField" class="java.lang.String"/>\n</jasperReport>',
     );
 
@@ -793,7 +780,7 @@ describe("duplicateElement", () => {
       position: { startLine: 4, startColumn: 1, endLine: 4, endColumn: 80 },
     });
     const item = new OutlineItem("textField", "element", node, []);
-    setupEditor(
+    setupMockEditor(
       '<jasperReport>\n  <detail>\n    <band>\n      <element kind="textField" uuid="aaaa-bbbb-cccc" x="0" y="0"/>\n    </band>\n  </detail>\n</jasperReport>',
     );
 
@@ -816,7 +803,7 @@ describe("duplicateElement", () => {
       position: { startLine: 4, startColumn: 1, endLine: 4, endColumn: 60 },
     });
     const item = new OutlineItem("line", "element", node, []);
-    setupEditor(
+    setupMockEditor(
       '<jasperReport>\n  <detail>\n    <band>\n      <element kind="line" x="0" y="0"/>\n    </band>\n  </detail>\n</jasperReport>',
     );
 
@@ -838,7 +825,7 @@ describe("addSection", () => {
   });
 
   it("does nothing when all sections present", async () => {
-    setupEditor(
+    setupMockEditor(
       `<jasperReport>
   <title><band height="50"/></title>
   <pageHeader><band height="30"/></pageHeader>
@@ -858,7 +845,7 @@ describe("addSection", () => {
   });
 
   it("shows quick pick with missing sections only", async () => {
-    setupEditor(
+    setupMockEditor(
       '<jasperReport>\n  <title><band height="50"/></title>\n  <detail><band height="30"/></detail>\n</jasperReport>',
     );
     (vscode.window.showQuickPick as ReturnType<typeof vi.fn>).mockResolvedValue(
@@ -879,7 +866,7 @@ describe("addSection", () => {
   });
 
   it("inserts section at correct position", async () => {
-    setupEditor(
+    setupMockEditor(
       '<jasperReport>\n  <title><band height="50"/></title>\n  <detail><band height="30"/></detail>\n</jasperReport>',
     );
     (vscode.window.showQuickPick as ReturnType<typeof vi.fn>).mockResolvedValue(
@@ -898,7 +885,7 @@ describe("addSection", () => {
   });
 
   it("does nothing when user cancels quick pick", async () => {
-    setupEditor(
+    setupMockEditor(
       '<jasperReport>\n  <title><band height="50"/></title>\n</jasperReport>',
     );
     (vscode.window.showQuickPick as ReturnType<typeof vi.fn>).mockResolvedValue(
