@@ -22,6 +22,10 @@ import { PreviewManager } from "./preview";
 import { configurePreview } from "./previewConfigUI";
 import { NodePosition } from "./jrxml-parser";
 import { PropertiesViewProvider } from "./properties";
+import {
+  ExpressionEditorProvider,
+  EXPR_SCHEME,
+} from "./properties/expressionEditorProvider";
 
 const XML_EXTENSION_ID = "redhat.vscode-xml";
 
@@ -94,12 +98,22 @@ function registerOutlineView(context: vscode.ExtensionContext): void {
 
   // Properties panel
   const propertiesProvider = new PropertiesViewProvider(context.extensionUri);
+  const expressionEditorProvider = new ExpressionEditorProvider();
+
+  context.subscriptions.push(
+    vscode.workspace.registerFileSystemProvider(
+      EXPR_SCHEME,
+      expressionEditorProvider,
+    ),
+  );
   context.subscriptions.push(
     vscode.window.registerWebviewViewProvider(
       PropertiesViewProvider.viewType,
       propertiesProvider,
     ),
   );
+
+  propertiesProvider.expressionEditorProvider = expressionEditorProvider;
 
   // Update properties when tree selection changes
   context.subscriptions.push(

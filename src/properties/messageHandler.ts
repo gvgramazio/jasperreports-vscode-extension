@@ -8,19 +8,27 @@ import {
   handleAddAttribute,
   AddAttributeMessage,
 } from "./editHandler";
+import { ExpressionEditorProvider } from "./expressionEditorProvider";
 import { NodeIdentityTracker } from "./nodeIdentity";
+
+export interface OpenInEditorMessage {
+  type: "openInEditor";
+  expressionTag: string;
+}
 
 export type WebviewMessage =
   | EditMessage
   | ExpressionEditMessage
   | RemoveAttributeMessage
   | AddAttributeMessage
+  | OpenInEditorMessage
   | { type: "refresh" };
 
 interface MessageHandlerDeps {
   tracker: NodeIdentityTracker;
   onRefresh: () => void;
   setEditInProgress: (value: boolean) => void;
+  expressionEditorProvider?: ExpressionEditorProvider;
 }
 
 export async function handleWebviewMessage(
@@ -77,5 +85,13 @@ export async function handleWebviewMessage(
     }
   } else if (message.type === "refresh") {
     onRefresh();
+  } else if (message.type === "openInEditor") {
+    const identity = tracker.current;
+    if (identity && deps.expressionEditorProvider) {
+      await deps.expressionEditorProvider.openExpression(
+        identity,
+        message.expressionTag,
+      );
+    }
   }
 }

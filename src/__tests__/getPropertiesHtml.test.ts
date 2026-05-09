@@ -419,6 +419,7 @@ describe("getPropertiesHtml", () => {
     expect(html).toContain('data-expr-tag="expression"');
     expect(html).toContain("$F{name}");
     expect(html).toContain("expr-expand-btn");
+    expect(html).toContain("expr-open-editor-btn");
     // Should NOT have data-attr or data-pos (attribute-style edits)
     expect(html).not.toContain('data-attr="expression"');
     expect(html).not.toContain("data-pos=");

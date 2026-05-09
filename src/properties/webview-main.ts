@@ -372,6 +372,17 @@ function setupEditListeners(): void {
       });
     });
 
+  // Open in Editor buttons for expression textareas
+  document
+    .querySelectorAll<HTMLButtonElement>(".expr-open-editor-btn")
+    .forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const exprTag = btn.dataset.exprTag;
+        if (!exprTag) return;
+        vscode.postMessage({ type: "openInEditor", expressionTag: exprTag });
+      });
+    });
+
   // Handle stale banner
   const overlay = document.getElementById("stale-overlay");
   if (overlay) {

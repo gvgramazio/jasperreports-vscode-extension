@@ -22,6 +22,7 @@ vi.mock("../properties/editHandler", () => ({
 vi.mock("../properties/nodeIdentity", () => {
   const NodeIdentityTracker = vi.fn();
   NodeIdentityTracker.prototype.findCurrentNode = vi.fn();
+  NodeIdentityTracker.prototype.current = null;
   return { NodeIdentityTracker };
 });
 
@@ -244,6 +245,63 @@ describe("handleWebviewMessage", () => {
 
       expect(onRefresh).toHaveBeenCalled();
       expect(setEditInProgress).not.toHaveBeenCalled();
+    });
+  });
+
+  // ── openInEditor ──
+
+  describe("openInEditor message", () => {
+    const openMsg: WebviewMessage = {
+      type: "openInEditor",
+      expressionTag: "expression",
+    };
+
+    it("calls expressionEditorProvider.openExpression when identity and provider exist", async () => {
+      const identity = {
+        tag: "element",
+        name: "",
+        uuid: "abc",
+        label: "TextField",
+      };
+      Object.defineProperty(tracker, "current", { get: () => identity });
+      const mockProvider = {
+        openExpression: vi.fn().mockResolvedValue(undefined),
+      };
+
+      await handleWebviewMessage(openMsg, {
+        ...deps(),
+        expressionEditorProvider: mockProvider as never,
+      });
+
+      expect(mockProvider.openExpression).toHaveBeenCalledWith(
+        identity,
+        "expression",
+      );
+    });
+
+    it("does nothing when no identity", async () => {
+      Object.defineProperty(tracker, "current", { get: () => null });
+      const mockProvider = { openExpression: vi.fn() };
+
+      await handleWebviewMessage(openMsg, {
+        ...deps(),
+        expressionEditorProvider: mockProvider as never,
+      });
+
+      expect(mockProvider.openExpression).not.toHaveBeenCalled();
+    });
+
+    it("does nothing when no expressionEditorProvider", async () => {
+      const identity = {
+        tag: "element",
+        name: "",
+        uuid: "abc",
+        label: "TextField",
+      };
+      Object.defineProperty(tracker, "current", { get: () => identity });
+
+      // Should not throw
+      await handleWebviewMessage(openMsg, deps());
     });
   });
 });
