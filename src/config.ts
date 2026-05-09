@@ -38,3 +38,12 @@ export function isLiveReloadEnabled(): boolean {
 export function getPreviewFormat(): PreviewFormat {
   return cfg().get<PreviewFormat>("preview.format", "html");
 }
+
+export type ExpressionEnterBehavior = "commit" | "newline";
+
+export function getExpressionEnterBehavior(): ExpressionEnterBehavior {
+  return cfg().get<ExpressionEnterBehavior>(
+    "expression.enterBehavior",
+    "commit",
+  );
+}

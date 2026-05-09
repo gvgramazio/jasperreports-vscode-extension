@@ -381,6 +381,18 @@ describe("getPropertiesHtml", () => {
     expect(html).toContain("opacity");
   });
 
+  it("renders data-expr-enter attribute with default commit value", () => {
+    const html = getPropertiesHtml(makeWebview(), extensionUri, [], "");
+    expect(html).toContain('data-expr-enter="commit"');
+  });
+
+  it("renders data-expr-enter attribute with newline value", () => {
+    const html = getPropertiesHtml(makeWebview(), extensionUri, [], "", {
+      expressionEnterBehavior: "newline",
+    });
+    expect(html).toContain('data-expr-enter="newline"');
+  });
+
   it("renders expression entries as textarea with edit-expression class", () => {
     const groups: PropertyGroup[] = [
       {

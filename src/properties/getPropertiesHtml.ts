@@ -1,12 +1,18 @@
 import * as crypto from "crypto";
 import * as vscode from "vscode";
+import type { ExpressionEnterBehavior } from "../config";
 import { PropertyEntry, PropertyGroup } from "./formatNode";
+
+export interface PropertiesHtmlOptions {
+  expressionEnterBehavior?: ExpressionEnterBehavior;
+}
 
 export function getPropertiesHtml(
   webview: vscode.Webview,
   extensionUri: vscode.Uri,
   groups: PropertyGroup[],
   nodeLabel: string,
+  options?: PropertiesHtmlOptions,
 ): string {
   const scriptUri = webview.asWebviewUri(
     vscode.Uri.joinPath(extensionUri, "dist", "webview-properties.js"),
@@ -17,6 +23,8 @@ export function getPropertiesHtml(
     groups.length > 0
       ? groups.map((g) => renderGroup(g)).join("\n")
       : `<p class="empty">Select an element in the outline to view its properties.</p>`;
+
+  const enterBehavior = options?.expressionEnterBehavior ?? "commit";
 
   return `<!DOCTYPE html>
 <html lang="en">
@@ -191,7 +199,7 @@ export function getPropertiesHtml(
     }
   </style>
 </head>
-<body>
+<body data-expr-enter="${enterBehavior}">
   <div id="stale-overlay" class="stale-overlay">
     <div class="stale-message">Document changed externally.<br/>Click to refresh.</div>
   </div>

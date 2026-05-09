@@ -9,6 +9,7 @@ import {
   getCustomJrtxSchemaPath,
   isLiveReloadEnabled,
   getPreviewFormat,
+  getExpressionEnterBehavior,
 } from "../config";
 
 beforeEach(() => {
@@ -93,6 +94,16 @@ describe("config", () => {
   it("getPreviewFormat returns html by default", () => {
     mockConfig({});
     expect(getPreviewFormat()).toBe("html");
+  });
+
+  it("getExpressionEnterBehavior returns configured value", () => {
+    mockConfig({ "expression.enterBehavior": "newline" });
+    expect(getExpressionEnterBehavior()).toBe("newline");
+  });
+
+  it("getExpressionEnterBehavior returns commit by default", () => {
+    mockConfig({});
+    expect(getExpressionEnterBehavior()).toBe("commit");
   });
 
   it("reads from jasperreports configuration section", () => {
