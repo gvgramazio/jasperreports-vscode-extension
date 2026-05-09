@@ -3,17 +3,7 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import * as vscode from "vscode";
 import { Uri } from "vscode";
 import { PropertiesViewProvider } from "../properties/PropertiesViewProvider";
-import { JrxmlNode } from "../jrxml-parser";
-
-function makeNode(overrides: Partial<JrxmlNode> = {}): JrxmlNode {
-  return {
-    tag: "element",
-    attributes: { kind: "TextField", x: "10", y: "20" },
-    children: [],
-    position: { startLine: 1, startColumn: 1, endLine: 1, endColumn: 10 },
-    ...overrides,
-  };
-}
+import { makeNode } from "./helpers/makeNode";
 
 describe("PropertiesViewProvider", () => {
   let provider: PropertiesViewProvider;
@@ -57,7 +47,7 @@ describe("PropertiesViewProvider", () => {
 
   it("update renders properties for a node", () => {
     provider.resolveWebviewView(mockWebviewView as never);
-    const node = makeNode();
+    const node = makeNode({ attributes: { kind: "TextField", x: "10" } });
     provider.update(node, "TextField");
 
     expect(mockWebviewView.webview.html).toContain("TextField");
