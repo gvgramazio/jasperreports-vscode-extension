@@ -381,7 +381,7 @@ describe("getPropertiesHtml", () => {
     expect(html).toContain("opacity");
   });
 
-  it("renders expression entries as editable inputs with edit-expression class", () => {
+  it("renders expression entries as textarea with edit-expression class", () => {
     const groups: PropertyGroup[] = [
       {
         label: "Expressions",
@@ -402,16 +402,17 @@ describe("getPropertiesHtml", () => {
       groups,
       "TextField",
     );
+    expect(html).toContain("<textarea");
     expect(html).toContain("edit-expression");
-    expect(html).toContain("edit-input");
     expect(html).toContain('data-expr-tag="expression"');
     expect(html).toContain("$F{name}");
+    expect(html).toContain("expr-expand-btn");
     // Should NOT have data-attr or data-pos (attribute-style edits)
     expect(html).not.toContain('data-attr="expression"');
     expect(html).not.toContain("data-pos=");
   });
 
-  it("renders absent expression entries as editable inputs", () => {
+  it("renders absent expression entries as editable textareas", () => {
     const groups: PropertyGroup[] = [
       {
         label: "Expressions",
