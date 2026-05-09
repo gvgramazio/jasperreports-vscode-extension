@@ -35,7 +35,9 @@ import { validateJavac } from "../java";
 beforeEach(() => {
   vi.clearAllMocks();
   vi.mocked(fs.mkdtempSync).mockReturnValue("/tmp/jr-sources-abc");
-  vi.mocked(fs.readdirSync).mockReturnValue([]);
+  (
+    vi.mocked(fs.readdirSync) as unknown as ReturnType<typeof vi.fn>
+  ).mockReturnValue([]);
 });
 
 describe("findJavaFiles", () => {
@@ -44,7 +46,9 @@ describe("findJavaFiles", () => {
   });
 
   it("finds .java files recursively", () => {
-    vi.mocked(fs.readdirSync).mockImplementation((dir) => {
+    (
+      vi.mocked(fs.readdirSync) as unknown as ReturnType<typeof vi.fn>
+    ).mockImplementation((dir) => {
       const d = String(dir);
       if (d === "/src") {
         return [
@@ -70,7 +74,9 @@ describe("findJavaFiles", () => {
   });
 
   it("skips directories that cannot be read", () => {
-    vi.mocked(fs.readdirSync).mockImplementation(() => {
+    (
+      vi.mocked(fs.readdirSync) as unknown as ReturnType<typeof vi.fn>
+    ).mockImplementation(() => {
       throw new Error("EACCES");
     });
 
@@ -85,7 +91,9 @@ describe("compileJavaSources", () => {
   });
 
   it("returns temp dir on successful compilation", async () => {
-    vi.mocked(fs.readdirSync).mockReturnValue([
+    (
+      vi.mocked(fs.readdirSync) as unknown as ReturnType<typeof vi.fn>
+    ).mockReturnValue([
       { name: "Foo.java", isFile: () => true, isDirectory: () => false },
     ] as unknown as fs.Dirent[]);
 
@@ -110,7 +118,9 @@ describe("compileJavaSources", () => {
   });
 
   it("logs stdout when javac produces output", async () => {
-    vi.mocked(fs.readdirSync).mockReturnValue([
+    (
+      vi.mocked(fs.readdirSync) as unknown as ReturnType<typeof vi.fn>
+    ).mockReturnValue([
       { name: "Foo.java", isFile: () => true, isDirectory: () => false },
     ] as unknown as fs.Dirent[]);
 
@@ -130,7 +140,9 @@ describe("compileJavaSources", () => {
   });
 
   it("returns undefined and shows error on compilation failure", async () => {
-    vi.mocked(fs.readdirSync).mockReturnValue([
+    (
+      vi.mocked(fs.readdirSync) as unknown as ReturnType<typeof vi.fn>
+    ).mockReturnValue([
       { name: "Bad.java", isFile: () => true, isDirectory: () => false },
     ] as unknown as fs.Dirent[]);
 
@@ -153,7 +165,9 @@ describe("compileJavaSources", () => {
   });
 
   it("returns undefined when javac validation fails", async () => {
-    vi.mocked(fs.readdirSync).mockReturnValue([
+    (
+      vi.mocked(fs.readdirSync) as unknown as ReturnType<typeof vi.fn>
+    ).mockReturnValue([
       { name: "Foo.java", isFile: () => true, isDirectory: () => false },
     ] as unknown as fs.Dirent[]);
     vi.mocked(validateJavac).mockResolvedValue({
@@ -172,7 +186,9 @@ describe("compileJavaSources", () => {
 
 describe("copyResourceFiles", () => {
   it("copies non-java files preserving relative paths", () => {
-    vi.mocked(fs.readdirSync).mockImplementation((dir) => {
+    (
+      vi.mocked(fs.readdirSync) as unknown as ReturnType<typeof vi.fn>
+    ).mockImplementation((dir) => {
       const d = String(dir);
       if (d === "/src") {
         return [
@@ -215,7 +231,9 @@ describe("copyResourceFiles", () => {
   });
 
   it("skips unreadable directories", () => {
-    vi.mocked(fs.readdirSync).mockImplementation(() => {
+    (
+      vi.mocked(fs.readdirSync) as unknown as ReturnType<typeof vi.fn>
+    ).mockImplementation(() => {
       throw new Error("EACCES");
     });
 
@@ -223,7 +241,9 @@ describe("copyResourceFiles", () => {
   });
 
   it("logs copied files when channel is provided", () => {
-    vi.mocked(fs.readdirSync).mockImplementation((dir) => {
+    (
+      vi.mocked(fs.readdirSync) as unknown as ReturnType<typeof vi.fn>
+    ).mockImplementation((dir) => {
       const d = String(dir);
       if (d === "/src") {
         return [
@@ -247,7 +267,9 @@ describe("copyResourceFiles", () => {
   });
 
   it("handles copyFileSync failure gracefully", () => {
-    vi.mocked(fs.readdirSync).mockImplementation((dir) => {
+    (
+      vi.mocked(fs.readdirSync) as unknown as ReturnType<typeof vi.fn>
+    ).mockImplementation((dir) => {
       const d = String(dir);
       if (d === "/src") {
         return [
@@ -270,7 +292,9 @@ describe("copyResourceFiles", () => {
 
   it("copies from multiple source paths", () => {
     vi.mocked(fs.copyFileSync).mockImplementation(() => {});
-    vi.mocked(fs.readdirSync).mockImplementation((dir) => {
+    (
+      vi.mocked(fs.readdirSync) as unknown as ReturnType<typeof vi.fn>
+    ).mockImplementation((dir) => {
       const d = String(dir);
       if (d === "/src1") {
         return [

@@ -13,6 +13,7 @@ describe("PropertiesViewProvider", () => {
       html: string;
       asWebviewUri: ReturnType<typeof vi.fn>;
       cspSource: string;
+      onDidReceiveMessage: ReturnType<typeof vi.fn>;
       postMessage: ReturnType<typeof vi.fn>;
     };
   };

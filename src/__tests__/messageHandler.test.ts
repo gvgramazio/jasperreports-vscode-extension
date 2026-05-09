@@ -32,14 +32,14 @@ const mockHandleExpressionEdit = vi.mocked(handleExpressionEdit);
 
 describe("handleWebviewMessage", () => {
   let tracker: NodeIdentityTracker;
-  let onRefresh: ReturnType<typeof vi.fn>;
-  let setEditInProgress: ReturnType<typeof vi.fn>;
+  let onRefresh: ReturnType<typeof vi.fn<() => void>>;
+  let setEditInProgress: ReturnType<typeof vi.fn<(value: boolean) => void>>;
 
   beforeEach(() => {
     vi.clearAllMocks();
     tracker = new NodeIdentityTracker();
-    onRefresh = vi.fn();
-    setEditInProgress = vi.fn();
+    onRefresh = vi.fn<() => void>();
+    setEditInProgress = vi.fn<(value: boolean) => void>();
   });
 
   function deps() {

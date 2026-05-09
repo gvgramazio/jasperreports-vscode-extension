@@ -32,5 +32,12 @@ export function getAttributeType(
   if (def.type === "enum" && def.enumValues) {
     return { type: "enum", enumValues: def.enumValues };
   }
-  return { type: def.type };
+  if (
+    def.type === "integer" ||
+    def.type === "decimal" ||
+    def.type === "color"
+  ) {
+    return { type: def.type };
+  }
+  return undefined;
 }
