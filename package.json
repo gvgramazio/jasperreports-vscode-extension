@@ -281,6 +281,7 @@
     "url": "https://github.com/gvgramazio/jasperreports-vscode-extension"
   },
   "scripts": {
+    "typecheck": "tsc --noEmit",
     "build": "node esbuild.mjs",
     "watch": "node esbuild.mjs --watch",
     "lint": "eslint .",
