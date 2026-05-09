@@ -17,13 +17,14 @@ vi.mock("fs", async (importOriginal) => {
 });
 
 vi.mock("../compiler", () => ({
-  resolveActiveJrxmlPath: vi.fn(),
+  getActiveJrxmlPath: vi.fn(),
   resolveJavaEnv: vi.fn(),
+  JR_COMPILER_CLASS: "JrCompiler",
 }));
 
 import { execFile } from "child_process";
 import * as fs from "fs";
-import { resolveActiveJrxmlPath, resolveJavaEnv } from "../compiler";
+import { getActiveJrxmlPath, resolveJavaEnv } from "../compiler";
 
 let mockContext: ReturnType<typeof createMockContext>;
 let previewManager: InstanceType<typeof import("../preview").PreviewManager>;
@@ -40,7 +41,7 @@ beforeEach(async () => {
 
 describe("PreviewManager", () => {
   it("returns early when no jrxml file is resolved", async () => {
-    vi.mocked(resolveActiveJrxmlPath).mockReturnValue(undefined);
+    vi.mocked(getActiveJrxmlPath).mockReturnValue(undefined);
 
     await previewManager.preview();
 
@@ -49,7 +50,7 @@ describe("PreviewManager", () => {
   });
 
   it("returns early when Java environment is not resolved", async () => {
-    vi.mocked(resolveActiveJrxmlPath).mockReturnValue("/test/report.jrxml");
+    vi.mocked(getActiveJrxmlPath).mockReturnValue("/test/report.jrxml");
     vi.mocked(resolveJavaEnv).mockResolvedValue(undefined);
 
     await previewManager.preview();
@@ -58,7 +59,7 @@ describe("PreviewManager", () => {
   });
 
   it("returns when user cancels data source prompt", async () => {
-    vi.mocked(resolveActiveJrxmlPath).mockReturnValue("/test/report.jrxml");
+    vi.mocked(getActiveJrxmlPath).mockReturnValue("/test/report.jrxml");
     vi.mocked(resolveJavaEnv).mockResolvedValue({
       javaPath: "/usr/bin/java",
       javaVersion: "17.0.2",
@@ -74,7 +75,7 @@ describe("PreviewManager", () => {
   });
 
   it("previews HTML successfully", async () => {
-    vi.mocked(resolveActiveJrxmlPath).mockReturnValue("/test/report.jrxml");
+    vi.mocked(getActiveJrxmlPath).mockReturnValue("/test/report.jrxml");
     vi.mocked(resolveJavaEnv).mockResolvedValue({
       javaPath: "/usr/bin/java",
       javaVersion: "17.0.2",
@@ -110,7 +111,7 @@ describe("PreviewManager", () => {
   });
 
   it("previews PDF by opening file in VS Code", async () => {
-    vi.mocked(resolveActiveJrxmlPath).mockReturnValue("/test/report.jrxml");
+    vi.mocked(getActiveJrxmlPath).mockReturnValue("/test/report.jrxml");
     vi.mocked(resolveJavaEnv).mockResolvedValue({
       javaPath: "/usr/bin/java",
       javaVersion: "17.0.2",
@@ -149,7 +150,7 @@ describe("PreviewManager", () => {
   });
 
   it("shows error when PDF exec fails with stderr", async () => {
-    vi.mocked(resolveActiveJrxmlPath).mockReturnValue("/test/report.jrxml");
+    vi.mocked(getActiveJrxmlPath).mockReturnValue("/test/report.jrxml");
     vi.mocked(resolveJavaEnv).mockResolvedValue({
       javaPath: "/usr/bin/java",
       javaVersion: "17.0.2",
@@ -184,7 +185,7 @@ describe("PreviewManager", () => {
   });
 
   it("shows error when PDF exec fails without stderr", async () => {
-    vi.mocked(resolveActiveJrxmlPath).mockReturnValue("/test/report.jrxml");
+    vi.mocked(getActiveJrxmlPath).mockReturnValue("/test/report.jrxml");
     vi.mocked(resolveJavaEnv).mockResolvedValue({
       javaPath: "/usr/bin/java",
       javaVersion: "17.0.2",
@@ -218,7 +219,7 @@ describe("PreviewManager", () => {
   });
 
   it("shows error when PDF output file is missing after exec", async () => {
-    vi.mocked(resolveActiveJrxmlPath).mockReturnValue("/test/report.jrxml");
+    vi.mocked(getActiveJrxmlPath).mockReturnValue("/test/report.jrxml");
     vi.mocked(resolveJavaEnv).mockResolvedValue({
       javaPath: "/usr/bin/java",
       javaVersion: "17.0.2",
@@ -254,7 +255,7 @@ describe("PreviewManager", () => {
   });
 
   it("logs stdout and stderr from PDF preview", async () => {
-    vi.mocked(resolveActiveJrxmlPath).mockReturnValue("/test/report.jrxml");
+    vi.mocked(getActiveJrxmlPath).mockReturnValue("/test/report.jrxml");
     vi.mocked(resolveJavaEnv).mockResolvedValue({
       javaPath: "/usr/bin/java",
       javaVersion: "17.0.2",
@@ -292,7 +293,7 @@ describe("PreviewManager", () => {
   });
 
   it("passes dataSource to PDF preview args", async () => {
-    vi.mocked(resolveActiveJrxmlPath).mockReturnValue("/test/report.jrxml");
+    vi.mocked(getActiveJrxmlPath).mockReturnValue("/test/report.jrxml");
     vi.mocked(resolveJavaEnv).mockResolvedValue({
       javaPath: "/usr/bin/java",
       javaVersion: "17.0.2",
@@ -339,7 +340,7 @@ describe("dispose", () => {
 
 describe("runPreview error handling", () => {
   it("shows error when execFile fails", async () => {
-    vi.mocked(resolveActiveJrxmlPath).mockReturnValue("/test/report.jrxml");
+    vi.mocked(getActiveJrxmlPath).mockReturnValue("/test/report.jrxml");
     vi.mocked(resolveJavaEnv).mockResolvedValue({
       javaPath: "/usr/bin/java",
       javaVersion: "17.0.2",
@@ -373,7 +374,7 @@ describe("runPreview error handling", () => {
   });
 
   it("shows error when execFile fails with only err.message (no stderr)", async () => {
-    vi.mocked(resolveActiveJrxmlPath).mockReturnValue("/test/report.jrxml");
+    vi.mocked(getActiveJrxmlPath).mockReturnValue("/test/report.jrxml");
     vi.mocked(resolveJavaEnv).mockResolvedValue({
       javaPath: "/usr/bin/java",
       javaVersion: "17.0.2",
@@ -405,7 +406,7 @@ describe("runPreview error handling", () => {
   });
 
   it("shows error when readFileSync throws after successful exec", async () => {
-    vi.mocked(resolveActiveJrxmlPath).mockReturnValue("/test/report.jrxml");
+    vi.mocked(getActiveJrxmlPath).mockReturnValue("/test/report.jrxml");
     vi.mocked(resolveJavaEnv).mockResolvedValue({
       javaPath: "/usr/bin/java",
       javaVersion: "17.0.2",
@@ -444,7 +445,7 @@ describe("runPreview error handling", () => {
 
 describe("showPreviewPanel", () => {
   it("reuses existing panel on second preview", async () => {
-    vi.mocked(resolveActiveJrxmlPath).mockReturnValue("/test/report.jrxml");
+    vi.mocked(getActiveJrxmlPath).mockReturnValue("/test/report.jrxml");
     vi.mocked(resolveJavaEnv).mockResolvedValue({
       javaPath: "/usr/bin/java",
       javaVersion: "17.0.2",
@@ -493,7 +494,7 @@ describe("showPreviewPanel", () => {
 
 describe("wrapHtml", () => {
   it("prepends style when HTML has no </head> tag", async () => {
-    vi.mocked(resolveActiveJrxmlPath).mockReturnValue("/test/report.jrxml");
+    vi.mocked(getActiveJrxmlPath).mockReturnValue("/test/report.jrxml");
     vi.mocked(resolveJavaEnv).mockResolvedValue({
       javaPath: "/usr/bin/java",
       javaVersion: "17.0.2",
@@ -534,7 +535,7 @@ describe("wrapHtml", () => {
 
 describe("setupLiveReload", () => {
   it("registers save listener when liveReload is enabled", async () => {
-    vi.mocked(resolveActiveJrxmlPath).mockReturnValue("/test/report.jrxml");
+    vi.mocked(getActiveJrxmlPath).mockReturnValue("/test/report.jrxml");
     vi.mocked(resolveJavaEnv).mockResolvedValue({
       javaPath: "/usr/bin/java",
       javaVersion: "17.0.2",
@@ -579,7 +580,7 @@ describe("setupLiveReload", () => {
 
 describe("data source logging", () => {
   it("logs data source path when provided", async () => {
-    vi.mocked(resolveActiveJrxmlPath).mockReturnValue("/test/report.jrxml");
+    vi.mocked(getActiveJrxmlPath).mockReturnValue("/test/report.jrxml");
     vi.mocked(resolveJavaEnv).mockResolvedValue({
       javaPath: "/usr/bin/java",
       javaVersion: "17.0.2",
@@ -622,7 +623,7 @@ describe("data source logging", () => {
 
 describe("onDidDispose", () => {
   it("clears panel on dispose", async () => {
-    vi.mocked(resolveActiveJrxmlPath).mockReturnValue("/test/report.jrxml");
+    vi.mocked(getActiveJrxmlPath).mockReturnValue("/test/report.jrxml");
     vi.mocked(resolveJavaEnv).mockResolvedValue({
       javaPath: "/usr/bin/java",
       javaVersion: "17.0.2",

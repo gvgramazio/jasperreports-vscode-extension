@@ -1,12 +1,14 @@
 import * as vscode from "vscode";
 import * as path from "path";
-import { resolveActiveJrxmlPath } from "./compiler";
+import { getActiveJrxmlPath } from "./compiler";
 import {
   type PreviewFormat,
   getPreviewConfig,
   setPreviewConfig,
   resolveFormat,
 } from "./previewConfig";
+
+const BROWSE_VALUE = "__browse__";
 
 interface DataSourceItem extends vscode.QuickPickItem {
   value: string | undefined;
@@ -36,7 +38,7 @@ export async function promptDataSource(
   items.push({
     label: "$(folder-opened) Choose file...",
     description: "Select a JSON, CSV, or XML data source file",
-    value: "__browse__",
+    value: BROWSE_VALUE,
   });
 
   const selected = await vscode.window.showQuickPick(items, {
@@ -47,7 +49,7 @@ export async function promptDataSource(
     return "cancelled";
   }
 
-  if (selected.value === "__browse__") {
+  if (selected.value === BROWSE_VALUE) {
     const uris = await vscode.window.showOpenDialog({
       canSelectMany: false,
       filters: { "Data Source Files": ["json", "csv", "xml"] },
@@ -100,7 +102,7 @@ export async function promptFormat(
 export async function configurePreview(
   context: vscode.ExtensionContext,
 ): Promise<void> {
-  const filePath = resolveActiveJrxmlPath();
+  const filePath = getActiveJrxmlPath();
   if (!filePath) return;
 
   const existing = getPreviewConfig(context, filePath);

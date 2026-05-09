@@ -6,11 +6,13 @@ import { getOutputChannel } from "./logger";
 import { runJava } from "./java-runner";
 import { getClasspath, getSourcePaths } from "./config";
 
+export const JR_COMPILER_CLASS = "JrCompiler";
+
 /**
  * Resolves the active .jrxml file path from an explicit argument or the active editor.
  * Shows an error message and returns undefined if no .jrxml file is available.
  */
-export function resolveActiveJrxmlPath(jrxmlPath?: string): string | undefined {
+export function getActiveJrxmlPath(jrxmlPath?: string): string | undefined {
   const filePath =
     jrxmlPath ?? vscode.window.activeTextEditor?.document.fileName;
   if (!filePath || !filePath.endsWith(".jrxml")) {
@@ -107,7 +109,7 @@ export async function compileReport(
   extensionPath: string,
   jrxmlPath?: string,
 ): Promise<void> {
-  const filePath = resolveActiveJrxmlPath(jrxmlPath);
+  const filePath = getActiveJrxmlPath(jrxmlPath);
   if (!filePath) return;
 
   const env = await resolveJavaEnv(extensionPath);
@@ -131,7 +133,7 @@ export async function compileReport(
         const result = await runJava({
           javaPath: env.javaPath,
           classpath: env.classpath,
-          args: ["JrCompiler", "compile", filePath],
+          args: [JR_COMPILER_CLASS, "compile", filePath],
           cwd: path.dirname(filePath),
         });
 
