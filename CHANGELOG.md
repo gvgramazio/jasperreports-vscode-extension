@@ -1,3 +1,10 @@
+# [2.3.0](https://github.com/gvgramazio/jasperreports-vscode-extension/compare/v2.2.1...v2.3.0) (2026-05-09)
+
+
+### Features
+
+* add typecheck step to CI and script for TypeScript type checking ([c90c5e6](https://github.com/gvgramazio/jasperreports-vscode-extension/commit/c90c5e64f409d65967ccb71ce8185f1ac5e0a5f9))
+
 ## [2.2.1](https://github.com/gvgramazio/jasperreports-vscode-extension/compare/v2.2.0...v2.2.1) (2026-05-08)
 
 
