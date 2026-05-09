@@ -73,6 +73,53 @@ export function getPropertiesHtml(
     .edit-input.invalid {
       border-color: var(--vscode-inputValidation-errorBorder);
     }
+    .expr-wrapper {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      width: 100%;
+    }
+    .edit-expression {
+      width: 100%;
+      box-sizing: border-box;
+      background: var(--vscode-input-background);
+      color: var(--vscode-input-foreground);
+      border: 1px solid var(--vscode-input-border, transparent);
+      padding: 2px 4px;
+      font-family: var(--vscode-editor-font-family, monospace);
+      font-size: var(--vscode-font-size);
+      resize: vertical;
+      min-height: 2.4em;
+    }
+    .edit-expression:focus {
+      outline: 1px solid var(--vscode-focusBorder);
+    }
+    .edit-expression.dirty {
+      border-left: 2px solid var(--vscode-focusBorder);
+    }
+    .edit-expression.applied {
+      background-color: var(--vscode-diffEditor-insertedTextBackground);
+    }
+    .edit-expression.expanded {
+      min-height: 8em;
+    }
+    .expr-toolbar {
+      display: flex;
+      justify-content: flex-end;
+      gap: 4px;
+    }
+    .expr-toolbar-btn {
+      background: none;
+      border: none;
+      color: var(--vscode-descriptionForeground);
+      cursor: pointer;
+      font-size: 11px;
+      padding: 0 2px;
+      font-family: var(--vscode-font-family);
+    }
+    .expr-toolbar-btn:hover {
+      color: var(--vscode-foreground);
+    }
     .color-wrapper {
       display: flex;
       align-items: center;
@@ -217,9 +264,13 @@ function renderInputCell(e: PropertyEntry): string {
 
 function renderExpressionCell(e: PropertyEntry): string {
   return `<vscode-table-cell class="value-cell">
-              <input class="edit-input edit-expression" type="text"
-                value="${escapeHtml(e.value)}"
-                data-expr-tag="${escapeHtml(e.name)}" />
+              <div class="expr-wrapper">
+                <textarea class="edit-expression" rows="2"
+                  data-expr-tag="${escapeHtml(e.name)}">${escapeHtml(e.value)}</textarea>
+                <div class="expr-toolbar">
+                  <button class="expr-toolbar-btn expr-expand-btn" type="button" title="Expand / Collapse">Expand</button>
+                </div>
+              </div>
             </vscode-table-cell>`;
 }
 

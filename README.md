@@ -115,7 +115,7 @@ A webview panel below the Report Outline showing detailed properties for the sel
 - **Model-driven groups** — for elements with a registered model definition, properties are organized into semantic groups (Report Element, Font, Text Alignment, Hyperlink, etc.) derived from the element schema rather than a flat attribute list
 - **Full schema view** — all attributes defined in the model are shown, including those not yet present in the file; absent attributes appear dimmed (0.5 opacity) with empty values
 - **Attributes** — all element attributes in a tabular view, **editable inline** (blur or Enter commits, Escape reverts); enum attributes use dropdown selectors; color attributes include a visual color picker; boolean attributes use three-state checkboxes (checked/unchecked/indeterminate); clearing a present attribute to blank removes it from the XML; setting a value on an absent attribute adds it to the XML; `uuid` is read-only
-- **Expressions** — expression content (e.g. `expression`, `imageExpression`) **editable inline** for model-driven elements; editing an existing expression updates its CDATA content, clearing removes the child element, and typing into an absent expression creates a new child element with CDATA wrapping
+- **Expressions** — expression content (e.g. `expression`, `imageExpression`) editable in a **multi-line textarea** for model-driven elements; a toggle button expands or collapses the textarea for longer expressions; **Ctrl+Enter** (Cmd+Enter on Mac) or blur commits, **Escape** reverts; editing an existing expression updates its CDATA content, clearing removes the child element, and typing into an absent expression creates a new child element with CDATA wrapping
 - **Box & Pen** — border and line properties including per-side pen attributes
 - **Legacy fallback** — elements not yet in the model registry display the original flat layout (Attributes, Expressions, Style, Report Element groups)
 - Automatically updates when selecting a different node in the outline tree
@@ -138,6 +138,7 @@ Context menu actions available on tree items:
 - **Dirty indicator** — a left border accent appears while you are typing an uncommitted change
 - **Applied indicator** — a subtle background tint marks values that have been applied but not yet saved to disk
 - **Input validation** — attributes with known types (integer, decimal, boolean, color) are validated as you type; invalid values are highlighted with an error border
+- **Keyboard shortcuts** — attributes commit on **Enter** or blur; expressions commit on **Ctrl+Enter** (Cmd+Enter on Mac) or blur, so that Enter can insert newlines; **Escape** reverts in both cases
 
 ## Installation
 

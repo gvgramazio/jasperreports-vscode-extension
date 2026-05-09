@@ -305,25 +305,25 @@ function setupEditListeners(): void {
       });
     });
 
-  // Expression inputs: inline editing for expression child elements
+  // Expression textareas: multi-line editing for expression child elements
   document
-    .querySelectorAll<HTMLInputElement>(".edit-expression")
-    .forEach((input) => {
-      const originalValue = input.value;
+    .querySelectorAll<HTMLTextAreaElement>(".edit-expression")
+    .forEach((textarea) => {
+      const originalValue = textarea.value;
 
-      input.addEventListener("input", () => {
-        input.classList.toggle("dirty", input.value !== originalValue);
-        input.classList.remove("applied");
+      textarea.addEventListener("input", () => {
+        textarea.classList.toggle("dirty", textarea.value !== originalValue);
+        textarea.classList.remove("applied");
       });
 
       const commit = () => {
-        const newValue = input.value;
+        const newValue = textarea.value;
         if (newValue === originalValue) {
-          input.classList.remove("dirty");
+          textarea.classList.remove("dirty");
           return;
         }
 
-        const exprTag = input.dataset.exprTag;
+        const exprTag = textarea.dataset.exprTag;
         if (!exprTag) return;
 
         vscode.postMessage({
@@ -331,20 +331,34 @@ function setupEditListeners(): void {
           expressionTag: exprTag,
           value: newValue,
         });
-        input.classList.remove("dirty");
-        input.classList.add("applied");
+        textarea.classList.remove("dirty");
+        textarea.classList.add("applied");
       };
 
-      input.addEventListener("blur", commit);
-      input.addEventListener("keydown", (e: KeyboardEvent) => {
-        if (e.key === "Enter") {
+      textarea.addEventListener("blur", commit);
+      textarea.addEventListener("keydown", (e: KeyboardEvent) => {
+        if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) {
           e.preventDefault();
           commit();
         } else if (e.key === "Escape") {
-          input.value = originalValue;
-          input.classList.remove("dirty", "applied");
-          input.blur();
+          textarea.value = originalValue;
+          textarea.classList.remove("dirty", "applied");
+          textarea.blur();
         }
+      });
+    });
+
+  // Expand/Collapse buttons for expression textareas
+  document
+    .querySelectorAll<HTMLButtonElement>(".expr-expand-btn")
+    .forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const wrapper = btn.closest(".expr-wrapper");
+        const textarea =
+          wrapper?.querySelector<HTMLTextAreaElement>(".edit-expression");
+        if (!textarea) return;
+        const isExpanded = textarea.classList.toggle("expanded");
+        btn.textContent = isExpanded ? "Collapse" : "Expand";
       });
     });
 
