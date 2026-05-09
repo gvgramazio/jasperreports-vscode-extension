@@ -113,7 +113,6 @@ export function parseJrxml(text: string): JrxmlDocument {
   parser.on("error", () => {
     // Gracefully ignore parse errors — return whatever was built so far
     hasErrors = true;
-    parser.resume();
   });
 
   try {

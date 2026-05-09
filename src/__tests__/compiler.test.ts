@@ -79,8 +79,10 @@ describe("compileReport", () => {
 
   it("shows error when active file is not jrxml", async () => {
     vscode.window.activeTextEditor = {
-      document: { fileName: "/test/file.xml" },
-    };
+      document: {
+        fileName: "/test/file.xml",
+      } as unknown as vscode.TextDocument,
+    } as unknown as vscode.TextEditor;
 
     const { compileReport } = await import("../compiler");
     await compileReport("/ext");

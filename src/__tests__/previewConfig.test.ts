@@ -7,7 +7,7 @@ let mockContext: ReturnType<typeof createMockContext>;
 beforeEach(() => {
   vi.clearAllMocks();
   mockContext = createMockContext();
-  vscode.workspace.workspaceFolders = [
+  (vscode.workspace as { workspaceFolders: unknown }).workspaceFolders = [
     { uri: { fsPath: "/workspace" }, name: "workspace", index: 0 },
   ];
 });
@@ -161,8 +161,10 @@ describe("configurePreview", () => {
 
   it("shows error when active file is not jrxml", async () => {
     vscode.window.activeTextEditor = {
-      document: { fileName: "/test/file.xml" },
-    };
+      document: {
+        fileName: "/test/file.xml",
+      } as unknown as vscode.TextDocument,
+    } as unknown as vscode.TextEditor;
 
     const { configurePreview } = await import("../previewConfigUI");
     await configurePreview(mockContext as unknown as vscode.ExtensionContext);
@@ -174,8 +176,10 @@ describe("configurePreview", () => {
 
   it("returns when user cancels data source prompt", async () => {
     vscode.window.activeTextEditor = {
-      document: { fileName: "/workspace/report.jrxml" },
-    };
+      document: {
+        fileName: "/workspace/report.jrxml",
+      } as unknown as vscode.TextDocument,
+    } as unknown as vscode.TextEditor;
     vi.mocked(vscode.window.showQuickPick).mockResolvedValue(undefined);
 
     const { configurePreview } = await import("../previewConfigUI");
@@ -186,8 +190,10 @@ describe("configurePreview", () => {
 
   it("returns when user cancels format prompt", async () => {
     vscode.window.activeTextEditor = {
-      document: { fileName: "/workspace/report.jrxml" },
-    };
+      document: {
+        fileName: "/workspace/report.jrxml",
+      } as unknown as vscode.TextDocument,
+    } as unknown as vscode.TextEditor;
     // First showQuickPick → data source selection
     vi.mocked(vscode.window.showQuickPick)
       .mockResolvedValueOnce({
@@ -205,8 +211,10 @@ describe("configurePreview", () => {
 
   it("saves config and shows success message", async () => {
     vscode.window.activeTextEditor = {
-      document: { fileName: "/workspace/report.jrxml" },
-    };
+      document: {
+        fileName: "/workspace/report.jrxml",
+      } as unknown as vscode.TextDocument,
+    } as unknown as vscode.TextEditor;
     vi.mocked(vscode.window.showQuickPick)
       .mockResolvedValueOnce({
         label: "Empty",

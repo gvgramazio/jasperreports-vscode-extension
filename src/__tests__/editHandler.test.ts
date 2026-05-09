@@ -524,7 +524,9 @@ describe("handleAddAttribute", () => {
     const entries = editArg.entries();
     const edits = entries[0][1];
     // Insert position should be just before '/>'
-    expect(edits[0].position!.character).toBe(15); // position of '/'
+    expect(
+      (edits[0] as unknown as { position: vscode.Position }).position.character,
+    ).toBe(15); // position of '/'
     expect(edits[0].newText).toBe(' y="20"');
   });
 
@@ -541,7 +543,9 @@ describe("handleAddAttribute", () => {
     const entries = editArg.entries();
     const edits = entries[0][1];
     // Insert position should be just before '>'
-    expect(edits[0].position!.character).toBe(15); // position of '>'
+    expect(
+      (edits[0] as unknown as { position: vscode.Position }).position.character,
+    ).toBe(15); // position of '>'
     expect(edits[0].newText).toBe(' width="100"');
   });
 
@@ -558,7 +562,9 @@ describe("handleAddAttribute", () => {
     const entries = editArg.entries();
     const edits = entries[0][1];
     // Insert before '/'
-    expect(edits[0].position!.character).toBe(8); // position of '/'
+    expect(
+      (edits[0] as unknown as { position: vscode.Position }).position.character,
+    ).toBe(8); // position of '/'
     expect(edits[0].newText).toBe(' x="5"');
   });
 

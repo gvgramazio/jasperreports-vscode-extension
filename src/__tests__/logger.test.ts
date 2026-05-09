@@ -10,7 +10,7 @@ beforeEach(() => {
         appendLine: vi.fn(),
         show: vi.fn(),
         dispose: vi.fn(),
-      }) as unknown as vscode.OutputChannel,
+      }) as unknown as vscode.LogOutputChannel,
   );
 });
 

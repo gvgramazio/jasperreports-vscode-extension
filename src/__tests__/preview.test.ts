@@ -119,7 +119,7 @@ describe("PreviewManager", () => {
     });
 
     // Set up existing config with PDF format
-    vscode.workspace.workspaceFolders = [
+    (vscode.workspace as { workspaceFolders: unknown }).workspaceFolders = [
       { uri: { fsPath: "/test" }, name: "test", index: 0 },
     ];
     const ctx = mockContext as unknown as vscode.ExtensionContext;
@@ -157,7 +157,7 @@ describe("PreviewManager", () => {
       classpath: "/cp/jr.jar",
     });
 
-    vscode.workspace.workspaceFolders = [
+    (vscode.workspace as { workspaceFolders: unknown }).workspaceFolders = [
       { uri: { fsPath: "/test" }, name: "test", index: 0 },
     ];
     const ctx = mockContext as unknown as vscode.ExtensionContext;
@@ -192,7 +192,7 @@ describe("PreviewManager", () => {
       classpath: "/cp/jr.jar",
     });
 
-    vscode.workspace.workspaceFolders = [
+    (vscode.workspace as { workspaceFolders: unknown }).workspaceFolders = [
       { uri: { fsPath: "/test" }, name: "test", index: 0 },
     ];
     const ctx = mockContext as unknown as vscode.ExtensionContext;
@@ -226,7 +226,7 @@ describe("PreviewManager", () => {
       classpath: "/cp/jr.jar",
     });
 
-    vscode.workspace.workspaceFolders = [
+    (vscode.workspace as { workspaceFolders: unknown }).workspaceFolders = [
       { uri: { fsPath: "/test" }, name: "test", index: 0 },
     ];
     const ctx = mockContext as unknown as vscode.ExtensionContext;
@@ -262,7 +262,7 @@ describe("PreviewManager", () => {
       classpath: "/cp/jr.jar",
     });
 
-    vscode.workspace.workspaceFolders = [
+    (vscode.workspace as { workspaceFolders: unknown }).workspaceFolders = [
       { uri: { fsPath: "/test" }, name: "test", index: 0 },
     ];
     const ctx = mockContext as unknown as vscode.ExtensionContext;
@@ -300,7 +300,7 @@ describe("PreviewManager", () => {
       classpath: "/cp/jr.jar",
     });
 
-    vscode.workspace.workspaceFolders = [
+    (vscode.workspace as { workspaceFolders: unknown }).workspaceFolders = [
       { uri: { fsPath: "/test" }, name: "test", index: 0 },
     ];
     const ctx = mockContext as unknown as vscode.ExtensionContext;

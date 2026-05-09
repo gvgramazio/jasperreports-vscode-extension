@@ -67,7 +67,11 @@ describe("downloadDependencies", () => {
 
   it("downloads successfully and updates classpath", async () => {
     vi.mocked(vscode.workspace).workspaceFolders = [
-      { uri: { fsPath: "/workspace" }, name: "ws", index: 0 },
+      {
+        uri: { fsPath: "/workspace" } as unknown as vscode.Uri,
+        name: "ws",
+        index: 0,
+      },
     ];
 
     const mockGet = vi.fn((key: string, defaultValue?: unknown) => {
@@ -135,7 +139,11 @@ describe("downloadDependencies", () => {
 
   it("does not duplicate classpath when glob already exists", async () => {
     vi.mocked(vscode.workspace).workspaceFolders = [
-      { uri: { fsPath: "/workspace" }, name: "ws", index: 0 },
+      {
+        uri: { fsPath: "/workspace" } as unknown as vscode.Uri,
+        name: "ws",
+        index: 0,
+      },
     ];
 
     const existingGlob = "/workspace/.jasperreports/*";
@@ -170,7 +178,11 @@ describe("downloadDependencies", () => {
 
   it("rejects when Maven fails", async () => {
     vi.mocked(vscode.workspace).workspaceFolders = [
-      { uri: { fsPath: "/workspace" }, name: "ws", index: 0 },
+      {
+        uri: { fsPath: "/workspace" } as unknown as vscode.Uri,
+        name: "ws",
+        index: 0,
+      },
     ];
 
     vi.mocked(vscode.workspace.getConfiguration).mockReturnValue({
@@ -194,11 +206,12 @@ describe("downloadDependencies", () => {
     );
 
     // withProgress will invoke the task, which calls runMavenDownload, which rejects
-    vi.mocked(vscode.window.withProgress).mockImplementation(
-      async (_opts: unknown, task: (progress: unknown) => Promise<unknown>) => {
-        await expect(task({ report: vi.fn() })).rejects.toThrow("Maven failed");
-      },
-    );
+    vi.mocked(vscode.window.withProgress).mockImplementation((async (
+      _opts: unknown,
+      task: (progress: unknown) => Promise<unknown>,
+    ) => {
+      await expect(task({ report: vi.fn() })).rejects.toThrow("Maven failed");
+    }) as unknown as typeof vscode.window.withProgress);
 
     const { downloadDependencies } = await import("../dependencies");
     await downloadDependencies();

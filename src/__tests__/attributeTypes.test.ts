@@ -73,9 +73,9 @@ describe("getAttributeType", () => {
     expect(result?.enumValues).toContain("Report");
   });
 
-  it("returns string type as-is (no special treatment)", () => {
+  it("returns undefined for string type (no special treatment)", () => {
     const result = getAttributeType("element", "pattern", "textField");
-    expect(result).toEqual({ type: "string" });
+    expect(result).toBeUndefined();
   });
 
   it("returns enum for positionType on element", () => {
