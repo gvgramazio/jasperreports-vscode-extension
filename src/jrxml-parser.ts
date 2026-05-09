@@ -48,6 +48,7 @@ export function parseJrxml(text: string): JrxmlDocument {
   parser.on("opentag", (node) => {
     const attrs: Record<string, string> = {};
     for (const [key, value] of Object.entries(node.attributes)) {
+      // Safe: xmlns:false guarantees string values (saxes types don't narrow this)
       attrs[key] = value as string;
     }
 

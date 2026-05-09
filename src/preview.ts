@@ -2,7 +2,11 @@ import * as vscode from "vscode";
 import * as path from "path";
 import * as fs from "fs";
 import * as os from "os";
-import { resolveActiveJrxmlPath, resolveJavaEnv } from "./compiler";
+import {
+  getActiveJrxmlPath,
+  resolveJavaEnv,
+  JR_COMPILER_CLASS,
+} from "./compiler";
 import { cleanupTempDir } from "./java-sources";
 import { getOutputChannel } from "./logger";
 import { runJava } from "./java-runner";
@@ -27,7 +31,7 @@ export class PreviewManager implements vscode.Disposable {
     viewColumn: vscode.ViewColumn = vscode.ViewColumn.Active,
     jrxmlPath?: string,
   ): Promise<void> {
-    const filePath = resolveActiveJrxmlPath(jrxmlPath);
+    const filePath = getActiveJrxmlPath(jrxmlPath);
     if (!filePath) return;
 
     const env = await resolveJavaEnv(this.context.extensionPath);
@@ -176,7 +180,7 @@ async function runPreview(
   const tmpDir = os.tmpdir();
   const outputFile = path.join(tmpDir, `jr-preview-${Date.now()}.html`);
 
-  const args = ["JrCompiler", "preview", jrxmlPath, outputFile, format];
+  const args = [JR_COMPILER_CLASS, "preview", jrxmlPath, outputFile, format];
   if (dataSourcePath) {
     args.push(dataSourcePath);
   }
@@ -218,7 +222,7 @@ async function runPdfPreview(
   const tmpDir = os.tmpdir();
   const outputFile = path.join(tmpDir, `jr-preview-${Date.now()}.pdf`);
 
-  const args = ["JrCompiler", "preview", jrxmlPath, outputFile, "pdf"];
+  const args = [JR_COMPILER_CLASS, "preview", jrxmlPath, outputFile, "pdf"];
   if (dataSourcePath) {
     args.push(dataSourcePath);
   }

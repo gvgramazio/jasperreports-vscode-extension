@@ -106,7 +106,7 @@ function registerOutlineView(context: vscode.ExtensionContext): void {
     treeView.onDidChangeSelection((e) => {
       const selected = e.selection[0];
       if (selected) {
-        propertiesProvider.update(selected.node, selected.label as string);
+        propertiesProvider.update(selected.node, selected.label);
       } else {
         propertiesProvider.update(null, "");
       }
