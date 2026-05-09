@@ -276,6 +276,7 @@ function renderExpressionCell(e: PropertyEntry): string {
                 <textarea class="edit-expression" rows="2"
                   data-expr-tag="${escapeHtml(e.name)}">${escapeHtml(e.value)}</textarea>
                 <div class="expr-toolbar">
+                  <button class="expr-toolbar-btn expr-open-editor-btn" type="button" data-expr-tag="${escapeHtml(e.name)}" title="Open in Editor">Open in Editor</button>
                   <button class="expr-toolbar-btn expr-expand-btn" type="button" title="Expand / Collapse">Expand</button>
                 </div>
               </div>

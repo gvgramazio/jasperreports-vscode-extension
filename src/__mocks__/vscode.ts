@@ -10,7 +10,20 @@ export const workspace = {
   }),
   onDidChangeTextDocument: vi.fn().mockReturnValue({ dispose: vi.fn() }),
   onDidSaveTextDocument: vi.fn().mockReturnValue({ dispose: vi.fn() }),
+  onWillSaveTextDocument: vi.fn().mockReturnValue({ dispose: vi.fn() }),
   applyEdit: vi.fn().mockResolvedValue(true),
+  registerTextDocumentContentProvider: vi
+    .fn()
+    .mockReturnValue({ dispose: vi.fn() }),
+  registerFileSystemProvider: vi.fn().mockReturnValue({ dispose: vi.fn() }),
+  openTextDocument: vi.fn().mockResolvedValue({
+    uri: { scheme: "jrexpr", toString: () => "jrexpr:/test" },
+    getText: () => "",
+  }),
+  textDocuments: [] as Array<{
+    uri: { toString: () => string };
+    getText: () => string;
+  }>,
 };
 
 export const window = {
@@ -55,11 +68,16 @@ export const window = {
   showQuickPick: vi.fn().mockResolvedValue(undefined),
   showInputBox: vi.fn().mockResolvedValue(undefined),
   showOpenDialog: vi.fn().mockResolvedValue(undefined),
+  showTextDocument: vi.fn().mockResolvedValue(undefined),
   onDidChangeActiveTextEditor: vi.fn().mockReturnValue({ dispose: vi.fn() }),
 };
 
 export const extensions = {
   getExtension: vi.fn().mockReturnValue(undefined),
+};
+
+export const languages = {
+  setTextDocumentLanguage: vi.fn().mockResolvedValue(undefined),
 };
 
 export const commands = {
@@ -74,6 +92,20 @@ export const Uri = {
     const joined = [base.fsPath, ...segments].join("/");
     return { fsPath: joined, toString: () => `file://${joined}` };
   },
+  from: (components: {
+    scheme: string;
+    path?: string;
+    query?: string;
+    fragment?: string;
+  }) => ({
+    scheme: components.scheme,
+    path: components.path ?? "",
+    query: components.query ?? "",
+    fragment: components.fragment ?? "",
+    fsPath: components.path ?? "",
+    toString: () =>
+      `${components.scheme}:${components.path ?? ""}${components.query ? `?${components.query}` : ""}`,
+  }),
 };
 
 export enum ConfigurationTarget {
@@ -94,6 +126,19 @@ export enum ViewColumn {
   One = 1,
   Two = 2,
   Three = 3,
+}
+
+export enum FileType {
+  Unknown = 0,
+  File = 1,
+  Directory = 2,
+  SymbolicLink = 64,
+}
+
+export enum FileChangeType {
+  Changed = 1,
+  Created = 2,
+  Deleted = 3,
 }
 
 export enum TreeItemCollapsibleState {

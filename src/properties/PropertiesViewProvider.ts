@@ -1,6 +1,7 @@
 import * as vscode from "vscode";
 import { getExpressionEnterBehavior } from "../config";
 import { JrxmlNode, parseJrxml } from "../jrxml-parser";
+import { ExpressionEditorProvider } from "./expressionEditorProvider";
 import { formatNodeProperties } from "./formatNode";
 import { getPropertiesHtml } from "./getPropertiesHtml";
 import { NodeIdentityTracker, findNodeByIdentity } from "./nodeIdentity";
@@ -13,6 +14,7 @@ export class PropertiesViewProvider implements vscode.WebviewViewProvider {
   private _extensionUri: vscode.Uri;
   private _editInProgress = false;
   private _tracker = new NodeIdentityTracker();
+  expressionEditorProvider?: ExpressionEditorProvider;
 
   constructor(extensionUri: vscode.Uri) {
     this._extensionUri = extensionUri;
@@ -37,6 +39,7 @@ export class PropertiesViewProvider implements vscode.WebviewViewProvider {
         setEditInProgress: (v) => {
           this._editInProgress = v;
         },
+        expressionEditorProvider: this.expressionEditorProvider,
       });
     });
 

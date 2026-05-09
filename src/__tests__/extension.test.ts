@@ -228,6 +228,16 @@ describe("extension", () => {
     );
   });
 
+  it("registers expression editor content provider", async () => {
+    const context = createContext();
+    await extension.activate(context);
+
+    expect(vscode.workspace.registerFileSystemProvider).toHaveBeenCalledWith(
+      "jrexpr",
+      expect.anything(),
+    );
+  });
+
   it("invokes command callbacks correctly", async () => {
     const context = createContext();
     await extension.activate(context);
