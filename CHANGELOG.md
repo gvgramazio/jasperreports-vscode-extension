@@ -1,3 +1,11 @@
+# [2.4.0](https://github.com/gvgramazio/jasperreports-vscode-extension/compare/v2.3.0...v2.4.0) (2026-05-09)
+
+
+### Features
+
+* add expression.enterBehavior setting for Enter key behavior ([7972da4](https://github.com/gvgramazio/jasperreports-vscode-extension/commit/7972da465d24a91ad5cfd6a10e5b84893e6770a9))
+* multi-line textarea with expand/collapse for expression editing ([0cd54a0](https://github.com/gvgramazio/jasperreports-vscode-extension/commit/0cd54a0cc19d9c6f5e0ec06830b4ede04c0f4550)), closes [#63](https://github.com/gvgramazio/jasperreports-vscode-extension/issues/63)
+
 # [2.3.0](https://github.com/gvgramazio/jasperreports-vscode-extension/compare/v2.2.1...v2.3.0) (2026-05-09)
 
 
