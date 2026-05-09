@@ -1,4 +1,5 @@
 import * as vscode from "vscode";
+import { getExpressionEnterBehavior } from "../config";
 import { JrxmlNode, parseJrxml } from "../jrxml-parser";
 import { formatNodeProperties } from "./formatNode";
 import { getPropertiesHtml } from "./getPropertiesHtml";
@@ -59,6 +60,7 @@ export class PropertiesViewProvider implements vscode.WebviewViewProvider {
       this._extensionUri,
       groups,
       label,
+      { expressionEnterBehavior: getExpressionEnterBehavior() },
     );
   }
 
@@ -84,6 +86,7 @@ export class PropertiesViewProvider implements vscode.WebviewViewProvider {
         this._extensionUri,
         groups,
         this._tracker.current.label,
+        { expressionEnterBehavior: getExpressionEnterBehavior() },
       );
     }
   }
@@ -95,6 +98,7 @@ export class PropertiesViewProvider implements vscode.WebviewViewProvider {
       this._extensionUri,
       [],
       "",
+      { expressionEnterBehavior: getExpressionEnterBehavior() },
     );
   }
 }

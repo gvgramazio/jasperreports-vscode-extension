@@ -306,6 +306,9 @@ function setupEditListeners(): void {
     });
 
   // Expression textareas: multi-line editing for expression child elements
+  const enterBehavior =
+    document.body.dataset.exprEnter === "newline" ? "newline" : "commit";
+
   document
     .querySelectorAll<HTMLTextAreaElement>(".edit-expression")
     .forEach((textarea) => {
@@ -338,6 +341,13 @@ function setupEditListeners(): void {
       textarea.addEventListener("blur", commit);
       textarea.addEventListener("keydown", (e: KeyboardEvent) => {
         if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) {
+          e.preventDefault();
+          commit();
+        } else if (
+          e.key === "Enter" &&
+          !e.shiftKey &&
+          enterBehavior === "commit"
+        ) {
           e.preventDefault();
           commit();
         } else if (e.key === "Escape") {

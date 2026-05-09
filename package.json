@@ -272,6 +272,19 @@
           "type": "boolean",
           "default": false,
           "description": "Automatically re-run preview when the JRXML file is saved."
+        },
+        "jasperreports.expression.enterBehavior": {
+          "type": "string",
+          "default": "commit",
+          "enum": [
+            "commit",
+            "newline"
+          ],
+          "enumDescriptions": [
+            "Enter commits the expression. Shift+Enter inserts a newline. Ctrl+Enter / Cmd+Enter also commits.",
+            "Enter inserts a newline. Ctrl+Enter / Cmd+Enter commits. Shift+Enter also inserts a newline."
+          ],
+          "description": "Controls what the Enter key does inside expression textareas in the Properties panel."
         }
       }
     }
