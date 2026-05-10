@@ -122,6 +122,7 @@ describe("ExpressionEditorProvider", () => {
       expect.objectContaining({ tag: "element" }),
       "expression",
       "$F{newField}",
+      expect.objectContaining({ getText: expect.any(Function) }),
     );
   });
 

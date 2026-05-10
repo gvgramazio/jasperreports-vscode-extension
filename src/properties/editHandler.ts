@@ -162,16 +162,20 @@ export async function handleAddAttribute(
 /**
  * Handles adding, updating, or removing an expression child element.
  * Re-parses positions from the live document to avoid stale data.
+ * If no document is provided, uses the active text editor's document.
  */
 export async function handleExpressionEdit(
   node: JrxmlNode,
   expressionTag: string,
   value: string,
+  document?: vscode.TextDocument,
 ): Promise<boolean> {
-  const editor = vscode.window.activeTextEditor;
-  if (!editor) return false;
+  if (!document) {
+    const editor = vscode.window.activeTextEditor;
+    if (!editor) return false;
+    document = editor.document;
+  }
 
-  const document = editor.document;
   const text = document.getText();
 
   const child = node.children.find((c) => c.tag === expressionTag);
