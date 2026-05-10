@@ -138,7 +138,7 @@ export class ExpressionEditorProvider implements vscode.FileSystemProvider {
     const node = findNodeByIdentity(parsed.root, state.identity);
     if (!node) return;
 
-    await handleExpressionEdit(node, state.expressionTag, newValue);
+    await handleExpressionEdit(node, state.expressionTag, newValue, sourceDoc);
   }
 
   private _findNode(state: ExpressionDocState): JrxmlNode | null {
