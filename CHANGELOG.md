@@ -1,3 +1,15 @@
+# [2.5.0](https://github.com/gvgramazio/jasperreports-vscode-extension/compare/v2.4.0...v2.5.0) (2026-05-10)
+
+
+### Bug Fixes
+
+* save-back from expression editor ([#64](https://github.com/gvgramazio/jasperreports-vscode-extension/issues/64)) ([f6ff745](https://github.com/gvgramazio/jasperreports-vscode-extension/commit/f6ff7454afa2450a5106e60b44b4f2cbc5734bf9))
+
+
+### Features
+
+* open in editor for expressions via virtual document ([#64](https://github.com/gvgramazio/jasperreports-vscode-extension/issues/64)) ([04b4f1a](https://github.com/gvgramazio/jasperreports-vscode-extension/commit/04b4f1aab289f19d497653fe402e5dcd689eecb7))
+
 # [2.4.0](https://github.com/gvgramazio/jasperreports-vscode-extension/compare/v2.3.0...v2.4.0) (2026-05-09)
 
 
