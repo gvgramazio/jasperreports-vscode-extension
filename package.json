@@ -316,7 +316,7 @@
     "@semantic-release/exec": "^7.1.0",
     "@semantic-release/git": "^11.0.1",
     "@types/node": "^22.19.18",
-    "@types/vscode": "~1.110.0",
+    "@types/vscode": "~1.136.0",
     "@vitest/coverage-v8": "^4.1.5",
     "@vscode/vsce": "^3.9.2",
     "esbuild": "^0.28.2",
